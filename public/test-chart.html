@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart.js Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <h1>Chart.js Test</h1>
+    <canvas id="testChart" width="800" height="400"></canvas>
+
+    <script>
+        console.log('%c🧪 Testing Chart.js...', 'color: blue; font-weight: bold;');
+
+        // Test 1: Check if Chart.js loaded
+        if (typeof Chart !== 'undefined') {
+            console.log('%c✅ Chart.js v' + Chart.version + ' loaded successfully', 'color: green;');
+        } else {
+            console.error('%c❌ Chart.js not loaded', 'color: red;');
+        }
+
+        // Test 2: Create a simple test chart
+        try {
+            const ctx = document.getElementById('testChart');
+
+            const testChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Test Data',
+                        data: [10, 20, 15, 25, 30, 22],
+                        borderColor: '#1cc88a',
+                        backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            console.log('%c✅ Test chart created successfully', 'color: green; font-weight: bold;');
+        } catch (error) {
+            console.error('%c❌ Error creating test chart:', 'color: red;', error);
+        }
+    </script>
+</body>
+</html>

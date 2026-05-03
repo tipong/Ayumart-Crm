@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Payment Bug Fix - Testing Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { font-size: 1.1em; opacity: 0.9; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2::before {
+            font-size: 1.3em;
+        }
+        .test-case {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .test-case h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .test-case p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .steps {
+            list-style: none;
+            counter-reset: step;
+        }
+        .steps li {
+            counter-increment: step;
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+        }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .checkbox {
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+        .checkbox input {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .sql-query {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border-left: 3px solid #667eea;
+        }
+        .result {
+            background: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Testing Guide: Payment Bug Fix & Auto-Cancel</h1>
+            <p class="subtitle">Comprehensive testing procedures for payment system improvements</p>
+        </header>
+
+        <div class="grid">
+            <!-- TEST 1 -->
+            <div class="card">
+                <h2>✅ Test 1: Normal Payment Flow</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify that standard payment flow works correctly with proper status updates and stock reduction</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>Login as customer and add items to cart</li>
+                    <li>Go to checkout page
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Select "Dikirim Kurir" as shipping method</li>
+                            <li>Select a delivery address</li>
+                            <li>Note the shipping cost (Ongkir) displayed</li>
+                        </ul>
+                    </li>
+                    <li>Complete checkout and proceed to payment
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Verify payment page shows same Ongkir amount</li>
+                            <li>Verify total = subtotal - diskon + ongkir + membership fee</li>
+                        </ul>
+                    </li>
+                    <li>Complete payment in Midtrans test mode
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Use test card: 4811 1111 1111 1114</li>
+                            <li>Any future date, any CVV</li>
+                        </ul>
+                    </li>
+                    <li>Wait for page to redirect or check /orders page
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Order status should be "Sudah Bayar" ✓</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> Order status updates to "Sudah Bayar"</p>
+                    <p><span class="success">✓</span> Shipping cost consistent on all pages</p>
+                    <p><span class="success">✓</span> Membership points awarded</p>
+                    <p><span class="success">✓</span> Stock reduced in database integrasi</p>
+                    <p><span class="success">✓</span> Shipment record created</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Logs to Check</h3>
+                <div class="code-block">
+                tail -f storage/logs/laravel.log | grep -i "payment\|callback"
+                </div>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">Look for: "✅ Midtrans Callback Received", "✅ Payment successful"</p>
+            </div>
+
+            <!-- TEST 2 -->
+            <div class="card">
+                <h2>⏳ Test 2: Payment Callback Delayed</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify that payment status updates correctly even if Midtrans callback is delayed, via polling mechanism</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>Complete payment in Midtrans (as in Test 1)</li>
+                    <li>Don't close browser, leave payment page open</li>
+                    <li>Frontend will poll /payment-status/{order_id} every 3 seconds</li>
+                    <li>Observe browser console logs:
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Should see "🔄 Checking payment status..."</li>
+                            <li>After callback arrives: "✅ Payment confirmed on server!"</li>
+                        </ul>
+                    </li>
+                    <li>Page should redirect to /orders within 2 seconds</li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> Status updates via polling (no manual page refresh needed)</p>
+                    <p><span class="success">✓</span> Page auto-redirects to orders</p>
+                    <p><span class="success">✓</span> Order shows as "Sudah Bayar"</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Browser Console Check</h3>
+                <p style="color: #666; margin-bottom: 10px;">Open F12 → Console, look for:</p>
+                <div class="code-block">
+🔄 Checking payment status...
+✅ Payment confirmed on server!
+                </div>
+            </div>
+
+            <!-- TEST 3 -->
+            <div class="card">
+                <h2>🚫 Test 3: Auto-Cancel Expired Orders</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify that unpaid orders are automatically cancelled after 15 minutes</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Setup</h3>
+                <p style="color: #666; margin-bottom: 10px;">Create an order without paying:</p>
+                <ol class="steps">
+                    <li>Complete checkout but close Midtrans popup (don't pay)</li>
+                    <li>Get the order code from /orders page, e.g., "TRX-20260321-abc1"</li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>In database, simulate expired payment:
+                        <div class="sql-query">
+UPDATE tb_transaksi
+SET payment_expired_at = DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+WHERE kode_transaksi = 'TRX-20260321-abc1';
+                        </div>
+                    </li>
+                    <li>Run auto-cancel command:
+                        <div class="code-block">
+php artisan orders:cancel-expired --verbose
+                        </div>
+                    </li>
+                    <li>Check order status in database:
+                        <div class="sql-query">
+SELECT kode_transaksi, status_pembayaran, payment_expired_at
+FROM tb_transaksi
+WHERE kode_transaksi = 'TRX-20260321-abc1';
+                        </div>
+                    </li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> status_pembayaran = 'kadaluarsa'</p>
+                    <p><span class="success">✓</span> Stock restored to database integrasi</p>
+                    <p><span class="success">✓</span> Log entry: "✅ Order automatically cancelled"</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Check Logs</h3>
+                <div class="code-block">
+tail -f storage/logs/laravel.log | grep "CancelExpiredOrders"
+                </div>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">Look for: "Order automatically cancelled due to payment timeout"</p>
+            </div>
+
+            <!-- TEST 4 -->
+            <div class="card">
+                <h2>⏱️ Test 4: Payment Expiry Timer UI</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify that countdown timer displays correctly on payment page</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>Complete checkout and go to payment page</li>
+                    <li>Look for alert box with countdown timer</li>
+                    <li>Verify timer:
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Starts at 15:00</li>
+                            <li>Counts down every second</li>
+                            <li>Color changes to yellow at 5 minutes remaining</li>
+                            <li>Color changes to red at 2 minutes remaining</li>
+                            <li>Shows message: "Jika waktu habis, pesanan otomatis dibatalkan"</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> Timer displays and counts down correctly</p>
+                    <p><span class="success">✓</span> Colors change at correct thresholds</p>
+                    <p><span class="success">✓</span> User receives clear warning about auto-cancel</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Browser Console</h3>
+                <p style="color: #666; margin-bottom: 10px;">Check timer is updating:</p>
+                <div class="code-block">
+startPaymentExpiryTimer() called
+Timer updating every second
+                </div>
+            </div>
+
+            <!-- TEST 5 -->
+            <div class="card">
+                <h2>💰 Test 5: Shipping Cost Consistency</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify shipping cost is consistent from checkout through payment and order detail</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>Go to checkout page
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Select "Dikirim Kurir"</li>
+                            <li>Select a delivery address</li>
+                            <li>Note the Ongkir shown (e.g., "Rp 125.000")</li>
+                            <li>Inspect: Check hidden input #shipping_cost has same value</li>
+                        </ul>
+                    </li>
+                    <li>Go to payment page
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Verify "Total Pembayaran" includes the same Ongkir</li>
+                            <li>Check "Rincian Pembayaran" shows Ongkir correctly</li>
+                        </ul>
+                    </li>
+                    <li>After payment, go to order detail page
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Verify "Ongkir" in "Ringkasan Pembayaran" matches</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> Ongkir consistent on checkout page</p>
+                    <p><span class="success">✓</span> Ongkir consistent on payment page</p>
+                    <p><span class="success">✓</span> Ongkir consistent on order detail page</p>
+                    <p><span class="success">✓</span> Total calculation correct everywhere</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Debug Info</h3>
+                <p style="color: #666; margin-bottom: 10px;">Checkout page - Inspect element:</p>
+                <div class="code-block">
+&lt;input type="hidden" name="shipping_cost" id="shipping_cost" value="125000"&gt;
+                </div>
+                <p style="color: #666; margin-top: 15px; margin-bottom: 10px;">Check logs for shipping cost flow:</p>
+                <div class="code-block">
+tail -f storage/logs/laravel.log | grep "shipping_cost\|ongkir"
+                </div>
+            </div>
+
+            <!-- TEST 6 -->
+            <div class="card">
+                <h2>🔄 Test 6: Stock Management</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify that stock is correctly reduced after payment and restored on cancellation</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>Note initial stock in database integrasi:
+                        <div class="sql-query">
+SELECT id_produk, id_cabang, total_stok
+FROM tb_stok_cabang
+WHERE id_produk = 1 AND id_cabang = 1;
+                        </div>
+                    </li>
+                    <li>Add product to cart and complete payment</li>
+                    <li>Check stock after payment:
+                        <div class="sql-query">
+SELECT total_stok FROM tb_stok_cabang
+WHERE id_produk = 1 AND id_cabang = 1;
+                        </div>
+                        <p style="color: #666; margin-top: 8px;">Should be reduced by qty purchased</p>
+                    </li>
+                    <li>Cancel the order and check stock restoration:
+                        <div class="sql-query">
+UPDATE tb_transaksi
+SET status_pembayaran = 'kadaluarsa'
+WHERE id_transaksi = 1;
+                        </div>
+                        <p style="color: #666; margin-top: 8px;">Or run: php artisan orders:cancel-expired</p>
+                    </li>
+                    <li>Verify stock restored:
+                        <div class="sql-query">
+SELECT total_stok FROM tb_stok_cabang
+WHERE id_produk = 1 AND id_cabang = 1;
+                        </div>
+                        <p style="color: #666; margin-top: 8px;">Should be same as initial</p>
+                    </li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> Stock reduced after payment</p>
+                    <p><span class="success">✓</span> Stock restored on cancellation</p>
+                    <p><span class="success">✓</span> Stock never goes negative</p>
+                    <p><span class="success">✓</span> Log entries for all stock changes</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Check Logs</h3>
+                <div class="code-block">
+tail -f storage/logs/laravel.log | grep -i "stock\|stok"
+                </div>
+            </div>
+
+            <!-- TEST 7 -->
+            <div class="card">
+                <h2>📋 Test 7: Membership Points</h2>
+
+                <div class="test-case">
+                    <h3>Objective</h3>
+                    <p>Verify that membership points are awarded after successful payment</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 15px;">Steps</h3>
+                <ol class="steps">
+                    <li>Create order for customer without membership</li>
+                    <li>Note customer's current points and tier:
+                        <div class="sql-query">
+SELECT user_id, points, tier
+FROM tb_membership
+WHERE user_id = 1;
+                        </div>
+                    </li>
+                    <li>Complete payment for order</li>
+                    <li>Check points awarded:
+                        <div class="sql-query">
+SELECT points, tier FROM tb_membership WHERE user_id = 1;
+                        </div>
+                        <p style="color: #666; margin-top: 8px;">Points = Total / 20000 (rounded)</p>
+                    </li>
+                    <li>Verify tier upgraded if applicable</li>
+                </ol>
+
+                <h3 style="color: #333; margin-top: 20px;">Expected Results</h3>
+                <div class="result">
+                    <p><span class="success">✓</span> Points awarded: order_total / 20000</p>
+                    <p><span class="success">✓</span> Tier upgraded if threshold reached</p>
+                    <p><span class="success">✓</span> New membership created if first transaction</p>
+                    <p><span class="success">✓</span> Log entries for points calculation</p>
+                </div>
+
+                <h3 style="color: #333; margin-top: 20px;">Check Logs</h3>
+                <div class="code-block">
+tail -f storage/logs/laravel.log | grep "points\|membership"
+                </div>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">Look for: "Membership points awarded", "New membership created"</p>
+            </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <h2>✔️ Final Verification Checklist</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Database & Setup</h3>
+                    <div class="checkbox"><input type="checkbox"> Migration ran successfully</div>
+                    <div class="checkbox"><input type="checkbox"> New columns exist in tb_transaksi</div>
+                    <div class="checkbox"><input type="checkbox"> Cron job configured for scheduler</div>
+                    <div class="checkbox"><input type="checkbox"> Midtrans keys configured</div>
+                </div>
+
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Payment Flow</h3>
+                    <div class="checkbox"><input type="checkbox"> Callback received and logged</div>
+                    <div class="checkbox"><input type="checkbox"> Status updated to sudah_bayar</div>
+                    <div class="checkbox"><input type="checkbox"> Stock reduced correctly</div>
+                    <div class="checkbox"><input type="checkbox"> Shipment created</div>
+                </div>
+
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Polling Mechanism</h3>
+                    <div class="checkbox"><input type="checkbox"> /payment-status endpoint works</div>
+                    <div class="checkbox"><input type="checkbox"> Midtrans API query successful</div>
+                    <div class="checkbox"><input type="checkbox"> Status updates via polling</div>
+                    <div class="checkbox"><input type="checkbox"> Page auto-redirects</div>
+                </div>
+
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Auto-Cancel</h3>
+                    <div class="checkbox"><input type="checkbox"> Command runs successfully</div>
+                    <div class="checkbox"><input type="checkbox"> Orders marked as kadaluarsa</div>
+                    <div class="checkbox"><input type="checkbox"> Stock restored</div>
+                    <div class="checkbox"><input type="checkbox"> Logs created</div>
+                </div>
+
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">UI & UX</h3>
+                    <div class="checkbox"><input type="checkbox"> Timer displays on payment page</div>
+                    <div class="checkbox"><input type="checkbox"> Timer counts down correctly</div>
+                    <div class="checkbox"><input type="checkbox"> Color changes work</div>
+                    <div class="checkbox"><input type="checkbox"> Ongkir displayed correctly</div>
+                </div>
+
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Consistency</h3>
+                    <div class="checkbox"><input type="checkbox"> Ongkir same on checkout → payment</div>
+                    <div class="checkbox"><input type="checkbox"> Ongkir same on payment → order detail</div>
+                    <div class="checkbox"><input type="checkbox"> Total calculation consistent</div>
+                    <div class="checkbox"><input type="checkbox"> Membership fee included</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TROUBLESHOOTING -->
+        <div class="card" style="grid-column: 1 / -1; background: #fff3cd; border: 2px solid #ffc107;">
+            <h2>🔧 Troubleshooting</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div>
+                    <h3 style="color: #856404; margin-bottom: 10px;">❌ Order not updating after payment</h3>
+                    <ul style="color: #856404; line-height: 1.8;">
+                        <li>Check if callback URL is configured</li>
+                        <li>Verify Midtrans can reach your callback endpoint</li>
+                        <li>Check /payment-status API works</li>
+                        <li>Verify Midtrans keys in .env</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #856404; margin-bottom: 10px;">❌ Auto-cancel not working</h3>
+                    <ul style="color: #856404; line-height: 1.8;">
+                        <li>Verify cron is running: check logs</li>
+                        <li>Run manually: php artisan orders:cancel-expired</li>
+                        <li>Check scheduler: php artisan schedule:list</li>
+                        <li>Verify database connection</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #856404; margin-bottom: 10px;">❌ Ongkir different on pages</h3>
+                    <ul style="color: #856404; line-height: 1.8;">
+                        <li>Check hidden input #shipping_cost set</li>
+                        <li>Verify distance calculation correct</li>
+                        <li>Check form submitted with value</li>
+                        <li>Verify database stores correct ongkir</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #856404; margin-bottom: 10px;">❌ Stock not restored</h3>
+                    <ul style="color: #856404; line-height: 1.8;">
+                        <li>Verify IntegrasiProdukService available</li>
+                        <li>Check db_integrasi connection configured</li>
+                        <li>Verify tambahStok() method exists</li>
+                        <li>Check logs for errors</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #856404; margin-bottom: 10px;">❌ Timer not showing</h3>
+                    <ul style="color: #856404; line-height: 1.8;">
+                        <li>Check payment_expired_at is set</li>
+                        <li>Verify JavaScript loaded</li>
+                        <li>Check element IDs exist</li>
+                        <li>Check browser console for errors</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #856404; margin-bottom: 10px;">❌ Database errors</h3>
+                    <ul style="color: #856404; line-height: 1.8;">
+                        <li>Run migration: php artisan migrate</li>
+                        <li>Check columns exist: DESCRIBE tb_transaksi</li>
+                        <li>Verify indexes created</li>
+                        <li>Check database connection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Testing Guide - Payment System v1.0</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Last Updated: 21 Maret 2026 | Status: ✅ Ready</p>
+        </footer>
+    </div>
+</body>
+</html>

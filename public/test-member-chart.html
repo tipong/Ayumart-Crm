@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Growth Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #e8f4f8;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #2e7d32;
+        }
+        .error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+        }
+        .warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #e65100;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Member Growth Chart Test</h1>
+
+        <div class="info">
+            <strong>Description:</strong> This page tests the member growth chart with sample data
+        </div>
+
+        <div id="status"></div>
+
+        <h2>Chart Preview</h2>
+        <div class="chart-container">
+            <canvas id="memberGrowthChart"></canvas>
+        </div>
+
+        <h2>Data Summary</h2>
+        <div id="dataSummary"></div>
+
+        <h2>Troubleshooting Guide</h2>
+        <div class="info warning">
+            <h3>If chart doesn't appear in dashboard:</h3>
+            <ol>
+                <li>Open browser DevTools (F12)</li>
+                <li>Go to Console tab</li>
+                <li>Look for messages starting with 📊, ✅, or ❌</li>
+                <li>If you see "No chart data available", check database</li>
+                <li>Verify memberships table has data with created_at in last 12 months</li>
+            </ol>
+        </div>
+
+        <h2>Database Check Commands</h2>
+        <pre><code>
+# Count memberships
+mysql -u root -p crm_system -e "SELECT COUNT(*) FROM memberships;"
+
+# Check last 12 months data
+mysql -u root -p crm_system -e "
+SELECT MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as count
+FROM memberships
+WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+GROUP BY year, month
+ORDER BY year, month;
+"
+        </code></pre>
+    </div>
+
+    <script>
+        // Sample data from database
+        const chartData = [0, 0, 1, 6, 12, 10, 17, 13, 11, 20, 18, 22];
+        const chartLabels = [
+            "Mar '25", "Apr '25", "May '25", "Jun '25", "Jul '25", "Aug '25",
+            "Sep '25", "Oct '25", "Nov '25", "Dec '25", "Jan '26", "Feb '26"
+        ];
+
+        console.log('📊 Member Growth Chart Test Started');
+        console.log('Chart Data:', chartData);
+        console.log('Chart Labels:', chartLabels);
+
+        // Status report
+        const statusDiv = document.getElementById('status');
+
+        if (chartData && chartData.length > 0) {
+            statusDiv.innerHTML = '<div class="info success">✅ Chart data is available (' + chartData.length + ' months)</div>';
+
+            // Render chart
+            const memberGrowthCtx = document.getElementById('memberGrowthChart');
+            if (memberGrowthCtx) {
+                console.log('✅ Canvas element found, rendering chart...');
+
+                const memberChart = new Chart(memberGrowthCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Member Baru',
+                            data: chartData,
+                            borderColor: '#1cc88a',
+                            backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#1cc88a',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    font: { size: 12 }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 5 }
+                            }
+                        }
+                    }
+                });
+                console.log('✅ Chart rendered successfully!');
+                statusDiv.innerHTML += '<div class="info success">✅ Chart rendered successfully!</div>';
+            }
+        } else {
+            statusDiv.innerHTML = '<div class="info error">❌ No chart data available</div>';
+        }
+
+        // Data summary
+        const dataSummary = document.getElementById('dataSummary');
+        const totalMembers = chartData.reduce((a, b) => a + b, 0);
+        const avgMembers = Math.round(totalMembers / chartData.length);
+        const maxMonth = Math.max(...chartData);
+        const minMonth = Math.min(...chartData);
+
+        dataSummary.innerHTML = `
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #f5f5f5;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total Months</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${chartData.length}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total Members</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${totalMembers}</td>
+                </tr>
+                <tr style="background: #f5f5f5;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Average per Month</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${avgMembers}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Peak Month</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${maxMonth} members</td>
+                </tr>
+                <tr style="background: #f5f5f5;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Lowest Month</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${minMonth} members</td>
+                </tr>
+            </table>
+        `;
+    </script>
+</body>
+</html>
