@@ -185,21 +185,21 @@ class Product extends Model
             $tableName = 'product_member_discounts';
             $schemaBuilder = \Illuminate\Support\Facades\DB::connection('mysql_integrasi')
                 ->getSchemaBuilder();
-            
+
             // Jika tabel tidak ada, return empty collection
             if (!$schemaBuilder->hasTable($tableName)) {
                 Log::warning('Table ' . $tableName . ' does not exist in database');
                 return collect();
             }
-            
+
             $discounts = $this->memberDiscounts()
                 ->where('is_active', true)
                 ->get();
-            
+
             if ($discounts->isEmpty()) {
                 return collect();
             }
-            
+
             return $discounts->map(function ($discount) {
                 $basePrice = $this->getCurrentPrice();
                 return [
