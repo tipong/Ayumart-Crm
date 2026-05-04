@@ -25,7 +25,7 @@
             <div class="row">
                 <div class="col-md-2">
                     @if($product->foto_produk)
-                        <img src="{{ asset('storage/' . $product->foto_produk) }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getProductImage($product->foto_produk) }}"
                              alt="{{ $product->nama_produk }}"
                              class="img-thumbnail w-100">
                     @else

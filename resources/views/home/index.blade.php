@@ -1489,7 +1489,7 @@
                         <a href="{{ route('product.show', $product->id_produk) }}" style="text-decoration: none; color: inherit;">
                             <div class="product-image">
                                 @if($product->foto_produk)
-                                    <img src="{{ asset('storage/' . $product->foto_produk) }}" alt="{{ $product->nama_produk }}">
+                                    <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 200, 200) }}" alt="{{ $product->nama_produk }}">
                                 @else
                                     <i class="bi bi-box-seam"></i>
                                 @endif
@@ -1573,7 +1573,7 @@
                         <a href="{{ route('product.show', $product->id_produk) }}" style="text-decoration: none; color: inherit;">
                             <div class="product-image">
                                 @if($product->foto_produk)
-                                    <img src="{{ asset('storage/' . $product->foto_produk) }}" alt="{{ $product->nama_produk }}">
+                                    <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 200, 200) }}" alt="{{ $product->nama_produk }}">
                                 @else
                                     <i class="bi bi-box-seam"></i>
                                 @endif

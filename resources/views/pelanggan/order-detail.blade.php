@@ -54,7 +54,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 @if(isset($item->foto_produk) && $item->foto_produk)
-                                                    <img src="{{ asset('storage/' . $item->foto_produk) }}"
+                                                    <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($item->foto_produk, 60, 60) }}"
                                                          alt="{{ $item->nama_produk }}"
                                                          class="img-thumbnail me-3"
                                                          style="width: 60px; height: 60px; object-fit: cover;">

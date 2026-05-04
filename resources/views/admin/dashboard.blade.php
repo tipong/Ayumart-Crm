@@ -214,7 +214,7 @@
                             <div class="product-item">
                                 <div class="flex-shrink-0" style="width: 50px; height: 50px;">
                                     @if($product->foto_produk)
-                                        <img src="{{ asset('storage/' . $product->foto_produk) }}"
+                                        <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 50, 50) }}"
                                              alt="{{ $product->nama_produk }}"
                                              class="product-image"
                                              onerror="this.src='{{ asset('images/no-image.png') }}'">

@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Helpers\ImageHelper;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -11,6 +14,7 @@ class Product extends Model
 
     protected $table = 'tb_produk';
     protected $primaryKey = 'id_produk';
+    protected $connection = 'mysql_integrasi';
 
     /**
      * Get the route key for the model.
@@ -172,21 +176,44 @@ class Product extends Model
 
     /**
      * Get all member discounts with details
+     * Method ini aman dan return empty collection jika tabel tidak ada
      */
     public function getAllMemberDiscounts()
     {
-        return $this->memberDiscounts()
-            ->where('is_active', true)
-            ->get()
-            ->map(function ($discount) {
+        try {
+            // Check if table exists first
+            $tableName = 'product_member_discounts';
+            $schemaBuilder = \Illuminate\Support\Facades\DB::connection('mysql_integrasi')
+                ->getSchemaBuilder();
+            
+            // Jika tabel tidak ada, return empty collection
+            if (!$schemaBuilder->hasTable($tableName)) {
+                Log::warning('Table ' . $tableName . ' does not exist in database');
+                return collect();
+            }
+            
+            $discounts = $this->memberDiscounts()
+                ->where('is_active', true)
+                ->get();
+            
+            if ($discounts->isEmpty()) {
+                return collect();
+            }
+            
+            return $discounts->map(function ($discount) {
                 $basePrice = $this->getCurrentPrice();
                 return [
                     'tier' => $discount->tier,
-                    'tier_name' => \App\Models\ProductMemberDiscount::TIERS[$discount->tier],
+                    'tier_name' => \App\Models\ProductMemberDiscount::TIERS[$discount->tier] ?? $discount->tier,
                     'discount_percentage' => $discount->discount_percentage,
                     'price_with_discount' => $basePrice - ($basePrice * ($discount->discount_percentage / 100)),
                 ];
             });
+        } catch (\Exception $e) {
+            // Return empty collection jika ada error (misalnya tabel tidak ada)
+            Log::warning('Error getting member discounts for product ' . $this->id_produk . ': ' . $e->getMessage());
+            return collect();
+        }
     }
 
     public function hasActiveDiscount()
@@ -239,7 +266,7 @@ class Product extends Model
     public function getImageUrl()
     {
         if ($this->foto_produk) {
-            return asset('storage/' . $this->foto_produk);
+            return ImageHelper::getProductImage($this->foto_produk);
         }
         return asset('images/no-image.png');
     }

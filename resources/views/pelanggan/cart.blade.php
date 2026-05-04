@@ -492,7 +492,7 @@
                             <div class="cart-item" data-item-id="{{ $item->id_detail_cart }}">
                                 <div class="row align-items-center">
                                     <div class="col-md-2">
-                                        <img src="{{ $item->produk->foto_produk ? asset('storage/' . $item->produk->foto_produk) : 'https://via.placeholder.com/100' }}"
+                                        <img src="{{ $item->produk->foto_produk ? \App\Helpers\ImageHelper::getProductThumbnail($item->produk->foto_produk, 100, 100) : 'https://via.placeholder.com/100' }}"
                                              alt="{{ $item->produk->nama_produk }}"
                                              class="product-image">
                                     </div>

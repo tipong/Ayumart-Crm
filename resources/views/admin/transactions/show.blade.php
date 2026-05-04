@@ -167,7 +167,7 @@
                                             <div class="d-flex align-items-center">
                                                 @if($item->product && $item->product->foto_produk)
                                                     <div class="product-img-wrapper me-3">
-                                                        <img src="{{ asset('storage/' . $item->product->foto_produk) }}"
+                                                        <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($item->product->foto_produk, 60, 60) }}"
                                                              alt="{{ $item->product->nama_produk }}">
                                                     </div>
                                                 @else

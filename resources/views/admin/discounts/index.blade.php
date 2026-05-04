@@ -126,7 +126,7 @@
                                     {{-- <td><strong>#{{ $product->id_produk }}</strong></td> --}}
                                     <td>
                                         @if($product->foto_produk)
-                                            <img src="{{ asset('storage/' . $product->foto_produk) }}"
+                                            <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 60, 60) }}"
                                                  alt="{{ $product->nama_produk }}"
                                                  class="img-thumbnail"
                                                  style="max-width: 60px; max-height: 60px; object-fit: cover;">

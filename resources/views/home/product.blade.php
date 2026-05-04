@@ -654,16 +654,16 @@
             <!-- Product Images -->
             <div class="col-md-5">
                 <div class="product-card">
-                    <img src="{{ $product->foto_produk ? asset('storage/' . $product->foto_produk) : 'https://via.placeholder.com/400' }}"
+                    <img src="{{ $product->foto_produk ? \App\Helpers\ImageHelper::getProductImage($product->foto_produk) : 'https://via.placeholder.com/400' }}"
                          alt="{{ $product->nama_produk }}"
                          class="product-image"
                          id="mainImage">
 
                     @if($images->count() > 0)
                     <div class="product-gallery">
-                        <img src="{{ asset('storage/' . $product->foto_produk) }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 100, 100) }}"
                              class="gallery-thumb active"
-                             onclick="changeImage('{{ asset('storage/' . $product->foto_produk) }}', this)">
+                             onclick="changeImage('{{ \App\Helpers\ImageHelper::getProductImage($product->foto_produk) }}', this)">
                         @foreach($images as $image)
                         <img src="{{ asset('storage/' . $image->path_gambar) }}"
                              class="gallery-thumb"

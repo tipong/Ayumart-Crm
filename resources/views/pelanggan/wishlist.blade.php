@@ -141,7 +141,7 @@
                     <div class="col-md-3 col-sm-6">
                         <div class="product-card">
                             <div class="position-relative">
-                                <img src="{{ $item->produk->foto_produk ? asset('storage/' . $item->produk->foto_produk) : 'https://via.placeholder.com/200' }}"
+                                <img src="{{ $item->produk->foto_produk ? \App\Helpers\ImageHelper::getProductThumbnail($item->produk->foto_produk, 200, 200) : 'https://via.placeholder.com/200' }}"
                                      alt="{{ $item->produk->nama_produk }}"
                                      class="product-image">
                                 @if($item->produk->hasActiveDiscount())

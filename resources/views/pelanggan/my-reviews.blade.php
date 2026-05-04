@@ -205,7 +205,7 @@
                         <div class="col-lg-2 col-md-3 mb-3 mb-md-0">
                             <div class="product-image-wrapper">
                                 @if($review->product->foto_produk)
-                                    <img src="{{ asset('storage/' . $review->product->foto_produk) }}"
+                                    <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($review->product->foto_produk, 150, 150) }}"
                                          alt="{{ $review->product->nama_produk }}">
                                 @else
                                     <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>

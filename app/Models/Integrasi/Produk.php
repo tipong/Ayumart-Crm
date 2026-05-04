@@ -3,6 +3,8 @@
 namespace App\Models\Integrasi;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class Produk extends Model
 {
@@ -65,10 +67,25 @@ class Produk extends Model
      */
     public function getDiscountForTier($tier)
     {
-        return $this->memberDiscounts()
-            ->where('tier', $tier)
-            ->where('is_active', true)
-            ->first();
+        try {
+            // Check if table exists first
+            $tableName = 'product_member_discounts';
+            $schemaBuilder = DB::connection('mysql_integrasi')->getSchemaBuilder();
+            
+            // Jika tabel tidak ada, return null
+            if (!$schemaBuilder->hasTable($tableName)) {
+                return null;
+            }
+            
+            return $this->memberDiscounts()
+                ->where('tier', $tier)
+                ->where('is_active', true)
+                ->first();
+        } catch (\Exception $e) {
+            // Return null jika ada error
+            Log::warning('Error getting discount for tier ' . $tier . ': ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -76,18 +93,34 @@ class Produk extends Model
      */
     public function getAllMemberDiscounts()
     {
-        return $this->memberDiscounts()
-            ->where('is_active', true)
-            ->get()
-            ->map(function ($discount) {
-                $basePrice = $this->harga_final;
-                return [
-                    'tier' => $discount->tier,
-                    'tier_name' => \App\Models\ProductMemberDiscount::TIERS[$discount->tier],
-                    'discount_percentage' => $discount->discount_percentage,
-                    'price_with_discount' => $basePrice - ($basePrice * ($discount->discount_percentage / 100)),
-                ];
-            });
+        try {
+            // Check if table exists first
+            $tableName = 'product_member_discounts';
+            $schemaBuilder = DB::connection('mysql_integrasi')->getSchemaBuilder();
+            
+            // Jika tabel tidak ada, return empty collection
+            if (!$schemaBuilder->hasTable($tableName)) {
+                Log::warning('Table ' . $tableName . ' does not exist in database');
+                return collect();
+            }
+            
+            return $this->memberDiscounts()
+                ->where('is_active', true)
+                ->get()
+                ->map(function ($discount) {
+                    $basePrice = $this->harga_final;
+                    return [
+                        'tier' => $discount->tier,
+                        'tier_name' => \App\Models\ProductMemberDiscount::TIERS[$discount->tier] ?? $discount->tier,
+                        'discount_percentage' => $discount->discount_percentage,
+                        'price_with_discount' => $basePrice - ($basePrice * ($discount->discount_percentage / 100)),
+                    ];
+                });
+        } catch (\Exception $e) {
+            // Return empty collection jika ada error (misalnya tabel tidak ada)
+            Log::warning('Error getting member discounts for product ' . $this->id_produk . ': ' . $e->getMessage());
+            return collect();
+        }
     }
 
     /**
