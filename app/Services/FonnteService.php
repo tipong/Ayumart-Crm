@@ -814,14 +814,21 @@ class FonnteService
      * @param int $offset
      * @return array
      */
-    public function getCustomersWithPhones($limit = PHP_INT_MAX, $offset = 0)
+    public function getCustomersWithPhones($limit = PHP_INT_MAX, $offset = 0, $targetTiers = null)
     {
         try {
             // Get customers with non-null and non-empty phone numbers
             $query = Pelanggan::query()
-                ->with('user')
+                ->with(['user', 'user.membership'])
                 ->whereNotNull('no_tlp_pelanggan')
                 ->where('no_tlp_pelanggan', '!=', '');
+
+            // Filter by membership tiers if provided
+            if (!empty($targetTiers)) {
+                $query->whereHas('user.membership', function($q) use ($targetTiers) {
+                    $q->whereIn('tier', $targetTiers)->where('is_active', true);
+                });
+            }
 
             $totalItems = $query->count();
 

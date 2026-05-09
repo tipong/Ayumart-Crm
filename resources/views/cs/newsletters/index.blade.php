@@ -324,3 +324,28 @@
 </form>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function deleteNewsletter(id) {
+        Swal.fire({
+            title: 'Hapus Newsletter?',
+            text: "Newsletter ini akan dihapus secara permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('deleteNewsletterForm');
+                // Construct the route dynamically
+                form.action = "{{ url('cs/newsletters') }}/" + id;
+                form.submit();
+            }
+        });
+    }
+</script>
+@endpush

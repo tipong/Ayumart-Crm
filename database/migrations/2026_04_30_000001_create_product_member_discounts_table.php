@@ -19,9 +19,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            // Foreign key ke tb_produk
-            $table->foreign('product_id')->references('id_produk')->on('tb_produk')->onDelete('cascade');
-
+            // Foreign key ke tb_produk dihapus karena tabel tb_produk berada di database berbeda (mysql_integrasi)
+            
             // Pastikan 1 produk hanya memiliki 1 diskon per tier
             $table->unique(['product_id', 'tier']);
         });

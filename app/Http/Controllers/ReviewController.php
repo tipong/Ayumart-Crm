@@ -142,8 +142,10 @@ class ReviewController extends Controller
             $fotoPath = null;
             if ($request->hasFile('foto_review')) {
                 $file = $request->file('foto_review');
-                $filename = 'review_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $fotoPath = $file->storeAs('reviews', $filename, 'public');
+                $uploadedFileUrl = cloudinary()->uploadApi()->upload($file->getRealPath(), [
+                    'folder' => 'crm_reviews'
+                ])['secure_url'];
+                $fotoPath = $uploadedFileUrl;
             }
 
             // Create review
@@ -180,8 +182,17 @@ class ReviewController extends Controller
                 'id_transaksi' => $validated['id_transaksi']
             ]);
 
-            if (isset($fotoPath) && $fotoPath && Storage::disk('public')->exists($fotoPath)) {
-                Storage::disk('public')->delete($fotoPath);
+            if (isset($fotoPath) && $fotoPath) {
+                if (str_starts_with($fotoPath, 'http')) {
+                    $parts = explode('/', parse_url($fotoPath, PHP_URL_PATH));
+                    $filename = end($parts);
+                    $publicId = 'crm_reviews/' . pathinfo($filename, PATHINFO_FILENAME);
+                    try {
+                        cloudinary()->uploadApi()->destroy($publicId);
+                    } catch (\Exception $e) {}
+                } else if (Storage::disk('public')->exists($fotoPath)) {
+                    Storage::disk('public')->delete($fotoPath);
+                }
             }
 
             return back()->with('error', 'Terjadi kesalahan saat mengirim review: ' . $e->getMessage())->withInput();
@@ -307,13 +318,24 @@ class ReviewController extends Controller
             // Handle photo upload if exists
             if ($request->hasFile('foto_review')) {
                 // Delete old photo
-                if ($review->foto_review && Storage::disk('public')->exists($review->foto_review)) {
-                    Storage::disk('public')->delete($review->foto_review);
+                if ($review->foto_review) {
+                    if (str_starts_with($review->foto_review, 'http')) {
+                        $parts = explode('/', parse_url($review->foto_review, PHP_URL_PATH));
+                        $filename = end($parts);
+                        $publicId = 'crm_reviews/' . pathinfo($filename, PATHINFO_FILENAME);
+                        try {
+                            cloudinary()->uploadApi()->destroy($publicId);
+                        } catch (\Exception $e) {}
+                    } else if (Storage::disk('public')->exists($review->foto_review)) {
+                        Storage::disk('public')->delete($review->foto_review);
+                    }
                 }
 
                 $file = $request->file('foto_review');
-                $filename = 'review_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $validated['foto_review'] = $file->storeAs('reviews', $filename, 'public');
+                $uploadedFileUrl = cloudinary()->uploadApi()->upload($file->getRealPath(), [
+                    'folder' => 'crm_reviews'
+                ])['secure_url'];
+                $validated['foto_review'] = $uploadedFileUrl;
             }
 
             $review->update($validated);
@@ -356,8 +378,17 @@ class ReviewController extends Controller
             DB::beginTransaction();
 
             // Delete photo if exists
-            if ($review->foto_review && Storage::disk('public')->exists($review->foto_review)) {
-                Storage::disk('public')->delete($review->foto_review);
+            if ($review->foto_review) {
+                if (str_starts_with($review->foto_review, 'http')) {
+                    $parts = explode('/', parse_url($review->foto_review, PHP_URL_PATH));
+                    $filename = end($parts);
+                    $publicId = 'crm_reviews/' . pathinfo($filename, PATHINFO_FILENAME);
+                    try {
+                        cloudinary()->uploadApi()->destroy($publicId);
+                    } catch (\Exception $e) {}
+                } else if (Storage::disk('public')->exists($review->foto_review)) {
+                    Storage::disk('public')->delete($review->foto_review);
+                }
             }
 
             $review->delete();

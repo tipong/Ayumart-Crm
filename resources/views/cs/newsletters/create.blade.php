@@ -166,7 +166,7 @@
                         </div>
 
                         <!-- Step 2: Target Penerima (Filter) -->
-                        <div class="step-group mb-5">
+                        <div class="step-group mb-5" id="target-filter-group">
                             <div class="step-header mb-3">
                                 <h5 class="fw-bold text-dark">
                                     <span class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">2</span>
@@ -177,7 +177,7 @@
 
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <label class="form-label fw-5 text-dark mb-3">Pilih Tier Membership (untuk Email)</label>
+                                    <label class="form-label fw-5 text-dark mb-3">Pilih Tier Membership</label>
                                     <div class="row g-2" id="tierFilterContainer">
                                         <div class="col-md-6">
                                             <div class="form-check tier-checkbox-card">
@@ -239,7 +239,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Filter ini hanya berlaku untuk metode pengiriman Email (Mailchimp)</small>
+                                    <small class="text-muted d-block mt-2">Filter ini hanya berlaku untuk metode pengiriman WhatsApp (Fonnte)</small>
                                 </div>
                             </div>
                         </div>
@@ -1657,4 +1657,30 @@ Tim Kami`
     }
 
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const methodRadios = document.querySelectorAll('input[name="jenis_newsletter"]');
+        const filterGroup = document.getElementById('target-filter-group');
+
+        function toggleFilterGroup() {
+            const selectedMethod = document.querySelector('input[name="jenis_newsletter"]:checked');
+            if (selectedMethod && selectedMethod.value === 'fonnte') {
+                filterGroup.style.display = 'block';
+            } else {
+                filterGroup.style.display = 'none';
+                // Reset checkboxes
+                const checkboxes = filterGroup.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+            }
+        }
+
+        // Run on load
+        toggleFilterGroup();
+
+        // Run on change
+        methodRadios.forEach(radio => {
+            radio.addEventListener('change', toggleFilterGroup);
+        });
+    });
+</script>
 @endpush

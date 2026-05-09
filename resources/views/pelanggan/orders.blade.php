@@ -191,7 +191,7 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            <small>{{ $order->kode_transaksi }}</small>
+                                            <small>{{ \Carbon\Carbon::parse($order->tanggal_transaksi ?? $order->created_at)->format('d M Y H:i') }}</small>
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group-vertical btn-group-sm" role="group">

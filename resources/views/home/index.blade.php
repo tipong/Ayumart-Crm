@@ -1197,7 +1197,7 @@
                         </li>
                     @else
                         <!-- Notifikasi -->
-                        <li class="nav-item dropdown">
+                        <!-- <li class="nav-item dropdown">
                             <a class="nav-link nav-icon dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" title="Notifikasi" id="notificationDropdown">
                                 <i class="bi bi-bell"></i>
                                 <span class="badge bg-danger" id="notification-count" style="display: none;">0</span>
@@ -1225,7 +1225,7 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> -->
 
                         <!-- Ticketing -->
                         <li class="nav-item">
@@ -1456,34 +1456,62 @@
             <div class="flash-sale-header">
                 <div class="flash-sale-title">
                     <i class="bi bi-percent text-danger fs-3"></i>
-                    <h3>DISKON & PROMO
+                    <h3>DISKON &amp; PROMO
                         @if(isset($categoryId) && $categoryId)
                             @php
                                 $selectedCategory = $categories->firstWhere('id_jenis', $categoryId);
                             @endphp
-                            @if($selectedCategory)
+                            <!-- @if($selectedCategory)
                                 <span class="text-muted" style="font-size: 0.8rem; font-weight: 400; text-transform: none;">
                                     - {{ $selectedCategory->nama_jenis }}
                                 </span>
-                            @endif
+                            @endif -->
                         @endif
                     </h3>
                 </div>
                 <div>
-                    @if(isset($categoryId) && $categoryId)
-                        <span class="badge bg-success me-2">Kategori Dipilih</span>
+                    @if(isset($customerTier) && $customerTier)
+                        @php
+                            $tierIcons = ['bronze'=>'🥉','silver'=>'🥈','gold'=>'🥇','platinum'=>'💎'];
+                            $tierColors = ['bronze'=>'warning','silver'=>'secondary','gold'=>'info','platinum'=>'danger'];
+                        @endphp
+                        <span class="badge bg-{{ $tierColors[$customerTier] ?? 'secondary' }} me-2">
+                            {{ $tierIcons[$customerTier] ?? '' }} Tier {{ ucfirst($customerTier) }} – Diskon Eksklusif Anda
+                        </span>
                     @endif
-                    {{-- <span class="badge bg-danger">HEMAT HINGGA 50%</span> --}}
                 </div>
             </div>
 
             @if(isset($promoProducts) && count($promoProducts) > 0)
             <div class="row g-2">
                 @foreach($promoProducts as $product)
+                @php
+                    // Kalkulasi harga diskon untuk tampilan
+                    $isTierDiscount = ($product->discount_target === 'tier');
+                    $tier = $product->customer_tier ?? null;
+                    $tierDiscountData = null;
+                    $hargaSetelahDiskon = $product->harga_produk;
+                    $pctDiskon = 0;
+                    $badgeLabel = '';
+
+                    if ($isTierDiscount && $tier) {
+                        $tierDiscountData = \App\Models\ProductMemberDiscount::findByProductAndTier($product->id_produk, $tier);
+                        if ($tierDiscountData) {
+                            $pctDiskon = $tierDiscountData->discount_percentage;
+                            $hargaSetelahDiskon = $product->harga_produk - ($product->harga_produk * ($pctDiskon / 100));
+                            $badgeLabel = '-' . number_format($pctDiskon, 0) . '%';
+                        }
+                    } elseif (!$isTierDiscount && $product->hasActiveDiscount()) {
+                        $hargaSetelahDiskon = $product->harga_diskon ?? $product->harga_produk;
+                        $pctDiskon = $product->persentase_diskon;
+                        $badgeLabel = '-' . number_format($pctDiskon, 0) . '%';
+                    }
+                    $adaDiskon = $pctDiskon > 0;
+                @endphp
                 <div class="col-lg-2 col-md-3 col-6">
                     <div class="product-card position-relative">
-                        @if($product->hasActiveDiscount())
-                            <span class="discount-badge">-{{ number_format($product->getDiscountPercentage(), 0) }}%</span>
+                        @if($adaDiskon)
+                            <span class="discount-badge">{{ $badgeLabel }}</span>
                         @endif
 
                         <a href="{{ route('product.show', $product->id_produk) }}" style="text-decoration: none; color: inherit;">
@@ -1499,17 +1527,21 @@
                                 <h5 class="product-title">{{ $product->nama_produk }}</h5>
 
                                 <div class="product-price">
-                                    @if($product->hasActiveDiscount())
-                                        <span class="current-price">Rp {{ number_format($product->getCurrentPrice(), 0, ',', '.') }}</span>
+                                    @if($adaDiskon)
+                                        <span class="current-price">Rp {{ number_format($hargaSetelahDiskon, 0, ',', '.') }}</span>
                                         <del class="original-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</del>
                                     @else
                                         <span class="current-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</span>
                                     @endif
                                 </div>
+
                                 <div class="product-footer">
-                                    @if($product->hasActiveDiscount())
+                                    @if($adaDiskon)
                                         <span class="stock-badge stock-low">
-                                            <i class="bi bi-tag-fill"></i> Hemat {{ number_format($product->getDiscountPercentage(), 0) }}%
+                                            <i class="bi bi-tag-fill"></i> Hemat {{ number_format($pctDiskon, 0) }}%
+                                            @if($isTierDiscount && $tier)
+                                                <small>({{ ucfirst($tier) }})</small>
+                                            @endif
                                         </span>
                                     @else
                                         <span class="stock-badge stock-available">Promo</span>
@@ -1564,10 +1596,35 @@
             @if($products && count($products) > 0)
             <div class="row g-2" id="productContainer">
                 @foreach($products as $product)
+                @php
+                    // Kalkulasi harga untuk setiap produk (general atau tier)
+                    $isProdukTier = ($product->discount_target === 'tier');
+                    $custTier = $product->customer_tier ?? null;
+                    $prodHargaDiskon = $product->harga_produk;
+                    $prodPctDiskon = 0;
+                    $prodAdaDiskon = false;
+                    $prodBadge = '';
+
+                    if ($isProdukTier && $custTier) {
+                        // Cari diskon spesifik untuk tier pelanggan ini
+                        $td = \App\Models\ProductMemberDiscount::findByProductAndTier($product->id_produk, $custTier);
+                        if ($td && $product->hasActiveDiscount()) {
+                            $prodPctDiskon = $td->discount_percentage;
+                            $prodHargaDiskon = $product->harga_produk - ($product->harga_produk * ($prodPctDiskon / 100));
+                            $prodAdaDiskon = true;
+                            $prodBadge = '-' . number_format($prodPctDiskon, 0) . '%';
+                        }
+                    } elseif (!$isProdukTier && $product->hasActiveDiscount()) {
+                        $prodHargaDiskon = $product->harga_diskon ?? $product->harga_produk;
+                        $prodPctDiskon = $product->persentase_diskon;
+                        $prodAdaDiskon = true;
+                        $prodBadge = '-' . number_format($prodPctDiskon, 0) . '%';
+                    }
+                @endphp
                 <div class="col-lg-2 col-md-3 col-6 product-item">
                     <div class="product-card position-relative">
-                        @if($product->hasActiveDiscount())
-                            <span class="discount-badge">-{{ number_format($product->getDiscountPercentage(), 0) }}%</span>
+                        @if($prodAdaDiskon)
+                            <span class="discount-badge">{{ $prodBadge }}</span>
                         @endif
 
                         <a href="{{ route('product.show', $product->id_produk) }}" style="text-decoration: none; color: inherit;">
@@ -1583,8 +1640,8 @@
                                 <h5 class="product-title">{{ $product->nama_produk }}</h5>
 
                                 <div class="product-price">
-                                    @if($product->hasActiveDiscount())
-                                        <span class="current-price">Rp {{ number_format($product->getCurrentPrice(), 0, ',', '.') }}</span>
+                                    @if($prodAdaDiskon)
+                                        <span class="current-price">Rp {{ number_format($prodHargaDiskon, 0, ',', '.') }}</span>
                                         <del class="original-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</del>
                                     @else
                                         <span class="current-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</span>

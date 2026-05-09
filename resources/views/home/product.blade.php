@@ -681,11 +681,37 @@
 
                     <!-- Price -->
                     <div class="mb-3">
-                        @if($product->hasActiveDiscount())
+                        @php
+                            $isTierProduk = ($product->discount_target === 'tier');
+                            $tierDiskonProduk = null;
+                            $hargaAkhirProduk = $product->harga_produk;
+                            $pctDiskonProduk = 0;
+                            $adaDiskonProduk = false;
+
+                            if ($isTierProduk && isset($customerTier) && $customerTier) {
+                                $tierDiskonProduk = \App\Models\ProductMemberDiscount::findByProductAndTier($product->id_produk, $customerTier);
+                                if ($tierDiskonProduk && $product->hasActiveDiscount()) {
+                                    $pctDiskonProduk = $tierDiskonProduk->discount_percentage;
+                                    $hargaAkhirProduk = $product->harga_produk - ($product->harga_produk * ($pctDiskonProduk / 100));
+                                    $adaDiskonProduk = true;
+                                }
+                            } elseif (!$isTierProduk && $product->hasActiveDiscount()) {
+                                $hargaAkhirProduk = $product->harga_diskon ?? $product->harga_produk;
+                                $pctDiskonProduk = $product->persentase_diskon;
+                                $adaDiskonProduk = true;
+                            }
+                        @endphp
+
+                        @if($adaDiskonProduk)
                             <div class="product-price-old">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</div>
                             <div class="product-price">
-                                Rp {{ number_format($product->getCurrentPrice(), 0, ',', '.') }}
-                                <span class="discount-badge">-{{ number_format($product->getDiscountPercentage(), 0) }}%</span>
+                                Rp {{ number_format($hargaAkhirProduk, 0, ',', '.') }}
+                                <span class="discount-badge">-{{ number_format($pctDiskonProduk, 0) }}%</span>
+                                @if($isTierProduk && isset($customerTier) && $customerTier)
+                                    <small class="d-block text-muted" style="font-size:0.75rem; font-weight:400;">
+                                        Harga khusus Tier {{ ucfirst($customerTier) }} Anda
+                                    </small>
+                                @endif
                             </div>
                             <div class="text-success small mt-2">
                                 <i class="bi bi-clock-fill"></i>
@@ -693,6 +719,11 @@
                             </div>
                         @else
                             <div class="product-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</div>
+                            @if($isTierProduk && $product->hasActiveDiscount() && (!isset($customerTier) || !$customerTier))
+                                <small class="text-info d-block mt-1">
+                                    <i class="bi bi-crown"></i> Produk ini memiliki harga khusus Member. <a href="{{ route('login') }}">Login</a> untuk melihat harga Anda.
+                                </small>
+                            @endif
                         @endif
                     </div>
 
@@ -903,7 +934,7 @@
                     </div>
                     @if($review->foto_review)
                     <div class="review-photo mt-3">
-                        <img src="{{ asset('storage/' . $review->foto_review) }}"
+                        <img src="{{ str_starts_with($review->foto_review, 'http') ? $review->foto_review : asset('storage/' . $review->foto_review) }}"
                              alt="Review Photo"
                              style="max-width: 200px; max-height: 200px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);"
                              onclick="window.open(this.src, '_blank')">

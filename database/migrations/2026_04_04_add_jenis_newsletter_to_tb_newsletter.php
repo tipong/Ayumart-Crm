@@ -17,7 +17,7 @@ return new class extends Migration
             if (!Schema::hasColumn('tb_newsletter', 'jenis_newsletter')) {
                 $table->enum('jenis_newsletter', [
                     'mailchimp',
-                    'fonte',
+                    'fonnte',
                     'keduanya'
                 ])->default('mailchimp')->after('subjek_email');
             }

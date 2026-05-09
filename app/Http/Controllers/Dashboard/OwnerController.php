@@ -19,24 +19,40 @@ class OwnerController extends Controller
         // Get year from request or use current year
         $currentYear = $request->get('year', now()->year);
 
-        // Get revenue statistics
+        // Get revenue statistics (excluding cancelled)
         $totalRevenue = Order::where('status_pembayaran', 'sudah_bayar')
+            ->whereDoesntHave('cancellation', function($q) {
+                $q->where('status_pembatalan', 'disetujui');
+            })
             ->sum('total_harga');
 
-        // Get transaction statistics
-        $totalTransactions = Order::count();
+        // Get transaction statistics (excluding cancelled)
+        $totalTransactions = Order::whereDoesntHave('cancellation', function($q) {
+            $q->where('status_pembatalan', 'disetujui');
+        })->count();
 
         // Get customer statistics
         $totalCustomers = Pelanggan::count();
 
-        // Get product statistics
-        $totalProducts = Product::count();
+        // Get product statistics (Total item yang terjual, bukan jumlah SKU)
+        $totalProducts = DB::table('tb_detail_transaksi as dt')
+            ->join('tb_transaksi as t', 'dt.id_transaksi', '=', 't.id_transaksi')
+            ->leftJoin('tb_pembatalan_transaksi as pt', 't.id_transaksi', '=', 'pt.id_transaksi')
+            ->where('t.status_pembayaran', 'sudah_bayar')
+            ->where(function($query) {
+                $query->whereNull('pt.id_pembatalan_transaksi')
+                      ->orWhere('pt.status_pembatalan', '!=', 'disetujui');
+            })
+            ->sum('dt.qty');
 
         // Get monthly sales data for the selected year
         $salesData = array_fill(0, 12, 0); // Default all months to 0
 
-        // Query sales data grouped by month using tanggal_transaksi column
+        // Query sales data grouped by month using tanggal_transaksi column (excluding cancelled)
         $monthlySales = Order::where('status_pembayaran', 'sudah_bayar')
+            ->whereDoesntHave('cancellation', function($q) {
+                $q->where('status_pembatalan', 'disetujui');
+            })
             ->whereYear('tanggal_transaksi', $currentYear)
             ->selectRaw('MONTH(tanggal_transaksi) as month, ROUND(SUM(total_harga - total_diskon) / 1000000, 2) as total')
             ->groupBy('month')
@@ -48,15 +64,24 @@ class OwnerController extends Controller
             $salesData[$sale->month - 1] = $sale->total;
         }
 
-        // Get all paid orders and their totals
+        // Get all paid orders and their totals (excluding cancelled)
         $totalSales = Order::where('status_pembayaran', 'sudah_bayar')
+            ->whereDoesntHave('cancellation', function($q) {
+                $q->where('status_pembatalan', 'disetujui');
+            })
             ->sum('total_harga');
 
         // Get top products from detail transaksi with paid orders
-        // Step 1: Get product IDs with quantities for paid orders
+        // Get top products from detail transaksi with paid orders (excluding cancelled & filtered by year)
         $topProductIds = DB::table('tb_detail_transaksi as dt')
             ->join('tb_transaksi as t', 'dt.id_transaksi', '=', 't.id_transaksi')
+            ->leftJoin('tb_pembatalan_transaksi as pt', 't.id_transaksi', '=', 'pt.id_transaksi')
             ->where('t.status_pembayaran', 'sudah_bayar')
+            ->whereYear('t.tanggal_transaksi', $currentYear)
+            ->where(function($query) {
+                $query->whereNull('pt.id_pembatalan_transaksi')
+                      ->orWhere('pt.status_pembatalan', '!=', 'disetujui');
+            })
             ->selectRaw('dt.id_produk, SUM(dt.qty) as total_sold')
             ->groupBy('dt.id_produk')
             ->orderBy('total_sold', 'desc')
@@ -83,7 +108,7 @@ class OwnerController extends Controller
                 $product = $products[$item->id_produk] ?? null;
                 if ($product) {
                     $topProductLabels[] = $product->nama_produk;
-                    $topProductData[] = $item->total_sold;
+                    $topProductData[] = (int)$item->total_sold;
                 }
             }
         }
@@ -145,6 +170,9 @@ class OwnerController extends Controller
             ->whereMonth('tanggal_transaksi', $bulan)
             ->whereYear('tanggal_transaksi', $tahun)
             ->where('status_pembayaran', 'sudah_bayar')
+            ->whereDoesntHave('cancellation', function($q) {
+                $q->where('status_pembatalan', 'disetujui');
+            })
             ->orderBy('tanggal_transaksi', 'desc')
             ->get();
 
@@ -160,10 +188,15 @@ class OwnerController extends Controller
             ->table('tb_detail_transaksi')
             ->join('tb_transaksi', 'tb_detail_transaksi.id_transaksi', '=', 'tb_transaksi.id_transaksi')
             ->join('db_integrasi_ayu_mart.tb_produk', 'tb_detail_transaksi.id_produk', '=', 'db_integrasi_ayu_mart.tb_produk.id_produk')
+            ->leftJoin('tb_pembatalan_transaksi', 'tb_transaksi.id_transaksi', '=', 'tb_pembatalan_transaksi.id_transaksi')
             ->where('tb_transaksi.id_cabang', $idCabang)
             ->whereMonth('tb_transaksi.tanggal_transaksi', $bulan)
             ->whereYear('tb_transaksi.tanggal_transaksi', $tahun)
             ->where('tb_transaksi.status_pembayaran', 'sudah_bayar')
+            ->where(function($query) {
+                $query->whereNull('tb_pembatalan_transaksi.id_pembatalan_transaksi')
+                      ->orWhere('tb_pembatalan_transaksi.status_pembatalan', '!=', 'disetujui');
+            })
             ->select(
                 'db_integrasi_ayu_mart.tb_produk.nama_produk',
                 DB::raw('SUM(tb_detail_transaksi.qty) as total_terjual'),

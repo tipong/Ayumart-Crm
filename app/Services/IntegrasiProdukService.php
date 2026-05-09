@@ -74,28 +74,76 @@ class IntegrasiProdukService
     }
 
     /**
-     * Get produk promo dengan stok by cabang
+     * Get produk promo dengan stok by cabang.
+     * Menyertakan diskon general dan diskon tier sesuai tier pelanggan.
+     *
+     * @param string|null $idCabang
+     * @param int $limit
+     * @param string|null $customerTier Tier membership pelanggan (bronze/silver/gold/platinum)
      */
-    public function getProdukPromoWithStokByCabang($idCabang, $limit = 6)
+    public function getProdukPromoWithStokByCabang($idCabang, $limit = 6, $customerTier = null, $filters = [])
     {
-        $products = Produk::where('status_produk', 'aktif')
+        // 1. Produk dengan diskon GENERAL yang aktif
+        $generalQuery = Produk::where('status_produk', 'aktif')
             ->where('is_diskon_active', 1)
+            ->where(function ($q) {
+                $q->where('discount_target', 'general')
+                  ->orWhereNull('discount_target'); // backward compat: produk lama tanpa discount_target
+            })
             ->whereNotNull('harga_diskon')
             ->whereNotNull('tanggal_akhir_diskon')
             ->where('tanggal_akhir_diskon', '>=', now()->startOfDay())
-            ->with(['jenis'])
-            ->orderBy('harga_diskon', 'desc')
+            ->where('tanggal_mulai_diskon', '<=', now())
+            ->with(['jenis']);
+
+        if (isset($filters['id_jenis'])) {
+            $generalQuery->where('id_jenis', $filters['id_jenis']);
+        }
+
+        $generalPromo = $generalQuery->orderBy('harga_diskon', 'desc')
             ->limit($limit)
             ->get();
 
+        // 2. Produk dengan diskon TIER yang aktif (hanya jika pelanggan login dan punya tier)
+        $tierPromo = collect();
+        if ($customerTier) {
+            $tierProductIds = \App\Models\ProductMemberDiscount::where('tier', $customerTier)
+                ->where('is_active', true)
+                ->pluck('product_id');
+
+            if ($tierProductIds->isNotEmpty()) {
+                $tierQuery = Produk::where('status_produk', 'aktif')
+                    ->where('is_diskon_active', 1)
+                    ->where('discount_target', 'tier')
+                    ->whereNotNull('tanggal_akhir_diskon')
+                    ->where('tanggal_akhir_diskon', '>=', now()->startOfDay())
+                    ->where('tanggal_mulai_diskon', '<=', now())
+                    ->whereIn('id_produk', $tierProductIds)
+                    ->with(['jenis']);
+                
+                if (isset($filters['id_jenis'])) {
+                    $tierQuery->where('id_jenis', $filters['id_jenis']);
+                }
+
+                $tierPromo = $tierQuery->limit($limit)->get();
+            }
+        }
+
+        // Gabungkan keduanya, hapus duplikasi berdasarkan id_produk
+        $combined = $generalPromo->merge($tierPromo)->unique('id_produk')->take($limit);
+
         // Tambahkan informasi stok untuk setiap produk
-        foreach ($products as $product) {
+        foreach ($combined as $product) {
             $stok = $this->getStokProdukCabang($product->id_produk, $idCabang);
             $product->stok_cabang = $stok;
             $product->is_available = $stok > 0;
+            // Tandai apakah ini diskon tier
+            $product->is_tier_discount = $product->discount_target === 'tier';
+            // Simpan tier pelanggan untuk kalkulasi di view
+            $product->customer_tier = $customerTier;
         }
 
-        return $products;
+        return $combined;
     }
 
     /**

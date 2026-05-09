@@ -241,7 +241,7 @@
                             <!-- Review Photo -->
                             @if($review->foto_review)
                             <div class="mb-3">
-                                <img src="{{ asset('storage/' . $review->foto_review) }}"
+                                <img src="{{ str_starts_with($review->foto_review, 'http') ? $review->foto_review : asset('storage/' . $review->foto_review) }}"
                                      alt="Review Photo"
                                      class="review-photo img-thumbnail"
                                      style="max-height: 200px; max-width: 100%;"
@@ -259,7 +259,7 @@
                             <div class="action-buttons d-flex flex-wrap gap-2">
                                 <button type="button"
                                         class="btn btn-primary"
-                                        onclick="showEditModal({{ $review->id_review }}, {{ $review->rating }}, '{{ addslashes($review->review) }}', '{{ $review->foto_review ? asset('storage/' . $review->foto_review) : '' }}')">
+                                        onclick="showEditModal({{ $review->id_review }}, {{ $review->rating }}, '{{ addslashes($review->review) }}', '{{ $review->foto_review ? (str_starts_with($review->foto_review, 'http') ? $review->foto_review : asset('storage/' . $review->foto_review)) : '' }}')">
                                     <i class="bi bi-pencil-square"></i> Edit Review
                                 </button>
                                 <form action="{{ route('pelanggan.review.destroy', $review->id_review) }}"

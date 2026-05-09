@@ -420,28 +420,7 @@
                         </a>
                     </li>
 
-                    <!-- Notifikasi -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link nav-icon dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
-                            <i class="bi bi-bell"></i>
-                            <span class="badge bg-danger" id="notification-count" style="display: none;">0</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
-                            <li class="dropdown-header d-flex justify-content-between align-items-center">
-                                <span><strong>Notifikasi</strong></span>
-                                <button class="btn btn-sm btn-link text-decoration-none" id="markAllReadBtn" style="font-size: 0.75rem;">Tandai Semua Dibaca</button>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <div id="notificationList">
-                                <div class="text-center py-4">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <p class="text-muted mb-0 mt-2 small">Memuat notifikasi...</p>
-                                </div>
-                            </div>
-                        </ul>
-                    </li>
+                    <!-- Notifikasi disembunyikan sesuai permintaan -->
 
                     <!-- Ticketing -->
                     <li class="nav-item">

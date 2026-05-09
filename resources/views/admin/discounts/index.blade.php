@@ -111,13 +111,14 @@
                             <tr>
                                 {{-- <th width="5%">ID</th> --}}
                                 <th width="10%">Gambar</th>
-                                <th width="20%">Nama Produk</th>
+                                <th width="18%">Nama Produk</th>
                                 <th width="10%">Kategori</th>
-                                <th width="12%">Harga Normal</th>
-                                <th width="12%">Harga Diskon</th>
-                                <th width="10%">Diskon</th>
+                                <th width="11%">Harga Normal</th>
+                                <th width="11%">Harga Diskon</th>
+                                <th width="12%">Tanggal Diskon</th>
+                                <th width="9%">Target</th>
                                 <th width="10%">Status</th>
-                                <th width="11%">Aksi</th>
+                                <th width="12%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,15 +159,11 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($product->hasActiveDiscount())
-                                            <span class="badge badge-danger text-black">
-                                                -{{ number_format($product->persentase_diskon, 0) }}%
+                                        @if($product->hasActiveDiscount() || $product->discount_target === 'tier')
+                                            <span class="text-dark">
+                                                {{ $product->tanggal_mulai_diskon ? $product->tanggal_mulai_diskon->format('d/m/Y') : '-' }} -
+                                                {{ $product->tanggal_akhir_diskon ? $product->tanggal_akhir_diskon->format('d/m/Y') : '-' }}
                                             </span>
-                                            <br>
-                                            <small class="text-muted">
-                                                {{ $product->tanggal_mulai_diskon->format('d/m/Y') }} -
-                                                {{ $product->tanggal_akhir_diskon->format('d/m/Y') }}
-                                            </small>
                                             @if($product->isDiscountExpired())
                                                 <br>
                                                 <small class="text-danger">
@@ -182,27 +179,62 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($product->harga_diskon)
+                                        @if($product->discount_target === 'tier')
+                                            @php
+                                                $tierDiscounts = \App\Models\ProductMemberDiscount::where('product_id', $product->id_produk)
+                                                    ->where('is_active', true)
+                                                    ->get()
+                                                    ->keyBy('tier');
+                                                $tierBadges = [
+                                                    'bronze'   => ['bg' => 'warning',   'text' => 'dark',  'icon' => '🥉'],
+                                                    'silver'   => ['bg' => 'secondary', 'text' => 'dark', 'icon' => '🥈'],
+                                                    'gold'     => ['bg' => 'info',      'text' => 'dark', 'icon' => '🥇'],
+                                                    'platinum' => ['bg' => 'danger',    'text' => 'dark', 'icon' => '💎'],
+                                                ];
+                                            @endphp
+                                            @if($tierDiscounts->count() > 0)
+                                                @foreach(['bronze','silver','gold','platinum'] as $t)
+                                                    @if(isset($tierDiscounts[$t]))
+                                                        @php $tb = $tierBadges[$t]; @endphp
+                                                        <span class="badge badge-{{ $tb['bg'] }} text-{{ $tb['text'] }} mb-1 d-inline-block" style="font-size:0.7rem;">
+                                                            {{ $tb['icon'] }} {{ ucfirst($t) }}: -{{ number_format($tierDiscounts[$t]->discount_percentage, 0) }}%
+                                                        </span><br>
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                <span class="badge badge-info text-white">
+                                                    <i class="fas fa-crown"></i> Tier
+                                                </span>
+                                            @endif
+                                        @elseif($product->discount_target === 'general' || ($product->harga_diskon && !$product->discount_target))
+                                            <span class="badge badge-success text-dark">
+                                                <i class="fas fa-globe"></i> Umum
+                                            </span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @php
+                                            $hasDiscount = $product->harga_diskon || ($product->discount_target === 'tier' && $product->is_diskon_active);
+                                        @endphp
+                                        @if($hasDiscount)
                                             @if($product->is_diskon_active)
                                                 @if($product->isDiscountExpired())
-                                                    {{-- Diskon expired tapi belum di-deactivate oleh system --}}
                                                     <span class="badge badge-secondary text-black">
                                                         Sudah Lewat
                                                     </span>
                                                 @else
-                                                    {{-- Diskon aktif dan masih berlaku --}}
                                                     <span class="badge badge-success text-success">
                                                         <i class="fas fa-check-circle"></i> Aktif
                                                     </span>
                                                 @endif
                                             @else
-                                                {{-- Diskon ada tapi nonaktif --}}
                                                 <span class="badge badge-warning text-warning">
                                                     <i class="fas fa-pause-circle"></i> Nonaktif
                                                 </span>
                                             @endif
                                         @else
-                                            {{-- Tidak ada diskon --}}
                                             <span class="badge badge-secondary text-secondary">
                                                 <i class="fas fa-times-circle"></i> Belum Ada
                                             </span>
@@ -210,21 +242,17 @@
                                     </td>
                                     <td>
                                         <div class="btn-group-vertical btn-group-sm" role="group">
-                                            @if($product->harga_diskon)
-                                                @if($product->hasActiveDiscount() && !$product->isDiscountExpired())
-                                                    <!-- Edit Discount (hanya jika masih dalam range) -->
+                                            @php
+                                                $hasAnyDiscount = $product->harga_diskon || ($product->discount_target === 'tier' && $product->is_diskon_active);
+                                                $isActiveAndValid = ($product->hasActiveDiscount() || ($product->discount_target === 'tier' && $product->is_diskon_active)) && !$product->isDiscountExpired();
+                                            @endphp
+                                            @if($hasAnyDiscount)
+                                                @if($isActiveAndValid)
+                                                    <!-- Edit Discount -->
                                                     <a href="{{ route('admin.discounts.edit', $product->id_produk) }}"
                                                        class="btn btn-warning btn-sm mb-1"
                                                        title="Edit Diskon">
                                                         <i class="fas fa-edit"></i> Edit
-                                                    </a>
-
-                                                    <!-- Member Discount -->
-                                                    <a href="{{ route('admin.discounts.edit', $product->id_produk) }}#member-discount"
-                                                       class="btn btn-info btn-sm mb-1"
-                                                       title="Kelola Diskon Member Tier"
-                                                       onclick="navigateToMemberTab()">
-                                                        <i class="fas fa-crown"></i> Member Tier
                                                     </a>
 
                                                     <!-- Delete Discount -->
@@ -243,14 +271,14 @@
                                                         @method('DELETE')
                                                     </form>
                                                 @else
-                                                    <!-- Diskon sudah lewat - Tampilkan tombol Tambah Diskon -->
+                                                    <!-- Diskon sudah lewat - Tambah Diskon Baru -->
                                                     <a href="{{ route('admin.discounts.create', $product->id_produk) }}"
                                                        class="btn btn-success btn-sm mb-1"
                                                        title="Tambah Diskon Baru">
                                                         <i class="fas fa-plus"></i> Tambah Diskon
                                                     </a>
 
-                                                    <!-- Tetap tampilkan Delete untuk menghapus diskon lama -->
+                                                    <!-- Hapus Diskon Lama -->
                                                     <button type="button"
                                                             class="btn btn-danger btn-sm"
                                                             onclick="confirmDelete('delete-discount-{{ $product->id_produk }}', '{{ $product->nama_produk }}')"
@@ -267,7 +295,7 @@
                                                     </form>
                                                 @endif
                                             @else
-                                                <!-- Add Discount -->
+                                                <!-- Tambah Diskon -->
                                                 <a href="{{ route('admin.discounts.create', $product->id_produk) }}"
                                                    class="btn btn-success btn-sm"
                                                    title="Tambah Diskon">

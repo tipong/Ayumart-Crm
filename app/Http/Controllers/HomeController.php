@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\Integrasi\Produk as ProdukIntegrasi;
 use App\Models\Integrasi\Jenis;
 use App\Models\Cabang;
+use App\Models\Membership;
+use App\Models\ProductMemberDiscount;
 use App\Services\NearestBranchService;
 use App\Services\IntegrasiProdukService;
 
@@ -53,16 +55,31 @@ class HomeController extends Controller
         // Limit to 24 products for home page
         $products = $products->take(24);
 
+        // Tandai tier pelanggan ke setiap produk agar view bisa kalkulasi harga
+        foreach ($products as $product) {
+            $product->customer_tier = $customerTier ?? null;
+        }
+
         // Get product categories from database integrasi
         $categories = Jenis::orderBy('nama_jenis')->get();
 
+        // Dapatkan tier membership pelanggan yang sedang login
+        $customerTier = null;
+        if (auth()->check()) {
+            $membership = Membership::where('user_id', auth()->id())
+                ->where('is_active', true)
+                ->first();
+            $customerTier = $membership?->tier;
+        }
+
         // Get products with active discount for promo section (with category filter and stock)
-        $promoProducts = $this->integrasiProdukService->getProdukPromoWithStokByCabang($nearestBranchId, 6);
+        // Termasuk produk dengan diskon general DAN diskon tier
+        $promoProducts = $this->integrasiProdukService->getProdukPromoWithStokByCabang($nearestBranchId, 6, $customerTier, $filters);
 
         // Get all active branches for selection
         $branches = $this->nearestBranchService->getAllActiveBranches();
 
-        return view('home.index', compact('products', 'categories', 'promoProducts', 'categoryId', 'branches'));
+        return view('home.index', compact('products', 'categories', 'promoProducts', 'categoryId', 'branches', 'customerTier'));
     }
 
     /**
@@ -142,7 +159,16 @@ class HomeController extends Controller
             ];
         }
 
-        return view('home.product', compact('product', 'images', 'reviews', 'averageRating', 'totalReviews', 'ratingDistribution', 'branches'));
+        // Ambil tier membership pelanggan untuk menampilkan harga diskon yang sesuai
+        $customerTier = null;
+        if (auth()->check()) {
+            $membership = Membership::where('user_id', auth()->id())
+                ->where('is_active', true)
+                ->first();
+            $customerTier = $membership?->tier;
+        }
+
+        return view('home.product', compact('product', 'images', 'reviews', 'averageRating', 'totalReviews', 'ratingDistribution', 'branches', 'customerTier'));
     }
 
     /**

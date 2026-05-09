@@ -132,11 +132,11 @@
                             <th>Status Pembayaran:</th>
                             <td>
                                 @if($cancellation->transaksi->status_pembayaran == 'sudah_bayar')
-                                    <span class="badge badge-success">Sudah Dibayar</span>
+                                    <span class="badge badge-success text-success">Sudah Dibayar</span>
                                 @elseif($cancellation->transaksi->status_pembayaran == 'belum_bayar')
-                                    <span class="badge badge-warning">Belum Dibayar</span>
+                                    <span class="badge badge-warning text-warning">Belum Dibayar</span>
                                 @else
-                                    <span class="badge badge-danger">Kadaluarsa</span>
+                                    <span class="badge badge-danger text-danger">Kadaluarsa</span>
                                 @endif
                             </td>
                         </tr>

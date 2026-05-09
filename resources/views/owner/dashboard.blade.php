@@ -74,7 +74,7 @@
                 <div class="stat-icon">
                     <i class="bi bi-box-seam"></i>
                 </div>
-                <div class="stat-label">Total Produk</div>
+                <div class="stat-label">Total Produk Terjual</div>
                 <div class="stat-value">{{ $totalProducts ?? 0 }}</div>
             </div>
         </div>

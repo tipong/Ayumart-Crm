@@ -10,40 +10,9 @@
             <i class="fas fa-edit text-warning"></i> Edit Diskon
         </h1>
         <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">
-                // Member discount price preview
-    const basePriceForMember = {{ $product->harga_produk }};
-    const currentDiscountedPrice = {{ $product->hasActiveDiscount() ? $product->harga_diskon : $product->harga_produk }};
-
-    document.querySelectorAll('.member-discount-input').forEach((input) => {
-        input.addEventListener('input', function() {
-            const index = this.getAttribute('data-index');
-            const discount = parseFloat(this.value) || 0;
-            // Calculate based on current price (with regular discount if active)
-            const finalPrice = currentDiscountedPrice - (currentDiscountedPrice * (discount / 100));
-
-            // Update price preview
-            document.querySelector(`.member-price-preview-${index}`).textContent =
-                finalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        });
-    });fa-arrow-left"></i> Kembali
+            <i class="fas fa-arrow-left"></i> Kembali
         </a>
     </div>
-
-    <!-- Tabs for Regular and Member Discounts -->
-    <ul class="nav nav-tabs mb-4" id="discountTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="regular-tab" data-bs-toggle="tab"
-                    data-bs-target="#regular-discount" type="button" role="tab" aria-controls="regular-discount" aria-selected="true">
-                <i class="fas fa-tag"></i> Diskon Reguler
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="member-tab" data-bs-toggle="tab"
-                    data-bs-target="#member-discount" type="button" role="tab" aria-controls="member-discount" aria-selected="false">
-                <i class="fas fa-crown"></i> Diskon Member Tier
-            </button>
-        </li>
-    </ul>
 
     <!-- Product Info Card -->
     <div class="card shadow mb-4">
@@ -85,11 +54,7 @@
             </h6>
         </div>
         <div class="card-body">
-            <!-- Tab Content -->
-            <div class="tab-content" id="discountTabContent">
-                <!-- Regular Discount Tab -->
-                <div class="tab-pane fade show active" id="regular-discount" role="tabpanel" aria-labelledby="regular-tab">
-            <!-- Display All Errors -->
+            <!-- Alert Messages -->
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Terjadi Kesalahan!</h5>
@@ -105,7 +70,6 @@
                 </div>
             @endif
 
-            <!-- Display Success Message -->
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -115,7 +79,6 @@
                 </div>
             @endif
 
-            <!-- Display Error Message -->
             @if (session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-times-circle"></i> {{ session('error') }}
@@ -125,56 +88,271 @@
                 </div>
             @endif
 
+            @php
+                $currentTarget = old('discount_target', $product->discount_target ?? 'general');
+                $discountType  = 'percentage';
+                $discountValue = $product->persentase_diskon;
+                $tiers = \App\Models\ProductMemberDiscount::TIERS;
+                $existingTierDiscounts = \App\Models\ProductMemberDiscount::where('product_id', $product->id_produk)
+                    ->get()->keyBy('tier');
+                $tierColors = [
+                    'bronze'   => ['border' => 'warning',   'bg' => 'warning',   'icon' => 'fas fa-medal', 'label' => 'Bronze'],
+                    'silver'   => ['border' => 'secondary', 'bg' => 'secondary', 'icon' => 'fas fa-medal', 'label' => 'Silver'],
+                    'gold'     => ['border' => 'info',      'bg' => 'info',      'icon' => 'fas fa-crown', 'label' => 'Gold'],
+                    'platinum' => ['border' => 'danger',    'bg' => 'danger',    'icon' => 'fas fa-gem',   'label' => 'Platinum'],
+                ];
+            @endphp
+
             <form action="{{ route('admin.discounts.update', $product->id_produk) }}" method="POST" id="discountForm">
                 @csrf
                 @method('PUT')
 
-                @php
-                    // Calculate discount type based on existing data
-                    $discountType = 'percentage';
-                    $discountValue = $product->persentase_diskon;
-                @endphp
+                {{-- ===== TARGET DISKON ===== --}}
+                <div class="mb-4">
+                    <label class="form-label font-weight-bold">
+                        <i class="fas fa-bullseye"></i> Target Diskon <span class="text-danger">*</span>
+                    </label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-success {{ $currentTarget === 'general' ? 'card-target-selected shadow' : '' }}"
+                                 id="card-general" style="cursor: pointer; transition: all 0.2s;"
+                                 onclick="selectTarget('general')">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="mr-3">
+                                        <i class="fas fa-globe fa-2x text-success"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 font-weight-bold">Umum (General)</h6>
+                                        <small class="text-muted">Diskon berlaku untuk semua pelanggan tanpa memandang tier membership.</small>
+                                    </div>
+                                    <div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio"
+                                                   name="discount_target"
+                                                   id="target_general"
+                                                   value="general"
+                                                   class="custom-control-input"
+                                                   {{ $currentTarget === 'general' ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="target_general"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-info {{ $currentTarget === 'tier' ? 'card-target-selected shadow' : '' }}"
+                                 id="card-tier" style="cursor: pointer; transition: all 0.2s;"
+                                 onclick="selectTarget('tier')">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="mr-3">
+                                        <i class="fas fa-crown fa-2x text-info"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 font-weight-bold">Berdasarkan Tier Member</h6>
+                                        <small class="text-muted">Diskon khusus untuk setiap tier (Bronze, Silver, Gold, Platinum).</small>
+                                    </div>
+                                    <div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio"
+                                                   name="discount_target"
+                                                   id="target_tier"
+                                                   value="tier"
+                                                   class="custom-control-input"
+                                                   {{ $currentTarget === 'tier' ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="target_tier"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @error('discount_target')
+                        <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
+                    @enderror
+                </div>
 
-                <div class="row">
-                    <!-- Discount Type -->
-                    <div class="col-md-6 mb-3">
-                        <label for="discount_type" class="form-label">
-                            <i class="fas fa-percentage"></i> Tipe Diskon <span class="text-danger">*</span>
-                        </label>
-                        <select name="discount_type" id="discount_type" class="form-control @error('discount_type') is-invalid @enderror" required>
-                            <option value="">-- Pilih Tipe Diskon --</option>
-                            <option value="percentage" {{ old('discount_type', $discountType) == 'percentage' ? 'selected' : '' }}>Persentase (%)</option>
-                            <option value="fixed" {{ old('discount_type', $discountType) == 'fixed' ? 'selected' : '' }}>Nominal (Rp)</option>
-                        </select>
-                        @error('discount_type')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                {{-- ===== DISKON UMUM (GENERAL) ===== --}}
+                <div id="section-general" class="{{ $currentTarget === 'general' ? '' : 'd-none' }}">
+                    <div class="alert alert-success">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Diskon Umum:</strong> Diskon ini akan berlaku untuk seluruh pelanggan yang membeli produk ini.
+                    </div>
+                    <div class="row">
+                        <!-- Discount Type -->
+                        <div class="col-md-6 mb-3">
+                            <label for="discount_type" class="form-label">
+                                <i class="fas fa-percentage"></i> Tipe Diskon <span class="text-danger">*</span>
+                            </label>
+                            <select name="discount_type" id="discount_type" class="form-control @error('discount_type') is-invalid @enderror">
+                                <option value="">-- Pilih Tipe Diskon --</option>
+                                <option value="percentage" {{ old('discount_type', $discountType) == 'percentage' ? 'selected' : '' }}>Persentase (%)</option>
+                                <option value="fixed" {{ old('discount_type', $discountType) == 'fixed' ? 'selected' : '' }}>Nominal (Rp)</option>
+                            </select>
+                            @error('discount_type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Discount Value -->
+                        <div class="col-md-6 mb-3">
+                            <label for="discount_value" class="form-label">
+                                <i class="fas fa-money-bill"></i> Nilai Diskon <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="discount_value"
+                                   id="discount_value"
+                                   class="form-control @error('discount_value') is-invalid @enderror"
+                                   value="{{ old('discount_value', $discountValue) }}"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="Masukkan nilai diskon">
+                            @error('discount_value')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted" id="discount_hint">
+                                Masukkan persentase diskon (contoh: 20 untuk diskon 20%)
+                            </small>
+                        </div>
                     </div>
 
-                    <!-- Discount Value -->
-                    <div class="col-md-6 mb-3">
-                        <label for="discount_value" class="form-label">
-                            <i class="fas fa-money-bill"></i> Nilai Diskon <span class="text-danger">*</span>
-                        </label>
-                        <input type="number"
-                               name="discount_value"
-                               id="discount_value"
-                               class="form-control @error('discount_value') is-invalid @enderror"
-                               value="{{ old('discount_value', $discountValue) }}"
-                               min="0"
-                               step="0.01"
-                               required
-                               placeholder="Masukkan nilai diskon">
-                        @error('discount_value')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted" id="discount_hint">
-                            Masukkan persentase diskon (contoh: 20 untuk diskon 20%)
-                        </small>
+                    <!-- Active Status -->
+                    <div class="mb-3">
+                        <div class="custom-control custom-checkbox">
+                            <input type="hidden" name="is_active" value="0">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="is_active"
+                                   name="is_active"
+                                   value="1"
+                                   {{ old('is_active', $product->is_diskon_active) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="is_active">
+                                <strong>Aktifkan Diskon</strong>
+                                <small class="text-muted d-block">Centang untuk mengaktifkan diskon ini</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Preview Card -->
+                    <div class="alert alert-info" id="preview_card" style="display: none;">
+                        <h5 class="alert-heading"><i class="fas fa-eye"></i> Preview Diskon</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Harga Normal:</strong></p>
+                                <h4>Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</h4>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Diskon:</strong></p>
+                                <h4 class="text-danger" id="preview_discount">-</h4>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Harga Setelah Diskon:</strong></p>
+                                <h4 class="text-success" id="preview_price">-</h4>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row">
+                {{-- ===== DISKON PER TIER ===== --}}
+                <div id="section-tier" class="{{ $currentTarget === 'tier' ? '' : 'd-none' }}">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Diskon per Tier:</strong> Atur diskon berbeda untuk setiap tier membership pelanggan.
+                    </div>
+
+                    <!-- Status Aktif untuk semua tier discounts -->
+                    <div class="mb-3">
+                        <div class="custom-control custom-checkbox">
+                            <input type="hidden" name="is_active" value="0">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="is_active_tier"
+                                   name="is_active"
+                                   value="1"
+                                   {{ old('is_active', $product->is_diskon_active) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="is_active_tier">
+                                <strong>Aktifkan Diskon Tier</strong>
+                                <small class="text-muted d-block">Centang untuk mengaktifkan fitur diskon berdasarkan tier</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        @php $tierIndex = 0; @endphp
+                        @foreach($tiers as $tierCode => $tierName)
+                            @php
+                                $tc = $tierColors[$tierCode] ?? ['border'=>'secondary','bg'=>'secondary','icon'=>'fas fa-circle','label'=>$tierName];
+                                $existingDiscount = $existingTierDiscounts[$tierCode] ?? null;
+                                $isActive = $existingDiscount ? $existingDiscount->is_active : false;
+                                $discountPct = $existingDiscount ? $existingDiscount->discount_percentage : 0;
+                                $currentPrice = $product->harga_produk;
+                                $previewPrice = $currentPrice - ($currentPrice * ($discountPct / 100));
+                            @endphp
+                            <div class="col-md-6 mb-4">
+                                <div class="card border-{{ $tc['border'] }}">
+                                    <div class="card-header py-2 bg-{{ $tc['bg'] }} text-white">
+                                        <h6 class="mb-0 font-weight-bold">
+                                            <i class="{{ $tc['icon'] }}"></i> {{ $tierName }}
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <input type="hidden" name="tier_discounts[{{ $tierIndex }}][tier]" value="{{ $tierCode }}">
+
+                                        <div class="form-group mb-3">
+                                            <label for="tier_discount_{{ $tierIndex }}" class="form-label font-weight-bold">
+                                                <i class="fas fa-percentage"></i> Diskon untuk {{ $tierName }} (%)
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="number"
+                                                       name="tier_discounts[{{ $tierIndex }}][discount_percentage]"
+                                                       id="tier_discount_{{ $tierIndex }}"
+                                                       class="form-control tier-discount-input"
+                                                       data-tier="{{ $tierCode }}"
+                                                       data-index="{{ $tierIndex }}"
+                                                       value="{{ old('tier_discounts.' . $tierIndex . '.discount_percentage', $discountPct) }}"
+                                                       min="0"
+                                                       max="100"
+                                                       step="0.01">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="hidden" name="tier_discounts[{{ $tierIndex }}][is_active]" value="0">
+                                                <input type="checkbox"
+                                                       name="tier_discounts[{{ $tierIndex }}][is_active]"
+                                                       id="tier_active_{{ $tierIndex }}"
+                                                       class="custom-control-input"
+                                                       value="1"
+                                                       {{ old('tier_discounts.' . $tierIndex . '.is_active', $isActive) ? 'checked' : '' }}>
+                                                <label class="custom-control-label" for="tier_active_{{ $tierIndex }}">
+                                                    Aktifkan diskon untuk tier ini
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Preview Harga -->
+                                        <div class="alert alert-light mt-2 mb-0 small">
+                                            <p class="mb-1"><strong>Preview Harga Member {{ $tierName }}:</strong></p>
+                                            <p class="mb-0">
+                                                <span class="text-muted">Rp {{ number_format($currentPrice, 0, ',', '.') }}</span>
+                                                <i class="fas fa-arrow-right mx-1 text-muted"></i>
+                                                <strong class="text-success">Rp <span class="tier-price-preview-{{ $tierIndex }}">{{ number_format($previewPrice, 0, ',', '.') }}</span></strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @php $tierIndex++; @endphp
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- ===== TANGGAL DISKON ===== --}}
+                <div class="row mt-3">
                     <!-- Start Date -->
                     <div class="col-md-6 mb-3">
                         <label for="start_date" class="form-label">
@@ -208,44 +386,6 @@
                     </div>
                 </div>
 
-                <!-- Active Status -->
-                <div class="mb-3">
-                    <div class="custom-control custom-checkbox">
-                        <!-- Hidden input to ensure a value is always sent -->
-                        <input type="hidden" name="is_active" value="0">
-                        <input type="checkbox"
-                               class="custom-control-input"
-                               id="is_active"
-                               name="is_active"
-                               value="1"
-                               {{ old('is_active', $product->is_diskon_active) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="is_active">
-                            <strong>Aktifkan Diskon</strong>
-                            <small class="text-muted d-block">Centang untuk mengaktifkan diskon ini</small>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Preview Card -->
-                <div class="alert alert-info" id="preview_card" style="display: none;">
-                    <h5 class="alert-heading"><i class="fas fa-eye"></i> Preview Diskon</h5>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p class="mb-1"><strong>Harga Normal:</strong></p>
-                            <h4>Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</h4>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="mb-1"><strong>Diskon:</strong></p>
-                            <h4 class="text-danger" id="preview_discount">-</h4>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="mb-1"><strong>Harga Setelah Diskon:</strong></p>
-                            <h4 class="text-success" id="preview_price">-</h4>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Batal
@@ -254,147 +394,46 @@
                         <i class="fas fa-save"></i> Update Diskon
                     </button>
                 </div>
-                </form>
-                </div>
-                <!-- End Regular Discount Tab -->
-
-                <!-- Member Discount Tab -->
-                <div class="tab-pane fade" id="member-discount" role="tabpanel" aria-labelledby="member-tab">
-                    @php
-                        $tiers = \App\Models\ProductMemberDiscount::TIERS;
-                        $discounts = \App\Models\ProductMemberDiscount::where('product_id', $product->id_produk)
-                            ->get()
-                            ->keyBy('tier');
-                    @endphp
-
-                    <form action="{{ route('admin.discounts.update-member-discount', $product->id_produk) }}"
-                          method="POST"
-                          id="memberDiscountForm">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="alert alert-info mb-4">
-                            <i class="fas fa-info-circle"></i>
-                            Atur diskon khusus untuk setiap tier member. Pelanggan akan melihat harga yang berbeda sesuai tier membership mereka.
-                        </div>
-
-                        <div class="row">
-                            @php $index = 0; @endphp
-                            @foreach($tiers as $tierCode => $tierName)
-                                @php
-                                    $discount = $discounts[$tierCode] ?? null;
-                                    $isActive = $discount ? $discount->is_active : false;
-                                    $discountPercentage = $discount ? $discount->discount_percentage : 0;
-                                @endphp
-                                <div class="col-md-6 mb-4">
-                                    <div class="card border-{{
-                                        $tierCode === 'platinum' ? 'warning' :
-                                        ($tierCode === 'gold' ? 'info' :
-                                        ($tierCode === 'silver' ? 'secondary' : 'success'))
-                                    }}">
-                                        <div class="card-header py-2 bg-{{
-                                            $tierCode === 'platinum' ? 'warning' :
-                                            ($tierCode === 'gold' ? 'info' :
-                                            ($tierCode === 'silver' ? 'secondary' : 'success'))
-                                        }} text-white">
-                                            <h6 class="mb-0 font-weight-bold">
-                                                <i class="fas fa-crown"></i> {{ $tierName }}
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <input type="hidden" name="discounts[{{ $index }}][tier]" value="{{ $tierCode }}">
-
-                                            <div class="form-group mb-3">
-                                                <label for="member_discount_{{ $index }}" class="form-label font-weight-bold">
-                                                    <i class="fas fa-percentage"></i> Diskon (%)
-                                                </label>
-                                                <div class="input-group">
-                                                    <input type="number"
-                                                           name="discounts[{{ $index }}][discount_percentage]"
-                                                           id="member_discount_{{ $index }}"
-                                                           class="form-control member-discount-input"
-                                                           data-tier="{{ $tierCode }}"
-                                                           data-index="{{ $index }}"
-                                                           value="{{ old('discounts.' . $index . '.discount_percentage', $discountPercentage) }}"
-                                                           min="0"
-                                                           max="100"
-                                                           step="0.01">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text">%</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="hidden" name="discounts[{{ $index }}][is_active]" value="0">
-                                                    <input type="checkbox"
-                                                           name="discounts[{{ $index }}][is_active]"
-                                                           id="member_is_active_{{ $index }}"
-                                                           class="custom-control-input"
-                                                           value="1"
-                                                           {{ old('discounts.' . $index . '.is_active', $isActive) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="member_is_active_{{ $index }}">
-                                                        Aktifkan diskon untuk tier ini
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <!-- Price Preview -->
-                                            <div class="alert alert-light mt-3 mb-0 small">
-                                                <p class="mb-1"><strong>Harga Diskon untuk Member {{ $tierName }}:</strong></p>
-                                                @php
-                                                    // Get current price (base price or discounted price if regular discount is active)
-                                                    $currentPrice = $product->hasActiveDiscount() ? $product->harga_diskon : $product->harga_produk;
-                                                    $memberDiscountedPrice = $currentPrice - ($currentPrice * ($discountPercentage / 100));
-                                                @endphp
-                                                <p class="mb-0">
-                                                    <span class="text-muted">
-                                                        @if($product->hasActiveDiscount())
-                                                            <s>Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</s>
-                                                            Rp {{ number_format($currentPrice, 0, ',', '.') }}
-                                                        @else
-                                                            Rp {{ number_format($currentPrice, 0, ',', '.') }}
-                                                        @endif
-                                                    </span>
-                                                    <span class="float-right">
-                                                        <strong class="text-success">Rp <span class="member-price-preview-{{ $index }}">{{ number_format($memberDiscountedPrice, 0, ',', '.') }}</span></strong>
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                @php $index++; @endphp
-                            @endforeach
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between mt-4">
-                                    <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">
-                                        <i class="fas fa-times"></i> Batal
-                                    </a>
-                                    <button type="submit" class="btn btn-info">
-                                        <i class="fas fa-save"></i> Simpan Diskon Member
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <!-- End Member Discount Tab -->
-            </div>
+            </form>
         </div>
+    </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+    .card-target-selected {
+        border-width: 2px !important;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+    #card-general:hover, #card-tier:hover {
+        border-width: 2px;
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>
     const productPrice = {{ $product->harga_produk }};
 
-    // Update discount hint based on type
+    // ======= Target Diskon Toggle =======
+    function selectTarget(target) {
+        document.getElementById('target_' + target).checked = true;
+
+        if (target === 'general') {
+            document.getElementById('section-general').classList.remove('d-none');
+            document.getElementById('section-tier').classList.add('d-none');
+            document.getElementById('card-general').classList.add('card-target-selected');
+            document.getElementById('card-tier').classList.remove('card-target-selected');
+        } else {
+            document.getElementById('section-general').classList.add('d-none');
+            document.getElementById('section-tier').classList.remove('d-none');
+            document.getElementById('card-tier').classList.add('card-target-selected');
+            document.getElementById('card-general').classList.remove('card-target-selected');
+        }
+    }
+
+    // ======= General Discount Preview =======
     $('#discount_type').change(function() {
         const type = $(this).val();
         if (type === 'percentage') {
@@ -409,7 +448,6 @@
         calculatePreview();
     });
 
-    // Calculate preview when discount value changes
     $('#discount_value').on('input', calculatePreview);
 
     function calculatePreview() {
@@ -442,20 +480,16 @@
         return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    // Member discount price preview
-    const basePriceForMember = {{ $product->harga_produk }};
-    const currentDiscountedPrice = {{ $product->hasActiveDiscount() ? $product->harga_diskon : $product->harga_produk }};
-
-    document.querySelectorAll('.member-discount-input').forEach((input) => {
+    // ======= Tier Discount Preview =======
+    document.querySelectorAll('.tier-discount-input').forEach((input) => {
         input.addEventListener('input', function() {
             const index = this.getAttribute('data-index');
             const discount = parseFloat(this.value) || 0;
-            // Calculate based on current price (with regular discount if active)
-            const finalPrice = currentDiscountedPrice - (currentDiscountedPrice * (discount / 100));
-
-            // Update price preview
-            document.querySelector(`.member-price-preview-${index}`).textContent =
-                finalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const finalPrice = productPrice - (productPrice * (discount / 100));
+            const preview = document.querySelector(`.tier-price-preview-${index}`);
+            if (preview) {
+                preview.textContent = finalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
         });
     });
 
@@ -471,52 +505,46 @@
 
     // Form validation before submit
     $('#discountForm').on('submit', function(e) {
-        const discountType = $('#discount_type').val();
-        const discountValue = parseFloat($('#discount_value').val()) || 0;
+        const target = $('input[name="discount_target"]:checked').val();
         const startDate = $('#start_date').val();
         const endDate = $('#end_date').val();
 
-        console.log('Form submit - Data:', {
-            discount_type: discountType,
-            discount_value: discountValue,
-            start_date: startDate,
-            end_date: endDate,
-            is_active: $('#is_active').is(':checked')
-        });
-
-        // Validate discount type
-        if (!discountType) {
+        if (!target) {
             e.preventDefault();
-            alert('Silakan pilih tipe diskon!');
-            $('#discount_type').focus();
+            alert('Silakan pilih target diskon!');
             return false;
         }
 
-        // Validate discount value
-        if (discountValue <= 0) {
-            e.preventDefault();
-            alert('Nilai diskon harus lebih dari 0!');
-            $('#discount_value').focus();
-            return false;
+        if (target === 'general') {
+            const discountType  = $('#discount_type').val();
+            const discountValue = parseFloat($('#discount_value').val()) || 0;
+
+            if (!discountType) {
+                e.preventDefault();
+                alert('Silakan pilih tipe diskon!');
+                $('#discount_type').focus();
+                return false;
+            }
+            if (discountValue <= 0) {
+                e.preventDefault();
+                alert('Nilai diskon harus lebih dari 0!');
+                $('#discount_value').focus();
+                return false;
+            }
+            if (discountType === 'percentage' && discountValue > 100) {
+                e.preventDefault();
+                alert('Persentase diskon tidak boleh lebih dari 100%!');
+                $('#discount_value').focus();
+                return false;
+            }
+            if (discountType === 'fixed' && discountValue > productPrice) {
+                e.preventDefault();
+                alert('Nominal diskon tidak boleh lebih dari harga produk!');
+                $('#discount_value').focus();
+                return false;
+            }
         }
 
-        // Validate percentage
-        if (discountType === 'percentage' && discountValue > 100) {
-            e.preventDefault();
-            alert('Persentase diskon tidak boleh lebih dari 100%!');
-            $('#discount_value').focus();
-            return false;
-        }
-
-        // Validate fixed amount
-        if (discountType === 'fixed' && discountValue > productPrice) {
-            e.preventDefault();
-            alert('Nominal diskon tidak boleh lebih dari harga produk!');
-            $('#discount_value').focus();
-            return false;
-        }
-
-        // Validate dates
         if (!startDate || !endDate) {
             e.preventDefault();
             alert('Tanggal mulai dan berakhir harus diisi!');
@@ -530,20 +558,7 @@
             return false;
         }
 
-        console.log('Form validation passed, submitting...');
         return true;
-    });
-
-    // Handle tab navigation via hash
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.location.hash) {
-            const hash = window.location.hash;
-            if (hash === '#member-discount') {
-                // Activate member discount tab
-                const memberTab = new bootstrap.Tab(document.getElementById('member-tab'));
-                memberTab.show();
-            }
-        }
     });
 </script>
 @endpush

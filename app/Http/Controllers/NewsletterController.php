@@ -512,8 +512,14 @@ class NewsletterController extends Controller
     private function sendNewsletterViaFonnte($newsletter, $id)
     {
         try {
-            // Get customers with phone numbers from tb_pelanggan
-            $customersResult = $this->fonnte->getCustomersWithPhones(PHP_INT_MAX, 0);
+            // Get target tiers if any
+            $targetTiers = null;
+            if (!empty($newsletter->target_tiers)) {
+                $targetTiers = is_string($newsletter->target_tiers) ? json_decode($newsletter->target_tiers, true) : $newsletter->target_tiers;
+            }
+
+            // Get customers with phone numbers from tb_pelanggan, filtered by tier if applicable
+            $customersResult = $this->fonnte->getCustomersWithPhones(PHP_INT_MAX, 0, $targetTiers);
 
             if (!$customersResult['success']) {
                 throw new \Exception('Gagal mengambil data pelanggan: ' . $customersResult['error']);

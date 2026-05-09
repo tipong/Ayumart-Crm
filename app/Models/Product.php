@@ -38,6 +38,7 @@ class Product extends Model
         'tanggal_mulai_diskon',
         'tanggal_akhir_diskon',
         'is_diskon_active',
+        'discount_target',
         'diskon_produk',
         'stok_produk',
         'berat_produk',

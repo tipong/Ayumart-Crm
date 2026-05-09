@@ -3,6 +3,11 @@
 @section('title', 'Profil Saya')
 
 @push('styles')
+    {{-- Load Leaflet CSS --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     
     <style>
         :root {
             --primary-color: #3F4F44;
@@ -1650,4 +1655,19 @@
     // Load counts on page load
     loadCounts();
 </script>
+
+{{-- Include Address Modals --}}
+@include('pelanggan.partials.edit-address-modal')
+
+{{-- Load Leaflet.js for Interactive Maps --}}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+{{-- Load Custom Map Picker --}}
+<script src="{{ asset('js/map-picker.js') }}"></script>
+
+{{-- Load Checkout Address Management JS (contains editAddress logic) --}}
+<script src="{{ asset('js/checkout-address.js') }}"></script>
+
 @endpush

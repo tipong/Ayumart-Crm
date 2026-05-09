@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::table('tb_newsletter', function (Blueprint $table) {
             // Add metode_pengiriman column if it doesn't exist
             if (!Schema::hasColumn('tb_newsletter', 'metode_pengiriman')) {
-                $table->enum('metode_pengiriman', ['mailchimp', 'fonte', 'keduanya'])
+                $table->enum('metode_pengiriman', ['mailchimp', 'fonnte', 'keduanya'])
                     ->default('mailchimp')
                     ->after('konten_html')
-                    ->comment('Metode pengiriman newsletter: mailchimp, fonte, atau keduanya');
+                    ->comment('Metode pengiriman newsletter: mailchimp, fonnte, atau keduanya');
             }
         });
     }

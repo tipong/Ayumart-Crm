@@ -25,6 +25,7 @@ class Produk extends Model
         'tanggal_mulai_diskon',
         'tanggal_akhir_diskon',
         'is_diskon_active',
+        'discount_target',
         'berat_produk',
         'foto_produk',
         'status_produk',
@@ -158,13 +159,26 @@ class Produk extends Model
      */
     public function hasActiveDiscount()
     {
-        if (!$this->is_diskon_active || !$this->harga_diskon) {
+        if (!$this->is_diskon_active) {
             return false;
         }
 
-        $now = now();
+        // Diskon tier: cek tanggal saja (harga_diskon boleh null untuk tier target)
+        if ($this->discount_target === 'tier') {
+            $now   = now();
+            $start = $this->tanggal_mulai_diskon;
+            $end   = $this->tanggal_akhir_diskon;
+            return $start && $end && $now->between($start, $end);
+        }
+
+        // Diskon general: perlu harga_diskon dan dalam range tanggal
+        if (!$this->harga_diskon) {
+            return false;
+        }
+
+        $now   = now();
         $start = $this->tanggal_mulai_diskon;
-        $end = $this->tanggal_akhir_diskon;
+        $end   = $this->tanggal_akhir_diskon;
 
         if ($start && $end && $now->between($start, $end)) {
             return true;
@@ -191,16 +205,32 @@ class Produk extends Model
             return 0;
         }
 
+        // Jika target tier, tidak ada harga_diskon global
+        if ($this->discount_target === 'tier') {
+            return 0;
+        }
+
+        if (!$this->harga_diskon || $this->harga_produk <= 0) {
+            return 0;
+        }
+
         return round((($this->harga_produk - $this->harga_diskon) / $this->harga_produk) * 100);
     }
 
     /**
      * Get discount percentage (alias method untuk kompatibilitas dengan views)
-     * Same as persentase_diskon accessor
      */
     public function getDiscountPercentage()
     {
         return $this->persentase_diskon;
+    }
+
+    /**
+     * Cek apakah diskon ini bertarget tier
+     */
+    public function isTierDiscount(): bool
+    {
+        return $this->discount_target === 'tier';
     }
 
     /**
