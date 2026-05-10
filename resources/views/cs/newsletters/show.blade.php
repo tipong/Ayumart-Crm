@@ -425,7 +425,7 @@
             @endif
 
             <!-- Tracking Statistics -->
-            @if($newsletter->status === 'terkirim')
+            @if($newsletter->status === 'terkirim' && $newsletter->metode_pengiriman !== 'fonnte')
             <div class="detail-card">
                 <div class="detail-card-header success">
                     <h6>
@@ -595,7 +595,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th class="fw-bold">Pelanggan</th>
-                                        <th class="fw-bold">Email</th>
+                                        <th class="fw-bold">Kontak (Email/WA)</th>
                                         <th class="fw-bold">Status</th>
                                         <th class="fw-bold">Dibuka</th>
                                         <th class="fw-bold">Diklik</th>

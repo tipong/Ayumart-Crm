@@ -499,20 +499,24 @@
                                     <div class="col-md-3 product-info">
                                         <h6 class="mb-1">{{ $item->produk->nama_produk }}</h6>
                                         {{-- <small class="text-muted">Kode: {{ $item->produk->kode_produk }}</small> --}}
-                                        @if($item->produk->hasActiveDiscount())
+                                        @php
+                                            $customerTier = $membership ? $membership->tier : null;
+                                            $currentPrice = $item->produk->getCurrentPrice($customerTier);
+                                        @endphp
+                                        @if($currentPrice < $item->produk->harga_produk)
                                             <div class="mt-1">
-                                                <span class="badge bg-danger">-{{ $item->produk->persentase_diskon }}%</span>
+                                                <span class="badge bg-danger">-{{ round((($item->produk->harga_produk - $currentPrice) / $item->produk->harga_produk) * 100) }}%</span>
                                             </div>
                                         @endif
                                     </div>
                                     <div class="col-md-2">
                                         <div class="price-info">
-                                            @if($item->produk->hasActiveDiscount())
+                                            @if($currentPrice < $item->produk->harga_produk)
                                                 <small class="text-decoration-line-through text-muted price-original">
                                                     Rp {{ number_format($item->produk->harga_produk, 0, ',', '.') }}
                                                 </small>
                                                 <div class="fw-bold text-success price-current">
-                                                    Rp {{ number_format($item->produk->getCurrentPrice(), 0, ',', '.') }}
+                                                    Rp {{ number_format($currentPrice, 0, ',', '.') }}
                                                 </div>
                                             @else
                                                 <div class="fw-bold price-current">

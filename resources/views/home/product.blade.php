@@ -756,7 +756,7 @@
                     @php
                         $memberDiscounts = $product->getAllMemberDiscounts();
                     @endphp
-                    @if(!empty($memberDiscounts) && $memberDiscounts->count() > 0)
+                    <!-- @if(!empty($memberDiscounts) && $memberDiscounts->count() > 0)
                     <div class="mb-4">
                         <h5 class="mb-3">
                             <i class="bi bi-crown"></i> Harga Khusus Member
@@ -802,7 +802,7 @@
                             Harga akan berubah sesuai dengan tier membership Anda
                         </small>
                     </div>
-                    @endif
+                    @endif -->
 
                     @auth
                     @php

@@ -69,15 +69,6 @@ class Produk extends Model
     public function getDiscountForTier($tier)
     {
         try {
-            // Check if table exists first
-            $tableName = 'product_member_discounts';
-            $schemaBuilder = DB::connection('mysql_integrasi')->getSchemaBuilder();
-
-            // Jika tabel tidak ada, return null
-            if (!$schemaBuilder->hasTable($tableName)) {
-                return null;
-            }
-
             return $this->memberDiscounts()
                 ->where('tier', $tier)
                 ->where('is_active', true)
@@ -95,16 +86,6 @@ class Produk extends Model
     public function getAllMemberDiscounts()
     {
         try {
-            // Check if table exists first
-            $tableName = 'product_member_discounts';
-            $schemaBuilder = DB::connection('mysql_integrasi')->getSchemaBuilder();
-
-            // Jika tabel tidak ada, return empty collection
-            if (!$schemaBuilder->hasTable($tableName)) {
-                Log::warning('Table ' . $tableName . ' does not exist in database');
-                return collect();
-            }
-
             return $this->memberDiscounts()
                 ->where('is_active', true)
                 ->get()
@@ -118,7 +99,7 @@ class Produk extends Model
                     ];
                 });
         } catch (\Exception $e) {
-            // Return empty collection jika ada error (misalnya tabel tidak ada)
+            // Return empty collection jika ada error
             Log::warning('Error getting member discounts for product ' . $this->id_produk . ': ' . $e->getMessage());
             return collect();
         }
@@ -191,8 +172,30 @@ class Produk extends Model
      * Get current price (with discount if active)
      * Alias untuk harga_final untuk kompatibilitas
      */
-    public function getCurrentPrice()
+    public function getCurrentPrice($customerTier = null)
     {
+        $basePrice = $this->harga_produk;
+
+        // Cek diskon tier jika tier diberikan dan diskon_target = 'tier' atau 'semua'
+        if ($customerTier && in_array($this->discount_target, ['tier', 'semua']) && $this->is_diskon_active) {
+            $now = now();
+            $start = $this->tanggal_mulai_diskon;
+            $end = $this->tanggal_akhir_diskon;
+
+            if (!$start || !$end || $now->between($start, $end)) {
+                $tierDiscount = $this->getDiscountForTier($customerTier);
+                if ($tierDiscount && $tierDiscount->discount_percentage > 0) {
+                    $discountedPrice = $basePrice - ($basePrice * ($tierDiscount->discount_percentage / 100));
+                    // Jika target='semua', bandingkan diskon mana yang lebih murah: harga diskon reguler vs harga diskon tier
+                    if ($this->discount_target === 'semua' && $this->harga_diskon > 0) {
+                        return min($discountedPrice, $this->harga_diskon);
+                    }
+                    return $discountedPrice;
+                }
+            }
+        }
+
+        // Jika tidak ada diskon tier yang berlaku, kembalikan harga final reguler
         return $this->harga_final;
     }
 

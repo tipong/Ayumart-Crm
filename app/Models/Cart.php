@@ -75,9 +75,14 @@ class Cart extends Model
             return 0;
         }
 
+        $customerTier = null;
+        if ($this->pelanggan && $this->pelanggan->user && $this->pelanggan->user->membership) {
+            $customerTier = $this->pelanggan->user->membership->tier;
+        }
+
         // Produk dari integrasi DB - gunakan harga_final atau getCurrentPrice()
         $price = method_exists($produk, 'getCurrentPrice')
-            ? $produk->getCurrentPrice()
+            ? $produk->getCurrentPrice($customerTier)
             : ($produk->harga_final ?? $produk->harga_produk);
 
         return $price * $this->qty;

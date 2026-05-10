@@ -1469,7 +1469,7 @@
                         @endif
                     </h3>
                 </div>
-                <div>
+                <!-- <div>
                     @if(isset($customerTier) && $customerTier)
                         @php
                             $tierIcons = ['bronze'=>'🥉','silver'=>'🥈','gold'=>'🥇','platinum'=>'💎'];
@@ -1479,34 +1479,22 @@
                             {{ $tierIcons[$customerTier] ?? '' }} Tier {{ ucfirst($customerTier) }} – Diskon Eksklusif Anda
                         </span>
                     @endif
-                </div>
+                </div> -->
             </div>
 
             @if(isset($promoProducts) && count($promoProducts) > 0)
             <div class="row g-2">
                 @foreach($promoProducts as $product)
                 @php
-                    // Kalkulasi harga diskon untuk tampilan
+                    $custTier = $customerTier ?? null;
+                    $hargaSetelahDiskon = $product->getCurrentPrice($custTier);
+                    $adaDiskon = $hargaSetelahDiskon < $product->harga_produk;
+                    $pctDiskon = $adaDiskon ? round((($product->harga_produk - $hargaSetelahDiskon) / $product->harga_produk) * 100) : 0;
+                    $badgeLabel = $adaDiskon ? '-' . $pctDiskon . '%' : '';
+                    
+                    // Variabel untuk elemen badge di bawah
                     $isTierDiscount = ($product->discount_target === 'tier');
-                    $tier = $product->customer_tier ?? null;
-                    $tierDiscountData = null;
-                    $hargaSetelahDiskon = $product->harga_produk;
-                    $pctDiskon = 0;
-                    $badgeLabel = '';
-
-                    if ($isTierDiscount && $tier) {
-                        $tierDiscountData = \App\Models\ProductMemberDiscount::findByProductAndTier($product->id_produk, $tier);
-                        if ($tierDiscountData) {
-                            $pctDiskon = $tierDiscountData->discount_percentage;
-                            $hargaSetelahDiskon = $product->harga_produk - ($product->harga_produk * ($pctDiskon / 100));
-                            $badgeLabel = '-' . number_format($pctDiskon, 0) . '%';
-                        }
-                    } elseif (!$isTierDiscount && $product->hasActiveDiscount()) {
-                        $hargaSetelahDiskon = $product->harga_diskon ?? $product->harga_produk;
-                        $pctDiskon = $product->persentase_diskon;
-                        $badgeLabel = '-' . number_format($pctDiskon, 0) . '%';
-                    }
-                    $adaDiskon = $pctDiskon > 0;
+                    $tier = $custTier;
                 @endphp
                 <div class="col-lg-2 col-md-3 col-6">
                     <div class="product-card position-relative">
@@ -1597,29 +1585,11 @@
             <div class="row g-2" id="productContainer">
                 @foreach($products as $product)
                 @php
-                    // Kalkulasi harga untuk setiap produk (general atau tier)
-                    $isProdukTier = ($product->discount_target === 'tier');
-                    $custTier = $product->customer_tier ?? null;
-                    $prodHargaDiskon = $product->harga_produk;
-                    $prodPctDiskon = 0;
-                    $prodAdaDiskon = false;
-                    $prodBadge = '';
-
-                    if ($isProdukTier && $custTier) {
-                        // Cari diskon spesifik untuk tier pelanggan ini
-                        $td = \App\Models\ProductMemberDiscount::findByProductAndTier($product->id_produk, $custTier);
-                        if ($td && $product->hasActiveDiscount()) {
-                            $prodPctDiskon = $td->discount_percentage;
-                            $prodHargaDiskon = $product->harga_produk - ($product->harga_produk * ($prodPctDiskon / 100));
-                            $prodAdaDiskon = true;
-                            $prodBadge = '-' . number_format($prodPctDiskon, 0) . '%';
-                        }
-                    } elseif (!$isProdukTier && $product->hasActiveDiscount()) {
-                        $prodHargaDiskon = $product->harga_diskon ?? $product->harga_produk;
-                        $prodPctDiskon = $product->persentase_diskon;
-                        $prodAdaDiskon = true;
-                        $prodBadge = '-' . number_format($prodPctDiskon, 0) . '%';
-                    }
+                    $custTier = $customerTier ?? null;
+                    $prodHargaDiskon = $product->getCurrentPrice($custTier);
+                    $prodAdaDiskon = $prodHargaDiskon < $product->harga_produk;
+                    $prodPctDiskon = $prodAdaDiskon ? round((($product->harga_produk - $prodHargaDiskon) / $product->harga_produk) * 100) : 0;
+                    $prodBadge = $prodAdaDiskon ? '-' . $prodPctDiskon . '%' : '';
                 @endphp
                 <div class="col-lg-2 col-md-3 col-6 product-item">
                     <div class="product-card position-relative">

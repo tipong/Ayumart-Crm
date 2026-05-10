@@ -9,6 +9,7 @@ class ProductMemberDiscount extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
     protected $table = 'product_member_discounts';
 
     protected $fillable = [

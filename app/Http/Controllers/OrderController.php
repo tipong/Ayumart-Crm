@@ -438,12 +438,13 @@ class OrderController extends Controller
 
                 // Create order detail record
                 // PENTING: Gunakan getCurrentPrice() untuk harga_item (termasuk diskon jika aktif)
-                $finalPrice = $produk->getCurrentPrice();
+                $customerTier = $user->membership ? $user->membership->tier : null;
+                $finalPrice = $produk->getCurrentPrice($customerTier);
                 $subtotalItem = $finalPrice * $item->qty;
 
                 // Hitung diskon item jika ada
                 $diskonItem = 0;
-                if ($produk->hasActiveDiscount()) {
+                if ($finalPrice < $produk->harga_produk) {
                     $diskonItem = ($produk->harga_produk - $finalPrice) * $item->qty;
                     Log::info('💰 Saving discount info to order detail', [
                         'product_id' => $item->id_produk,
@@ -492,7 +493,8 @@ class OrderController extends Controller
 
                 if ($produk) {
                     // PENTING: Gunakan getCurrentPrice() untuk mendapatkan harga dengan diskon jika aktif
-                    $finalPrice = $produk->getCurrentPrice();
+                    $customerTier = $user->membership ? $user->membership->tier : null;
+                    $finalPrice = $produk->getCurrentPrice($customerTier);
 
                     $midtransItems[] = [
                         'id' => $item->id_produk,
