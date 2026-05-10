@@ -378,7 +378,7 @@ class KurirController extends Controller
 
             $message = $wasAlreadyAssigned
                 ? 'Pengiriman berhasil dimulai. Status diubah menjadi Dalam Pengiriman.'
-                : 'Berhasil mengambil dan memulai pengiriman. Status diubah menjadi "Dalam Pengiriman".';
+                : 'Berhasil mengambil dan memulai pengiriman. Status diubah menjadi Dalam Pengiriman.';
 
             return redirect()->back()->with('success', $message);
 

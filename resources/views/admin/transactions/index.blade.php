@@ -204,7 +204,7 @@
             </div>
 
             <!-- Status Filter Row -->
-            <div class="d-flex justify-content-between align-items-center">
+            <!-- <div class="d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">
                     <i class="fas fa-list"></i> Daftar Transaksi
                 </h6>
@@ -222,7 +222,7 @@
                         Kadaluarsa
                     </button>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="card-body">
             @if($transactions->count() > 0)
