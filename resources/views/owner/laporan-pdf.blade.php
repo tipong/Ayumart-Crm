@@ -286,26 +286,31 @@
             <thead>
                 <tr>
                     <th style="width: 5%;">No</th>
-                    <th style="width: 12%;">Kode Transaksi</th>
+                    <th style="width: 13%;">Kode Transaksi</th>
                     <th style="width: 10%;">Tanggal</th>
-                    {{-- <th style="width: 18%;">Pelanggan</th> --}}
-                    <th style="width: 15%;" class="text-right">Subtotal</th>
-                    <th style="width: 12%;" class="text-right">Diskon</th>
-                    <th style="width: 12%;" class="text-right">Ongkir</th>
+                    <th style="width: 15%;" class="text-right">Total Produk</th>
+                    <th style="width: 13%;" class="text-right">Biaya Member</th>
+                    <th style="width: 14%;" class="text-right">Diskon</th>
+                    <th style="width: 14%;" class="text-right">Ongkir</th>
                     <th style="width: 16%;" class="text-right">Total</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($transactions as $index => $transaction)
+                @php
+                    $diskonItem = $transaction->details->sum('diskon_item');
+                    $originalTotalProduk = ($transaction->total_harga ?? 0) + $diskonItem;
+                    $totalDiskonTransaction = ($transaction->total_diskon ?? 0) + $diskonItem;
+                @endphp
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $transaction->kode_transaksi ?? 'N/A' }}</td>
                     <td>{{ $transaction->tanggal_transaksi ? \Carbon\Carbon::parse($transaction->tanggal_transaksi)->format('d/m/Y') : 'N/A' }}</td>
-                    {{-- <td>{{ $transaction->pelanggan->name ?? 'N/A' }}</td> --}}
-                    <td class="text-right">Rp {{ number_format($transaction->total_harga - ($transaction->ongkir ?? 0) + ($transaction->total_diskon ?? 0), 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($transaction->total_diskon ?? 0, 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($originalTotalProduk, 0, ',', '.') }}</td>
+                    <td class="text-right">{{ (isset($transaction->biaya_membership) && $transaction->biaya_membership > 0) ? 'Rp ' . number_format($transaction->biaya_membership, 0, ',', '.') : '-' }}</td>
+                    <td class="text-right">Rp {{ number_format($totalDiskonTransaction, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($transaction->ongkir ?? 0, 0, ',', '.') }}</td>
-                    <td class="text-right text-bold">Rp {{ number_format($transaction->total_harga ?? 0, 0, ',', '.') }}</td>
+                    <td class="text-right text-bold">Rp {{ number_format($transaction->getTotalAmount(), 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -326,11 +331,11 @@
                 <div class="total-value">Rp {{ number_format($totalOngkir, 0, ',', '.') }}</div>
             </div>
             <div class="total-row grand-total">
-                <div class="total-label">TOTAL PENJUALAN:</div>
-                <div class="total-value">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</div>
+                <div class="total-label">Grand Total Pembayaran:</div>
+                <div class="total-value">Rp {{ number_format($grandTotal, 0, ',', '.') }}</div>
             </div>
             <div class="total-row">
-                <div class="total-label">PENDAPATAN BERSIH (Setelah Diskon):</div>
+                <div class="total-label">Pendapatan Bersih Produk:</div>
                 <div class="total-value">Rp {{ number_format($pendapatanBersih, 0, ',', '.') }}</div>
             </div>
         </div>

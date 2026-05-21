@@ -121,6 +121,9 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'admin.memberships.update',
             'destroy' => 'admin.memberships.destroy',
         ]);
+
+        // Dashboard Chart Data
+        Route::get('admin/dashboard/transaction-chart-data', [AdminController::class, 'getTransactionChartData'])->name('admin.dashboard.transaction-chart-data');
     });
 
     Route::middleware(['checkRole:cs'])->group(function () {

@@ -404,7 +404,7 @@
                 <h1>Bergabunglah!</h1>
                 <p>Daftar sekarang dan nikmati pengalaman berbelanja yang lebih mudah dan menyenangkan di Ayu Mart</p>
 
-                <div class="feature-list">
+                <!-- <div class="feature-list">
                     <div class="feature-item">
                         <i class="bi bi-check-circle-fill"></i>
                         <span>Proses pendaftaran cepat & mudah</span>
@@ -421,7 +421,7 @@
                         <i class="bi bi-truck"></i>
                         <span>Gratis ongkir untuk member baru</span>
                     </div>
-                </div>
+                </div> -->
 
                 <a href="{{ route('home') }}" class="btn-back">
                     <i class="bi bi-arrow-left"></i>

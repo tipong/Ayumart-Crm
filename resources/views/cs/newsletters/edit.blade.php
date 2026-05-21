@@ -444,7 +444,7 @@
                         <!-- Subjek Email -->
                         <div class="form-group">
                             <label for="subjek_email" class="form-label">
-                                <i class="fas fa-envelope"></i> Subjek Email
+                                <i class="fas fa-envelope"></i> Subjek
                             </label>
                             <input type="text"
                                    class="form-control @error('subjek_email') is-invalid @enderror"
@@ -477,7 +477,7 @@
                         </div>
 
                         <!-- HTML Content Section -->
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <div class="custom-control">
                                 <input type="checkbox"
                                        class="custom-control-input"
@@ -487,10 +487,10 @@
                                     <i class="fas fa-code me-1"></i> Gunakan konten HTML custom (Opsional)
                                 </label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Konten HTML -->
-                        <div class="form-group" id="htmlEditorGroup" style="display: {{ $newsletter->konten_html ? 'block' : 'none' }};">
+                        <!-- <div class="form-group" id="htmlEditorGroup" style="display: {{ $newsletter->konten_html ? 'block' : 'none' }};">
                             <label for="konten_html" class="form-label">
                                 <i class="fas fa-code"></i> Konten HTML
                             </label>
@@ -503,7 +503,7 @@
                             @error('konten_html')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> -->
 
                         <!-- Action Buttons -->
                         <div class="form-divider"></div>

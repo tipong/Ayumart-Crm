@@ -132,7 +132,7 @@ class Order extends Model
      */
     public function getFinalTotalAttribute()
     {
-        return $this->total_harga - $this->total_diskon + $this->ongkir;
+        return $this->total_harga - $this->total_diskon + $this->ongkir + ($this->biaya_membership ?? 0);
     }
 
     /**
@@ -140,7 +140,7 @@ class Order extends Model
      */
     public function getTotalAmount()
     {
-        return $this->total_harga - $this->total_diskon + $this->ongkir;
+        return $this->total_harga - $this->total_diskon + $this->ongkir + ($this->biaya_membership ?? 0);
     }
 
     /**

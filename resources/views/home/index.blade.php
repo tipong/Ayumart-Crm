@@ -1409,7 +1409,7 @@
             <div class="row g-2">
                 <!-- All Products Category -->
                 <div class="col-lg-1 col-md-2 col-4">
-                    <a href="{{ route('home') }}" style="text-decoration: none;">
+                    <a href="{{ route('home') }}#products" style="text-decoration: none;">
                         <div class="category-card {{ !request('category') ? 'active-category' : '' }}">
                             <i class="bi bi-grid-3x3-gap-fill"></i>
                             <h6>Semua</h6>
@@ -1419,7 +1419,7 @@
 
                 @foreach($categories as $category)
                 <div class="col-lg-1 col-md-2 col-4">
-                    <a href="{{ route('home', ['category' => $category->id_jenis]) }}" style="text-decoration: none;">
+                    <a href="{{ route('home', ['category' => $category->id_jenis]) }}#products" style="text-decoration: none;">
                         <div class="category-card {{ request('category') == $category->id_jenis ? 'active-category' : '' }}">
                             @php
                                 // Map kategori ke icon yang sesuai

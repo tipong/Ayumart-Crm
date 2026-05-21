@@ -10,18 +10,17 @@
     }
 
     .pagination .page-link {
-        padding: 0.375rem 0.75rem;
+        padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
         border-radius: 0.25rem;
         margin: 0 2px;
+        cursor: pointer;
+        border: 1px solid #dee2e6;
+        color: #4e73df;
+        text-decoration: none;
     }
 
-    .pagination .page-item:first-child .page-link,
-    .pagination .page-item:last-child .page-link {
-        border-radius: 0.25rem;
-    }
-
-    .pagination .page-link:hover {
+    .pagination .page-link:hover:not(.disabled) {
         background-color: #4e73df;
         color: white;
         border-color: #4e73df;
@@ -30,10 +29,14 @@
     .pagination .page-item.active .page-link {
         background-color: #4e73df;
         border-color: #4e73df;
+        color: white;
     }
 
     .pagination .page-item.disabled .page-link {
         color: #6c757d;
+        cursor: not-allowed;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
     }
 
     /* Custom button size for review */
@@ -41,50 +44,6 @@
         padding: 0.15rem 0.4rem;
         font-size: 0.75rem;
         line-height: 1.2;
-    }
-
-    /* Hide ALL DataTables UI elements - AGGRESSIVE CSS */
-    #transactionsTable thead th,
-    #transactionsTable thead th.sorting,
-    #transactionsTable thead th.sorting_asc,
-    #transactionsTable thead th.sorting_desc,
-    table.dataTable thead th.sorting,
-    table.dataTable thead th.sorting_asc,
-    table.dataTable thead th.sorting_desc {
-        background-image: none !important;
-        cursor: default !important;
-        padding-right: 8px !important;
-        user-select: none !important;
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-    }
-
-    #transactionsTable_filter,
-    #transactionsTable_wrapper .dataTables_filter,
-    .dataTables_filter {
-        display: none !important;
-    }
-
-    table.dataTable thead th {
-        cursor: default !important;
-    }
-
-    /* Prevent any sorting decorations */
-    .dataTables_wrapper .dataTables_header,
-    .dataTables_wrapper .dataTables_footer {
-        display: none !important;
-    }
-
-    /* Override all DataTables sorting styles */
-    table.dataTable thead th:not(.dataTables_empty) {
-        background: none !important;
-        background-image: none !important;
-    }
-
-    /* Prevent pointer cursor on headers */
-    table.dataTable thead th:hover {
-        cursor: default !important;
     }
 
     /* Search Input Styling */
@@ -106,6 +65,15 @@
         display: inline-block;
         padding: 0.375rem 0;
         color: #858796;
+    }
+
+    /* Table styling */
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
     }
 </style>
 @endpush
@@ -186,22 +154,41 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <!-- Search and Filter Row -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text"
-                               class="form-control border-start-0"
-                               id="searchInput"
-                               placeholder="Cari pelanggan, kode transaksi, atau cabang...">
+            <form id="searchForm" method="GET" action="{{ route('admin.transactions.index') }}" class="mb-3">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control border-start-0"
+                                   id="searchInput"
+                                   name="search"
+                                   value="{{ $search ?? '' }}"
+                                   placeholder="Cari pelanggan, kode transaksi, atau cabang...">
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        @if($search)
+                            <a href="{{ route('admin.transactions.index') }}" class="btn btn-sm btn-light">
+                                <i class="fas fa-times"></i> Hapus Filter
+                            </a>
+                        @endif
                     </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <span class="text-muted small" id="searchResults">Menampilkan semua transaksi</span>
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <span class="text-muted small" id="searchResults">
+                            @if($search)
+                                Hasil pencarian untuk "{{ $search }}" ({{ $transactions->total() }} hasil)
+                            @else
+                                Menampilkan semua transaksi (Total: {{ $transactions->total() }})
+                            @endif
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </form>
 
             <!-- Status Filter Row -->
             <!-- <div class="d-flex justify-content-between align-items-center">
@@ -227,7 +214,7 @@
         <div class="card-body">
             @if($transactions->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover datatable" id="transactionsTable">
+                    <table class="table table-hover" id="transactionsTable">
                         <thead>
                             <tr>
                                 <th width="13%">Pelanggan</th>
@@ -240,7 +227,7 @@
                                 <th width="12%">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tableBody">
                             @foreach($transactions as $transaction)
                                 @php
                                     $tanggalTransaksi = $transaction->tanggal_transaksi;
@@ -249,7 +236,7 @@
                                     }
                                     $sortDate = $tanggalTransaksi ? $tanggalTransaksi->format('d/m/Y') : '';
                                 @endphp
-                                <tr data-status="{{ $transaction->status_pembayaran }}" data-date="{{ $sortDate }}">
+                                <tr>
                                     <td>
                                         @if($transaction->pelanggan && $transaction->pelanggan->user)
                                             <i class="fas fa-user text-primary"></i>
@@ -399,15 +386,19 @@
                 </div>
 
                 <!-- Pagination Info -->
-                <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex justify-content-between align-items-center mt-4">
                     <div class="text-muted small">
-                        Total: <strong>{{ $transactions->total() }}</strong> transaksi
+                        Menampilkan <strong>{{ $transactions->count() }}</strong> dari
+                        <strong>{{ $transactions->total() }}</strong> transaksi
                     </div>
                 </div>
-            @else
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-info-circle"></i> Belum ada transaksi.
-                </div>
+
+                <!-- Laravel Pagination -->
+                @if($transactions->hasPages())
+                    <div class="mt-3 d-flex justify-content-center">
+                        {{ $transactions->appends(request()->query())->render('pagination.bootstrap-4') }}
+                    </div>
+                @endif
             @endif
         </div>
     </div>
@@ -458,171 +449,74 @@
 
 @section('scripts')
 <script>
-    // Variabel global untuk state filter
-    var currentStatusFilter = 'all';
-    var transactionsTable = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+        let searchTimeout;
 
-    $(document).ready(function() {
-        // Destroy DataTable jika sudah ada
-        if ($.fn.DataTable.isDataTable('#transactionsTable')) {
-            $('#transactionsTable').DataTable().destroy();
+        // Show popup if no results found
+        @if($noResults ?? false)
+            Swal.fire({
+                icon: 'info',
+                title: 'Data Tidak Ditemukan',
+                text: 'Tidak ada transaksi yang cocok dengan pencarian "{{ $search }}".',
+                confirmButtonColor: '#3F4F44'
+            }).then(() => {
+                // Redirect to transactions without search after popup
+                window.location.href = "{{ route('admin.transactions.index') }}";
+            });
+        @endif
+
+        // Bind search input with debounce - TRIGGER FORM SUBMIT
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                clearTimeout(searchTimeout);
+                // Submit immediately if Enter is pressed
+                if (e.key === 'Enter') {
+                    searchForm.submit();
+                } else {
+                    // Otherwise use debounce
+                    searchTimeout = setTimeout(() => {
+                        console.log('🔍 Submitting search form with term:', searchInput.value);
+                        searchForm.submit();
+                    }, 800);
+                }
+            });
         }
-
-        // Inisialisasi DataTables
-        transactionsTable = $('#transactionsTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
-            },
-            "pageLength": 15,
-            "lengthMenu": [[10, 15, 25, 50, -1], [10, 15, 25, 50, "Semua"]],
-            "dom": '<"row"<"col-sm-12 col-md-6"l>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-            "responsive": true,
-            "autoWidth": false,
-            "paging": true,
-            "ordering": false,
-            "columnDefs": [
-                { "orderable": false, "targets": "_all" }
-            ]
-        });
-
-        // Disable DataTables default search dan sorting UI
-        $(document).off('init.dt.dtr').off('init.dt');
-        $('#transactionsTable thead').off('click.DT');
-        $('#transactionsTable').off('click.DT');
-        $('#transactionsTable thead th').removeClass('sorting sorting_asc sorting_desc');
-
-        // Hapus filter elements
-        function removeFiltersUI() {
-            $('#transactionsTable_filter').remove();
-            $('.dataTables_filter').remove();
-            $('#transactionsTable thead th').css('background-image', 'none');
-            $('#transactionsTable thead').off('click.DT');
-        }
-
-        removeFiltersUI();
-        setTimeout(removeFiltersUI, 100);
-        setTimeout(removeFiltersUI, 500);
-
-        // Prevent re-initialization
-        $(document).on('DOMNodeInserted', function() {
-            removeFiltersUI();
-        });
-
-        // Event listener untuk search input
-        $('#searchInput').on('keyup', function() {
-            applyFilters();
-            updateSearchResults();
-        });
-
-        // Store instance untuk global use
-        window.transactionsTable = transactionsTable;
     });
-
-    function applyFilters() {
-        const searchTerm = $('#searchInput').val().toLowerCase();
-        const rows = $('#transactionsTable tbody tr');
-        let visibleCount = 0;
-
-        rows.each(function() {
-            const row = $(this);
-            const rowStatus = row.data('status');
-
-            // Ambil text dari 3 kolom utama
-            const pelangganText = row.find('td').eq(0).text().toLowerCase();
-            const cabangText = row.find('td').eq(1).text().toLowerCase();
-            const kodeText = row.find('td').eq(2).text().toLowerCase();
-
-            // Check search match
-            const matchesSearch = searchTerm === '' ||
-                                 pelangganText.includes(searchTerm) ||
-                                 cabangText.includes(searchTerm) ||
-                                 kodeText.includes(searchTerm);
-
-            // Check status match
-            const matchesStatus = currentStatusFilter === 'all' || rowStatus === currentStatusFilter;
-
-            // Tampilkan jika kedua filter cocok
-            if (matchesSearch && matchesStatus) {
-                row.show();
-                visibleCount++;
-            } else {
-                row.hide();
-            }
-        });
-
-        // Update visible count di bawah tabel
-        const totalFiltered = $('#transactionsTable tbody tr:visible').length;
-        console.log('Filter diterapkan - Status: ' + currentStatusFilter + ', Search: ' + searchTerm + ', Visible: ' + totalFiltered);
-
-        // Redraw pagination
-        if (transactionsTable) {
-            transactionsTable.draw(false);
-        }
-
-        return visibleCount;
-    }
-
-    function updateSearchResults() {
-        const searchTerm = $('#searchInput').val().toLowerCase();
-        const visibleCount = applyFilters();
-
-        if (searchTerm === '') {
-            $('#searchResults').text('Menampilkan semua transaksi');
-        } else {
-            $('#searchResults').text(`Menemukan ${visibleCount} hasil untuk "${searchTerm}"`);
-        }
-    }
-
-    function filterStatus(status) {
-        // Update tombol status filter
-        document.querySelectorAll('.btn-group button').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-
-        // Update current status filter
-        currentStatusFilter = status;
-
-        // Terapkan filter
-        applyFilters();
-        updateSearchResults();
-    }
 
     function cancelTransaction(transactionId) {
         Swal.fire({
             title: 'Batalkan Transaksi?',
-            text: "Anda akan membatalkan transaksi ini!",
+            text: 'Anda akan membatalkan transaksi ini!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Ya, Batalkan!',
             cancelButtonText: 'Batal'
-        }).then((result) => {
+        }).then(function(result) {
             if (result.isConfirmed) {
-                // Set form action
                 const form = document.getElementById('cancelForm');
-                form.action = `/admin/transactions/${transactionId}/cancel`;
-
-                // Show modal
+                form.action = '/admin/transactions/' + transactionId + '/cancel';
                 const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
                 modal.show();
             }
         });
     }
 
-    // Handle cancel form submission
-    document.getElementById('cancelForm').addEventListener('submit', function(e) {
+    document.getElementById('cancelForm')?.addEventListener('submit', function(e) {
         const reason = document.getElementById('cancellation_reason').value;
         if (!reason.trim()) {
             e.preventDefault();
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Mohon masukkan alasan pembatalan!',
+                text: 'Mohon masukkan alasan pembatalan!'
             });
             return false;
         }
     });
 </script>
 @endsection
+

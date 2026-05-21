@@ -180,7 +180,7 @@
                             <tr class="table-light">
                                 <th class="fw-bold">No</th>
                                 <th class="fw-bold">Judul</th>
-                                <th class="fw-bold">Subjek Email</th>
+                                <th class="fw-bold">Subjek</th>
                                 <th class="fw-bold">Metode</th>
                                 <th class="fw-bold">Status</th>
                                 <th class="fw-bold">Tanggal Kirim</th>

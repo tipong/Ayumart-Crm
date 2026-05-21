@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-namespace App\Commands;
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\FonnteService;

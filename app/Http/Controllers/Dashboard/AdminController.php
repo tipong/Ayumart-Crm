@@ -12,6 +12,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Pelanggan;
 use App\Models\UserMembership;
+use App\Models\Cabang;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -203,6 +205,41 @@ class AdminController extends Controller
             $memberChartValues = is_array($memberChartData) ? $memberChartData : $memberChartData->toArray();
             $memberChartLabels = is_array($memberChartLabels) ? $memberChartLabels : $memberChartLabels->toArray();
 
+            // Transaction chart initial data (current year)
+            $currentYear = date('Y');
+            $transactionData = Order::select(
+                    DB::raw('MONTH(tanggal_transaksi) as month'),
+                    DB::raw('COUNT(*) as count'),
+                    DB::raw('SUM(total_harga - total_diskon) as total_revenue')
+                )
+                ->whereYear('tanggal_transaksi', $currentYear)
+                ->where('status_pembayaran', 'sudah_bayar')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get()
+                ->keyBy('month');
+
+            $monthsIndonesia = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            $transactionChartLabels = $monthsIndonesia;
+            $transactionChartValues = [];
+            $transactionChartRevenues = [];
+            for ($m = 1; $m <= 12; $m++) {
+                $transactionChartValues[] = $transactionData[$m]->count ?? 0;
+                $transactionChartRevenues[] = intval($transactionData[$m]->total_revenue ?? 0);
+            }
+
+            // Available years for filter
+            $availableYears = Order::select(DB::raw('YEAR(tanggal_transaksi) as year'))
+                ->whereNotNull('tanggal_transaksi')
+                ->distinct()
+                ->orderByDesc('year')
+                ->pluck('year')
+                ->toArray();
+
+            if (empty($availableYears)) {
+                $availableYears = [intval($currentYear)];
+            }
+
             return view('admin.dashboard', compact(
                 'totalOrders',
                 'pendingOrders',
@@ -214,7 +251,12 @@ class AdminController extends Controller
                 'activeMemberCount',
                 'memberPercentage',
                 'memberChartLabels',
-                'memberChartValues'
+                'memberChartValues',
+                'transactionChartLabels',
+                'transactionChartValues',
+                'transactionChartRevenues',
+                'availableYears',
+                'currentYear'
             ));
         } catch (\Exception $e) {
             Log::error('Error loading admin dashboard: ' . $e->getMessage());
@@ -232,7 +274,12 @@ class AdminController extends Controller
                 'activeMemberCount' => 0,
                 'memberPercentage' => 0,
                 'memberChartLabels' => [],
-                'memberChartValues' => []
+                'memberChartValues' => [],
+                'transactionChartLabels' => ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                'transactionChartValues' => array_fill(0, 12, 0),
+                'transactionChartRevenues' => array_fill(0, 12, 0),
+                'availableYears' => [date('Y')],
+                'currentYear' => date('Y')
             ]);
         }
     }
@@ -605,22 +652,66 @@ class AdminController extends Controller
 
     // ==================== MANAJEMEN TRANSAKSI ====================
 
-    public function transactions()
+    public function transactions(Request $request)
     {
         try {
-            // Use Order model (tb_transaksi) which has tanggal_transaksi column
-            $transactions = Order::with(['pelanggan.user', 'cancellation', 'cabang'])
-                                ->orderBy('tanggal_transaksi', 'desc')
-                                ->paginate(15);
+            // Get search parameters
+            $search = $request->get('search', '');
+            $statusFilter = $request->get('status', '');
+            $perPage = 15;
 
-            // Count based on actual status_pembayaran values
+            // Build base query with relationships
+            $query = Order::with(['pelanggan.user', 'cancellation', 'cabang'])
+                         ->orderBy('tanggal_transaksi', 'desc');
+
+            // Apply search filter - simplified version that works
+            if (!empty($search)) {
+                $searchTerm = '%' . $search . '%';
+                Log::info('🔍 Transaction Search Started', ['search' => $search]);
+
+                $query = $query->where(function ($q) use ($searchTerm) {
+                    // Search in kode_transaksi
+                    $q->where('kode_transaksi', 'like', $searchTerm);
+
+                    // Also search in pelanggan nama
+                    $q->orWhereHas('pelanggan', function ($subQ) use ($searchTerm) {
+                        $subQ->where('nama_pelanggan', 'like', $searchTerm);
+                    });
+
+                    // Also search in cabang nama
+                    $q->orWhereHas('cabang', function ($subQ) use ($searchTerm) {
+                        $subQ->where('nama_cabang', 'like', $searchTerm);
+                    });
+                });
+            }
+
+            // Apply status filter
+            if (!empty($statusFilter)) {
+                $query->where('status_pembayaran', $statusFilter);
+            }
+
+            // Count results before pagination
+            $filteredCount = $query->count();
+            Log::info('📊 Search Results', ['count' => $filteredCount, 'search_term' => $search]);
+
+            // Paginate results
+            $transactions = $query->paginate($perPage);
+
+            // Get status counts
             $statusCounts = [
                 'pending' => Order::where('status_pembayaran', 'belum_bayar')->count(),
                 'completed' => Order::where('status_pembayaran', 'sudah_bayar')->count(),
                 'cancelled' => Order::where('status_pembayaran', 'kadaluarsa')->count(),
             ];
 
-            return view('admin.transactions.index', compact('transactions', 'statusCounts'));
+            // Determine if search returned no results
+            $noResults = !empty($search) && $filteredCount === 0;
+
+            if ($noResults) {
+                Log::warning('⚠️ No results found for search', ['search' => $search]);
+            }
+
+            return view('admin.transactions.index', compact('transactions', 'statusCounts', 'search', 'statusFilter', 'noResults'));
         } catch (\Exception $e) {
             Log::error('Error loading transactions: ' . $e->getMessage());
             return back()->with('error', 'Maaf, terjadi kesalahan saat memuat data transaksi.');
@@ -715,6 +806,39 @@ class AdminController extends Controller
             Log::error('Error updating shipping status: ' . $e->getMessage());
             return back()->with('error', 'Maaf, terjadi kesalahan saat mengupdate status pengiriman.');
         }
+    }
+
+    public function getTransactionChartData(Request $request)
+    {
+        $year = $request->input('year', date('Y'));
+
+        // Query transactions per month for the selected year
+        $transactionData = Order::select(
+                DB::raw('MONTH(tanggal_transaksi) as month'),
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(total_harga - total_diskon) as total_revenue')
+            )
+            ->whereYear('tanggal_transaksi', $year)
+            ->where('status_pembayaran', 'sudah_bayar')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+        $monthsIndonesia = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $chartData = [];
+        $chartRevenues = [];
+
+        for ($m = 1; $m <= 12; $m++) {
+            $chartData[] = $transactionData[$m]->count ?? 0;
+            $chartRevenues[] = intval($transactionData[$m]->total_revenue ?? 0);
+        }
+
+        return response()->json([
+            'labels' => $monthsIndonesia,
+            'data' => $chartData,
+            'revenues' => $chartRevenues
+        ]);
     }
 }
 

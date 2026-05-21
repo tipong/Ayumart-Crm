@@ -24,7 +24,9 @@ class OwnerController extends Controller
             ->whereDoesntHave('cancellation', function($q) {
                 $q->where('status_pembatalan', 'disetujui');
             })
-            ->sum('total_harga');
+            ->get()
+            ->map(function($t) { return $t->getTotalAmount(); })
+            ->sum();
 
         // Get transaction statistics (excluding cancelled)
         $totalTransactions = Order::whereDoesntHave('cancellation', function($q) {
@@ -54,7 +56,7 @@ class OwnerController extends Controller
                 $q->where('status_pembatalan', 'disetujui');
             })
             ->whereYear('tanggal_transaksi', $currentYear)
-            ->selectRaw('MONTH(tanggal_transaksi) as month, ROUND(SUM(total_harga - total_diskon) / 1000000, 2) as total')
+            ->selectRaw('MONTH(tanggal_transaksi) as month, ROUND(SUM(total_harga - total_diskon + ongkir + COALESCE(biaya_membership, 0)) / 1000000, 2) as total')
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -177,11 +179,17 @@ class OwnerController extends Controller
             ->get();
 
         // Calculate statistics
-        $totalPenjualan = $transactions->sum('total_harga');
-        $totalDiskon = $transactions->sum('total_diskon');
+        $totalPenjualan = $transactions->sum(function($t) {
+            return $t->total_harga + $t->details->sum('diskon_item');
+        });
+        $totalDiskon = $transactions->sum(function($t) {
+            return $t->total_diskon + $t->details->sum('diskon_item');
+        });
         $totalOngkir = $transactions->sum('ongkir');
+        $totalBiayaMember = $transactions->sum('biaya_membership');
         $totalTransaksi = $transactions->count();
         $pendapatanBersih = $totalPenjualan - $totalDiskon;
+        $grandTotal = $transactions->map(function($t) { return $t->getTotalAmount(); })->sum();
 
         // Get top products for the month at this branch
         $topProducts = DB::connection('mysql')
@@ -216,8 +224,10 @@ class OwnerController extends Controller
             'totalPenjualan' => $totalPenjualan,
             'totalDiskon' => $totalDiskon,
             'totalOngkir' => $totalOngkir,
+            'totalBiayaMember' => $totalBiayaMember,
             'totalTransaksi' => $totalTransaksi,
             'pendapatanBersih' => $pendapatanBersih,
+            'grandTotal' => $grandTotal,
             'topProducts' => $topProducts,
             'tanggalCetak' => now()->format('d/m/Y H:i'),
         ];
@@ -257,11 +267,17 @@ class OwnerController extends Controller
             ->get();
 
         // Calculate statistics
-        $totalPenjualan = $transactions->sum('total_harga');
-        $totalDiskon = $transactions->sum('total_diskon');
+        $totalPenjualan = $transactions->sum(function($t) {
+            return $t->total_harga + $t->details->sum('diskon_item');
+        });
+        $totalDiskon = $transactions->sum(function($t) {
+            return $t->total_diskon + $t->details->sum('diskon_item');
+        });
         $totalOngkir = $transactions->sum('ongkir');
+        $totalBiayaMember = $transactions->sum('biaya_membership');
         $totalTransaksi = $transactions->count();
         $pendapatanBersih = $totalPenjualan - $totalDiskon;
+        $grandTotal = $transactions->map(function($t) { return $t->getTotalAmount(); })->sum();
 
         // Get top products for the selected month
         $topProducts = DB::table('tb_detail_transaksi')
@@ -288,8 +304,10 @@ class OwnerController extends Controller
             'totalPenjualan' => $totalPenjualan,
             'totalDiskon' => $totalDiskon,
             'totalOngkir' => $totalOngkir,
+            'totalBiayaMember' => $totalBiayaMember,
             'totalTransaksi' => $totalTransaksi,
             'pendapatanBersih' => $pendapatanBersih,
+            'grandTotal' => $grandTotal,
             'topProducts' => $topProducts,
             'tanggalCetak' => now()->format('d/m/Y H:i'),
         ];

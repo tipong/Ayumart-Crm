@@ -292,16 +292,23 @@
             <thead>
                 <tr>
                     <th width="5%">No</th>
-                    <th width="15%">Kode</th>
-                    <th width="20%">Pelanggan</th>
-                    <th width="15%">Tanggal</th>
-                    <th width="15%" class="text-right">Total</th>
-                    <th width="15%" class="text-right">Diskon</th>
-                    <th width="15%" class="text-right">Ongkir</th>
+                    <th width="11%">Kode</th>
+                    <th width="16%">Pelanggan</th>
+                    <th width="11%">Tanggal</th>
+                    <th width="13%" class="text-right">Total Produk</th>
+                    <th width="13%" class="text-right">Biaya Member</th>
+                    <th width="10%" class="text-right">Diskon</th>
+                    <th width="10%" class="text-right">Ongkir</th>
+                    <th width="11%" class="text-right">Total</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($transactions as $index => $transaction)
+                @php
+                    $diskonItem = $transaction->details->sum('diskon_item');
+                    $originalTotalProduk = ($transaction->total_harga ?? 0) + $diskonItem;
+                    $totalDiskonTransaction = ($transaction->total_diskon ?? 0) + $diskonItem;
+                @endphp
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $transaction->kode_transaksi }}</td>
@@ -314,10 +321,12 @@
                             N/A
                         @endif
                     </td>
-                    <td>{{ $transaction->tanggal_transaksi ? \Carbon\Carbon::parse($transaction->tanggal_transaksi)->format('d/m/Y H:i') : 'N/A' }}</td>
-                    <td class="text-right">Rp {{ number_format($transaction->total_harga ?? 0, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($transaction->total_diskon ?? 0, 0, ',', '.') }}</td>
+                    <td>{{ $transaction->tanggal_transaksi ? \Carbon\Carbon::parse($transaction->tanggal_transaksi)->format('d/m/Y') : 'N/A' }}</td>
+                    <td class="text-right">Rp {{ number_format($originalTotalProduk, 0, ',', '.') }}</td>
+                    <td class="text-right">{{ (isset($transaction->biaya_membership) && $transaction->biaya_membership > 0) ? 'Rp ' . number_format($transaction->biaya_membership, 0, ',', '.') : '-' }}</td>
+                    <td class="text-right">Rp {{ number_format($totalDiskonTransaction, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($transaction->ongkir ?? 0, 0, ',', '.') }}</td>
+                    <td class="text-right font-bold">Rp {{ number_format($transaction->getTotalAmount(), 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -332,19 +341,23 @@
         <!-- Total Section -->
         <div class="total-section">
             <div class="total-row">
-                <div class="total-label">Total Penjualan:</div>
-                <div class="total-value">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</div>
+                <div class="total-label">Total Transaksi:</div>
+                <div class="total-value">{{ $totalTransaksi }} transaksi</div>
             </div>
             <div class="total-row">
                 <div class="total-label">Total Diskon:</div>
-                <div class="total-value">- Rp {{ number_format($totalDiskon, 0, ',', '.') }}</div>
+                <div class="total-value">Rp {{ number_format($totalDiskon, 0, ',', '.') }}</div>
             </div>
             <div class="total-row">
                 <div class="total-label">Total Ongkir:</div>
-                <div class="total-value">+ Rp {{ number_format($totalOngkir, 0, ',', '.') }}</div>
+                <div class="total-value">Rp {{ number_format($totalOngkir, 0, ',', '.') }}</div>
             </div>
             <div class="total-row grand-total">
-                <div class="total-label">PENDAPATAN BERSIH:</div>
+                <div class="total-label">Grand Total Pembayaran:</div>
+                <div class="total-value">Rp {{ number_format($grandTotal, 0, ',', '.') }}</div>
+            </div>
+            <div class="total-row">
+                <div class="total-label">Pendapatan Bersih Produk:</div>
                 <div class="total-value">Rp {{ number_format($pendapatanBersih, 0, ',', '.') }}</div>
             </div>
         </div>

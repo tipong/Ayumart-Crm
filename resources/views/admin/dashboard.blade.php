@@ -255,7 +255,7 @@
             <div class="card shadow h-100">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-chart-line"></i> Pertumbuhan Member (12 Bulan Terakhir)
+                        <i class="fas fa-chart-bar"></i> Pertumbuhan Member (12 Bulan Terakhir)
                     </h6>
                 </div>
                 <div class="card-body">
@@ -270,96 +270,31 @@
         </div>
     </div>
 
-    <!-- Recent Transactions -->
+    <!-- Grafik Transaksi Tahunan -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-list"></i> Transaksi Terbaru
+                        <i class="fas fa-chart-line"></i> Grafik Transaksi Per Bulan
                     </h6>
-                    <a href="{{ route('admin.transactions.index') }}" class="btn btn-sm btn-success">
-                        Lihat Semua <i class="fas fa-arrow-right"></i>
-                    </a>
+                    <div class="d-flex align-items-center">
+                        <label for="filterYear" class="mb-0 text-muted small fw-bold text-nowrap me-2">
+                            <i class="fas fa-filter"></i> Tahun:
+                        </label>
+                        <select id="filterYear" class="form-select form-select-sm" style="width: auto;">
+                            @foreach($availableYears as $year)
+                                <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>
+                                    {{ $year }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body">
-                    @if($recentOrders->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th width="8%">ID</th>
-                                        <th width="20%">Pelanggan</th>
-                                        <th width="18%">Total</th>
-                                        <th width="15%">Status</th>
-                                        <th width="18%">Tanggal</th>
-                                        <th width="21%">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentOrders as $order)
-                                    <tr>
-                                        <td><strong>#{{ $order->id_transaksi }}</strong></td>
-                                        <td>
-                                            <i class="fas fa-user text-primary"></i>
-                                            {{ $order->pelanggan->nama_pelanggan ?? 'N/A' }}
-                                        </td>
-                                        <td class="text-success font-weight-bold">
-                                            Rp {{ number_format($order->total_harga - $order->total_diskon + $order->ongkir, 0, ',', '.') }}
-                                        </td>
-                                        <td>
-                                            @if($order->status_pembayaran === 'belum_bayar')
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="fas fa-clock"></i> Belum Bayar
-                                                </span>
-                                            @elseif($order->status_pembayaran === 'sudah_bayar')
-                                                @if($order->status_pengiriman === 'dikemas')
-                                                    <span class="badge bg-info">
-                                                        <i class="fas fa-box"></i> Dikemas
-                                                    </span>
-                                                @elseif($order->status_pengiriman === 'dikirim')
-                                                    <span class="badge bg-primary">
-                                                        <i class="fas fa-truck"></i> Dikirim
-                                                    </span>
-                                                @elseif($order->status_pengiriman === 'sampai')
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check-circle"></i> Selesai
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check"></i> Sudah Bayar
-                                                    </span>
-                                                @endif
-                                            @elseif($order->status_pembayaran === 'kadaluarsa')
-                                                <span class="badge bg-danger">
-                                                    <i class="fas fa-times-circle"></i> Kadaluarsa
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary">
-                                                    <i class="fas fa-question"></i> {{ ucfirst($order->status_pembayaran) }}
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <i class="fas fa-calendar"></i>
-                                            {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('admin.transactions.show', $order->id_transaksi) }}"
-                                               class="btn btn-sm btn-info">
-                                                <i class="fas fa-eye"></i> Detail
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="alert alert-info text-center mb-0">
-                            <i class="fas fa-info-circle"></i> Belum ada transaksi
-                        </div>
-                    @endif
+                    <div class="chart-container" style="position: relative; height: 350px;">
+                        <canvas id="transactionLineChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -370,112 +305,177 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
-    // Member Growth Chart with Admin UI Colors
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('memberGrowthChart');
+        // --- 1. Member Growth Bar Chart ---
+        const memberCtx = document.getElementById('memberGrowthChart');
+        if (memberCtx) {
+            const memberLabels = @json($memberChartLabels ?? []);
+            const memberData = @json($memberChartValues ?? []);
+            const primaryColor = '#4e73df';
 
-        if (!ctx) {
-            console.error('Canvas element not found');
-            return;
-        }
-
-        const memberLabels = @json($memberChartLabels ?? []);
-        const memberData = @json($memberChartValues ?? []);
-
-        // Admin UI Primary Color
-        const primaryColor = '#4e73df';
-        const accentColor = '#224abe';
-        const lightColor = 'rgba(78, 115, 223, 0.1)';
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: memberLabels,
-                datasets: [{
-                    label: 'Member Baru',
-                    data: memberData,
-                    borderColor: primaryColor,
-                    backgroundColor: lightColor,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 5,
-                    pointBackgroundColor: primaryColor,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 7,
-                    pointHoverBackgroundColor: accentColor
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
+            new Chart(memberCtx, {
+                type: 'bar',
+                data: {
+                    labels: memberLabels,
+                    datasets: [{
+                        label: 'Member Baru',
+                        data: memberData,
+                        backgroundColor: 'rgba(78, 115, 223, 0.85)',
+                        borderColor: primaryColor,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            font: {
-                                size: 14,
-                                weight: 'bold'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: { size: 12, weight: 'bold' },
+                                color: '#333'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            cornerRadius: 6,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Member Baru: ' + context.parsed.y + ' orang';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0,
+                                callback: function(value) { return value + ' orang'; }
                             },
-                            padding: 15,
-                            usePointStyle: true,
-                            color: '#333'
-                        }
-                    },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 },
-                        cornerRadius: 6,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Member Baru: ' + context.parsed.y + ' orang';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            font: { size: 12 },
-                            callback: function(value) {
-                                return value + ' orang';
-                            }
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: true
-                        },
-                        title: {
-                            display: true,
-                            text: 'Jumlah Member Baru'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            font: { size: 12 }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawOnChartArea: true
-                        },
-                        title: {
-                            display: true,
-                            text: 'Bulan'
+                        x: {
+                            grid: { display: false }
                         }
                     }
                 }
+            });
+        }
+
+        // --- 2. Transaction Line Chart with Filter ---
+        const txCtx = document.getElementById('transactionLineChart');
+        if (txCtx) {
+            const txLabels = @json($transactionChartLabels ?? []);
+            const txValues = @json($transactionChartValues ?? []);
+            let txRevenues = @json($transactionChartRevenues ?? []);
+
+            const transactionChart = new Chart(txCtx, {
+                type: 'line',
+                data: {
+                    labels: txLabels,
+                    datasets: [{
+                        label: 'Jumlah Transaksi',
+                        data: txValues,
+                        borderColor: '#2e7d32', // Forest Green accent
+                        backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#2e7d32',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 7,
+                        pointHoverBackgroundColor: '#1b5e20'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: { size: 12, weight: 'bold' },
+                                color: '#333'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            cornerRadius: 6,
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const count = context.parsed.y;
+                                    const revenue = txRevenues[index] ?? 0;
+                                    const formattedRevenue = 'Rp ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(revenue);
+                                    return [
+                                        'Transaksi: ' + count + ' kali',
+                                        'Total Bersih: ' + formattedRevenue
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0,
+                                callback: function(value) { return value + ' tx'; }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+
+            // Filter year handler
+            const filterYear = document.getElementById('filterYear');
+            if (filterYear) {
+                filterYear.addEventListener('change', function() {
+                    const year = this.value;
+                    filterYear.disabled = true;
+
+                    fetch(`{{ route('admin.dashboard.transaction-chart-data') }}?year=${year}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(res => {
+                        filterYear.disabled = false;
+                        transactionChart.data.datasets[0].data = res.data;
+                        txRevenues = res.revenues;
+                        transactionChart.update();
+                    })
+                    .catch(err => {
+                        filterYear.disabled = false;
+                        console.error('Error loading transaction chart data:', err);
+                        alert('Gagal memuat data transaksi untuk tahun ' + year);
+                    });
+                });
             }
-        });
+        }
     });
 </script>
 @endpush

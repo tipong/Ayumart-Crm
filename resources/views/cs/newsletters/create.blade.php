@@ -276,7 +276,7 @@
                             <!-- Subjek Email -->
                             <div class="mb-4">
                                 <label for="subjek_email" class="form-label fw-5 text-dark">
-                                    Subjek Email <span class="text-danger">*</span>
+                                    Subjek <span class="text-danger">*</span>
                                 </label>
                                 <input type="text"
                                        class="form-control form-control-lg @error('subjek_email') is-invalid @enderror"

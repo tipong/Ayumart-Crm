@@ -148,7 +148,7 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Rp ' + context.parsed.y.toFixed(2) + ' juta';
+                            return 'Rp ' + context.parsed.y.toFixed(0) + ' juta';
                         }
                     }
                 }
@@ -157,6 +157,8 @@
                 y: {
                     beginAtZero: true,
                     ticks: {
+                        stepSize: 1,
+                        precision: 0,
                         callback: function(value) {
                             return 'Rp ' + value + 'jt';
                         }
