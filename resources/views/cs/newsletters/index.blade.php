@@ -18,7 +18,7 @@
         font-size: 0.875rem;
         border-radius: 0.375rem;
         border: 1px solid #dee2e6;
-        color: #4e73df;
+        color: #10b981;
         text-decoration: none;
         transition: all 0.2s ease-in-out;
         min-width: 2.5rem;
@@ -27,17 +27,17 @@
     }
 
     .pagination .page-link:hover {
-        background-color: #4e73df;
+        background-color: #10b981;
         color: white;
-        border-color: #4e73df;
-        box-shadow: 0 2px 4px rgba(78, 115, 223, 0.25);
+        border-color: #10b981;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
     }
 
     .pagination .page-item.active .page-link {
-        background-color: #4e73df;
-        border-color: #4e73df;
+        background-color: #10b981;
+        border-color: #10b981;
         color: white;
-        box-shadow: 0 2px 8px rgba(78, 115, 223, 0.35);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
     }
 
     .pagination .page-item.disabled .page-link {
@@ -56,7 +56,7 @@
     }
 
     .pagination-info strong {
-        color: #4e73df;
+        color: #10b981;
     }
 
     /* Pagination Container */

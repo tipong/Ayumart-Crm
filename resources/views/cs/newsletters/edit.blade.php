@@ -19,7 +19,7 @@
     }
 
     .form-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         padding: 1.25rem 1.5rem;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -57,7 +57,7 @@
     }
 
     .form-label i {
-        color: #667eea;
+        color: #10b981;
         font-size: 0.9rem;
     }
 
@@ -70,8 +70,8 @@
     }
 
     .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
         background-color: white;
     }
 
@@ -172,22 +172,22 @@
     }
 
     .sidebar-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         padding: 1rem 1.25rem;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-card-header.warning {
-        background: linear-gradient(135deg, #f6c23e 0%, #daa520 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
 
     .sidebar-card-header.info {
-        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
     }
 
     .sidebar-card-header.success {
-        background: linear-gradient(135deg, #1cc88a 0%, #169b6b 100%);
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
     }
 
     .sidebar-card-header h6 {
@@ -257,7 +257,7 @@
     }
 
     .tips-list i {
-        color: #4e73df;
+        color: var(--primary-color);
         flex-shrink: 0;
         margin-top: 0.1rem;
     }

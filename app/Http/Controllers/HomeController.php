@@ -35,6 +35,15 @@ class HomeController extends Controller
         // Get category filter if exists
         $categoryId = $request->get('category');
 
+        // Dapatkan tier membership pelanggan yang sedang login
+        $customerTier = null;
+        if (auth()->check()) {
+            $membership = Membership::where('user_id', auth()->id())
+                ->where('is_active', true)
+                ->first();
+            $customerTier = $membership?->tier;
+        }
+
         // Get nearest branch ID (from session or default)
         $nearestBranchId = $this->nearestBranchService->getNearestBranchId();
 
@@ -46,31 +55,28 @@ class HomeController extends Controller
 
         // Get all active products with stock from nearest branch
         $filters = [];
-        if ($categoryId) {
+        if ($categoryId && $categoryId !== 'all') {
             $filters['id_jenis'] = $categoryId;
         }
 
         $products = $this->integrasiProdukService->getProdukWithStokByCabang($nearestBranchId, $filters);
 
-        // Limit to 24 products for home page
-        $products = $products->take(24);
+        // Limit products based on request parameters
+        if (!$categoryId) {
+            // Default view: only show a few products (e.g. 8 products)
+            $products = $products->take(8);
+        } else {
+            // Show all products if category is selected (or 'all' is clicked)
+            $products = $products->take(100);
+        }
 
         // Tandai tier pelanggan ke setiap produk agar view bisa kalkulasi harga
         foreach ($products as $product) {
-            $product->customer_tier = $customerTier ?? null;
+            $product->customer_tier = $customerTier;
         }
 
         // Get product categories from database integrasi
         $categories = Jenis::orderBy('nama_jenis')->get();
-
-        // Dapatkan tier membership pelanggan yang sedang login
-        $customerTier = null;
-        if (auth()->check()) {
-            $membership = Membership::where('user_id', auth()->id())
-                ->where('is_active', true)
-                ->first();
-            $customerTier = $membership?->tier;
-        }
 
         // Get products with active discount for promo section (with category filter and stock)
         // Termasuk produk dengan diskon general DAN diskon tier

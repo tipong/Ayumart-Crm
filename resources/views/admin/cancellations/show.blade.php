@@ -3,98 +3,110 @@
 @section('title', 'Detail Pembatalan Transaksi')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-2">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
         <div>
-            <h1 class="h3 mb-0 text-gray-800">Detail Pembatalan Transaksi</h1>
+            <h1 class="fw-extrabold text-success-emphasis mb-1">
+                <i class="bi bi-x-octagon-fill text-success"></i> Detail Pembatalan Transaksi
+            </h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb bg-transparent p-0 m-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.cancellations.index') }}">Pembatalan</a></li>
-                    <li class="breadcrumb-item active">Detail</li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-success text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.cancellations.index') }}" class="text-success text-decoration-none">Pembatalan</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Detail</li>
                 </ol>
             </nav>
         </div>
-        <a href="{{ route('admin.cancellations.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
+        <div class="mt-3 mt-sm-0">
+            <a href="{{ route('admin.cancellations.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
     </div>
 
     <!-- Alert Messages -->
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle"></i> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Cancellation Info -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Informasi Pembatalan</h6>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3 ps-4">
+                    <h5 class="m-0 fw-bold text-success-emphasis">
+                        <i class="bi bi-info-circle-fill text-success me-1"></i> Informasi Pembatalan
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-sm">
+                    <table class="table table-borderless align-middle mb-0">
                         <tr>
-                            <th width="40%">Kode Transaksi:</th>
-                            <td>
-                                <a href="{{ route('admin.transactions.show', $cancellation->transaksi->id_transaksi) }}">
+                            <th width="40%" class="text-muted fw-semibold py-2">Kode Transaksi:</th>
+                            <td class="py-2">
+                                <a href="{{ route('admin.transactions.show', $cancellation->transaksi->id_transaksi) }}" class="fw-bold text-success text-decoration-none">
                                     {{ $cancellation->transaksi->kode_transaksi }}
                                 </a>
                             </td>
                         </tr>
                         <tr>
-                            <th>Pelanggan:</th>
-                            <td>{{ $cancellation->transaksi->pelanggan->nama_pelanggan ?? 'N/A' }}</td>
+                            <th class="text-muted fw-semibold py-2">Pelanggan:</th>
+                            <td class="py-2 fw-semibold text-dark">{{ $cancellation->transaksi->pelanggan->nama_pelanggan ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th>Email Pelanggan:</th>
-                            <td>
+                            <th class="text-muted fw-semibold py-2">Email Pelanggan:</th>
+                            <td class="py-2">
                                 @if($cancellation->transaksi->pelanggan && $cancellation->transaksi->pelanggan->user)
-                                    {{ $cancellation->transaksi->pelanggan->user->email }}
+                                    <a href="mailto:{{ $cancellation->transaksi->pelanggan->user->email }}" class="text-success text-decoration-none">
+                                        {{ $cancellation->transaksi->pelanggan->user->email }}
+                                    </a>
                                 @else
-                                    <span class="text-muted">N/A</span>
+                                    <span class="text-muted small">-</span>
                                 @endif
                             </td>
                         </tr>
                         <tr>
-                            <th>Tanggal Pembatalan:</th>
-                            <td>{{ $cancellation->created_at->format('d/m/Y H:i') }}</td>
+                            <th class="text-muted fw-semibold py-2">Tanggal Pengajuan:</th>
+                            <td class="py-2 text-dark">{{ $cancellation->created_at->format('d/m/Y H:i') }} WIB</td>
                         </tr>
                         <tr>
-                            <th>Status:</th>
-                            <td>
+                            <th class="text-muted fw-semibold py-2">Status:</th>
+                            <td class="py-2">
                                 @if($cancellation->status_pembatalan == 'diajukan')
-                                    <span class="badge text-warning">Menunggu Konfirmasi</span>
+                                    <span class="badge bg-warning text-dark px-3 py-1.5 fw-semibold">Menunggu Konfirmasi</span>
                                 @elseif($cancellation->status_pembatalan == 'disetujui')
-                                    <span class="badge text-success">Disetujui</span>
+                                    <span class="badge bg-success px-3 py-1.5 fw-semibold">Disetujui</span>
                                 @else
-                                    <span class="badge text-danger">Ditolak</span>
+                                    <span class="badge bg-danger px-3 py-1.5 fw-semibold">Ditolak</span>
                                 @endif
                             </td>
                         </tr>
                         <tr>
-                            <th>Alasan Pembatalan:</th>
-                            <td>{{ $cancellation->alasan_pembatalan }}</td>
+                            <th class="text-muted fw-semibold py-2">Alasan Pelanggan:</th>
+                            <td class="py-2 text-dark">
+                                <div class="bg-light p-2.5 rounded border small text-muted">
+                                    {{ $cancellation->alasan_pembatalan }}
+                                </div>
+                            </td>
                         </tr>
                         @if($cancellation->catatan_admin)
                         <tr>
-                            <th>Catatan Admin:</th>
-                            <td>{{ $cancellation->catatan_admin }}</td>
+                            <th class="text-muted fw-semibold py-2">Catatan Admin:</th>
+                            <td class="py-2">
+                                <div class="p-2.5 rounded border small" style="background-color: #f0fdf4; color: #155724; border-color: #c3e6cb;">
+                                    {{ $cancellation->catatan_admin }}
+                                </div>
+                            </td>
                         </tr>
                         @endif
                     </table>
@@ -103,46 +115,48 @@
         </div>
 
         <!-- Transaction Info -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Informasi Transaksi</h6>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3 ps-4">
+                    <h5 class="m-0 fw-bold text-success-emphasis">
+                        <i class="bi bi-wallet2 text-success me-1"></i> Informasi Transaksi
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-sm">
+                    <table class="table table-borderless align-middle mb-0">
                         <tr>
-                            <th width="40%">Total Transaksi:</th>
-                            <td>Rp {{ number_format($cancellation->transaksi->total_harga, 0, ',', '.') }}</td>
+                            <th width="40%" class="text-muted fw-semibold py-2">Total Harga Item:</th>
+                            <td class="py-2 text-dark fw-medium">Rp {{ number_format($cancellation->transaksi->total_harga, 0, ',', '.') }}</td>
                         </tr>
                         <tr>
-                            <th>Diskon:</th>
-                            <td>Rp {{ number_format($cancellation->transaksi->total_diskon, 0, ',', '.') }}</td>
+                            <th class="text-muted fw-semibold py-2">Potongan Diskon:</th>
+                            <td class="py-2 text-danger fw-medium">- Rp {{ number_format($cancellation->transaksi->total_diskon, 0, ',', '.') }}</td>
                         </tr>
                         <tr>
-                            <th>Ongkir:</th>
-                            <td>Rp {{ number_format($cancellation->transaksi->ongkir, 0, ',', '.') }}</td>
+                            <th class="text-muted fw-semibold py-2">Biaya Kirim (Ongkir):</th>
+                            <td class="py-2 text-dark fw-medium">Rp {{ number_format($cancellation->transaksi->ongkir, 0, ',', '.') }}</td>
                         </tr>
-                        <tr>
-                            <th>Grand Total:</th>
-                            <td class="font-weight-bold">
+                        <tr class="border-top">
+                            <th class="text-muted fw-bold py-3 fs-6">Grand Total:</th>
+                            <td class="py-3 text-success fw-extrabold fs-5">
                                 Rp {{ number_format($cancellation->transaksi->getTotalAmount(), 0, ',', '.') }}
                             </td>
                         </tr>
                         <tr>
-                            <th>Status Pembayaran:</th>
-                            <td>
+                            <th class="text-muted fw-semibold py-2">Status Pembayaran:</th>
+                            <td class="py-2">
                                 @if($cancellation->transaksi->status_pembayaran == 'sudah_bayar')
-                                    <span class="badge badge-success text-success">Sudah Dibayar</span>
+                                    <span class="badge bg-success px-3 py-1.5 fw-semibold">Sudah Dibayar</span>
                                 @elseif($cancellation->transaksi->status_pembayaran == 'belum_bayar')
-                                    <span class="badge badge-warning text-warning">Belum Dibayar</span>
+                                    <span class="badge bg-warning text-dark px-3 py-1.5 fw-semibold">Belum Dibayar</span>
                                 @else
-                                    <span class="badge badge-danger text-danger">Kadaluarsa</span>
+                                    <span class="badge bg-danger px-3 py-1.5 fw-semibold">Kadaluarsa / Batal</span>
                                 @endif
                             </td>
                         </tr>
                         <tr>
-                            <th>Metode Pengiriman:</th>
-                            <td>{{ $cancellation->transaksi->metode_pengiriman === 'kurir' ? 'Dikirim Kurir' : 'Ambil Sendiri' }}</td>
+                            <th class="text-muted fw-semibold py-2">Metode Pengiriman:</th>
+                            <td class="py-2 text-dark fw-medium">{{ $cancellation->transaksi->metode_pengiriman === 'kurir' ? 'Dikirim Kurir' : 'Ambil Sendiri' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -151,38 +165,37 @@
     </div>
 
     <!-- Order Items -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Detail Produk</h6>
+    <div class="card border-0 shadow-sm my-4">
+        <div class="card-header bg-white border-0 py-3 ps-4">
+            <h5 class="m-0 fw-bold text-success-emphasis">
+                <i class="bi bi-box-seam text-success me-1"></i> Detail Produk Transaksi
+            </h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary">
                         <tr>
-                            <th>No</th>
-                            <th>Produk</th>
-                            <th>Harga Asli</th>
-                            <th>Harga Diskon</th>
-                            <th>Qty</th>
-                            <th>Subtotal</th>
+                            <th scope="col" class="ps-4 py-3" width="8%">No</th>
+                            <th scope="col" class="py-3" width="42%">Nama Produk</th>
+                            <th scope="col" class="py-3 text-end" width="16%">Harga Asli</th>
+                            <th scope="col" class="py-3 text-end" width="16%">Harga Diskon</th>
+                            <th scope="col" class="py-3 text-center" width="10%">Qty</th>
+                            <th scope="col" class="pe-4 py-3 text-end" width="16%">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($cancellation->transaksi->details as $index => $item)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $item->product->nama_produk ?? 'Produk tidak ditemukan' }}</td>
-                            <td>
+                            <td class="ps-4 fw-semibold text-muted">{{ $index + 1 }}</td>
+                            <td class="fw-bold text-dark">{{ $item->product->nama_produk ?? 'Produk tidak ditemukan' }}</td>
+                            <td class="text-end fw-medium text-dark">
                                 @php
-                                    $hargaAsli = 0;
-                                    if ($item->product) {
-                                        $hargaAsli = $item->product->harga_produk ?? 0;
-                                    }
+                                    $hargaAsli = $item->product->harga_produk ?? 0;
                                 @endphp
                                 Rp {{ number_format($hargaAsli, 0, ',', '.') }}
                             </td>
-                            <td>
+                            <td class="text-end">
                                 @php
                                     $hargaDiskon = 0;
                                     if ($item->product && ($item->product->harga_diskon ?? 0) > 0 && ($item->product->hasActiveDiscount() ?? false)) {
@@ -190,16 +203,16 @@
                                     }
                                 @endphp
                                 @if($hargaDiskon > 0)
-                                    <strong class="text-success">Rp {{ number_format($hargaDiskon, 0, ',', '.') }}</strong>
-                                    <small class="text-danger d-block">
+                                    <span class="fw-semibold text-success">Rp {{ number_format($hargaDiskon, 0, ',', '.') }}</span>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger d-block mt-0.5" style="font-size: 0.7rem;">
                                         {{ round((($hargaAsli - $hargaDiskon) / $hargaAsli) * 100) }}% off
-                                    </small>
+                                    </span>
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            <td>{{ $item->qty }}</td>
-                            <td>Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
+                            <td class="text-center fw-bold text-dark">{{ $item->qty }}</td>
+                            <td class="pe-4 text-end fw-bold text-success-emphasis">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -210,27 +223,29 @@
 
     <!-- Action Buttons -->
     @if($cancellation->status_pembatalan == 'diajukan')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Tindakan</h6>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3 ps-4">
+            <h5 class="m-0 fw-bold text-success-emphasis">
+                <i class="bi bi-shield-check text-success me-1"></i> Keputusan Tindakan Admin
+            </h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
             <form id="processForm" method="POST" action="{{ route('admin.cancellations.process', $cancellation) }}">
                 @csrf
                 <input type="hidden" name="action" id="actionInput" value="">
 
-                <div class="form-group">
-                    <label for="catatan_admin">Catatan Admin (opsional):</label>
+                <div class="mb-3">
+                    <label for="catatan_admin" class="form-label fw-bold text-secondary">Catatan Admin / CS (Opsional)</label>
                     <textarea name="catatan_admin" id="catatan_admin" class="form-control" rows="3"
-                              placeholder="Berikan catatan jika diperlukan..."></textarea>
+                              placeholder="Tuliskan catatan respon persetujuan atau alasan penolakan..."></textarea>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-success mr-2" onclick="processAction('approve')">
-                        <i class="fas fa-check"></i> Setujui Pembatalan
+                    <button type="button" class="btn btn-success text-white fw-bold px-4" onclick="processAction('approve')">
+                        <i class="bi bi-check-circle me-1"></i> Setujui & Kembalikan Stok
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="processAction('reject')">
-                        <i class="fas fa-times"></i> Tolak Pembatalan
+                    <button type="button" class="btn btn-danger text-white fw-bold px-4" onclick="processAction('reject')">
+                        <i class="bi bi-x-circle me-1"></i> Tolak Permintaan
                     </button>
                 </div>
             </form>
@@ -238,18 +253,29 @@
     </div>
     @endif
 </div>
+@endsection
 
 @push('scripts')
 <script>
 function processAction(action) {
     const actionText = action === 'approve' ? 'menyetujui' : 'menolak';
-    const confirmText = `Apakah Anda yakin ingin ${actionText} pembatalan transaksi ini?`;
-
-    if (confirm(confirmText)) {
-        document.getElementById('actionInput').value = action;
-        document.getElementById('processForm').submit();
-    }
+    const actionColor = action === 'approve' ? '#10b981' : '#ef4444';
+    
+    Swal.fire({
+        title: 'Konfirmasi Keputusan',
+        text: `Apakah Anda yakin ingin ${actionText} permintaan pembatalan transaksi ini?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: actionColor,
+        cancelButtonColor: '#9ca3af',
+        confirmButtonText: 'Ya, Proses!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('actionInput').value = action;
+            document.getElementById('processForm').submit();
+        }
+    });
 }
 </script>
 @endpush
-@endsection

@@ -3,12 +3,64 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Order extends Model
 {
     protected $table = 'tb_transaksi';
     protected $primaryKey = 'id_transaksi';
     public $timestamps = false; // IMPORTANT: tb_transaksi tidak punya created_at & updated_at
+
+    /**
+     * Dynamically check and cancel all expired orders that are past their payment deadline
+     */
+    public static function checkAndCancelExpiredOrders()
+    {
+        try {
+            $expiredOrders = self::where('status_pembayaran', 'belum_bayar')
+                ->whereNotNull('payment_expired_at')
+                ->where('payment_expired_at', '<', now())
+                ->get();
+
+            if ($expiredOrders->isEmpty()) {
+                return;
+            }
+
+            $integrasiService = app(\App\Services\IntegrasiProdukService::class);
+
+            foreach ($expiredOrders as $order) {
+                DB::transaction(function () use ($order, $integrasiService) {
+                    // Update order status to kadaluarsa
+                    $order->update(['status_pembayaran' => 'kadaluarsa']);
+
+                    // Restore stock to integration database
+                    if ($order->id_cabang) {
+                        $orderItems = DB::table('tb_detail_transaksi')
+                            ->where('id_transaksi', $order->id_transaksi)
+                            ->get();
+
+                        foreach ($orderItems as $item) {
+                            try {
+                                $integrasiService->tambahStok(
+                                    $item->id_produk,
+                                    $order->id_cabang,
+                                    $item->qty
+                                );
+                                Log::info('Dynamically restored stock for expired order ' . $order->kode_transaksi . ', product ID: ' . $item->id_produk . ', qty: ' . $item->qty);
+                            } catch (\Exception $ex) {
+                                Log::error('Failed to restore stock dynamically: ' . $ex->getMessage());
+                            }
+                        }
+                    }
+
+                    Log::info('Order dynamically marked as expired (kadaluarsa): ' . $order->kode_transaksi);
+                });
+            }
+        } catch (\Exception $e) {
+            Log::error('Error checking and cancelling expired orders dynamically: ' . $e->getMessage());
+        }
+    }
 
     protected $fillable = [
         'id_pelanggan',

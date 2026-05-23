@@ -655,6 +655,9 @@ class AdminController extends Controller
     public function transactions(Request $request)
     {
         try {
+            // Dynamically check and cancel expired orders
+            Order::checkAndCancelExpiredOrders();
+
             // Get search parameters
             $search = $request->get('search', '');
             $statusFilter = $request->get('status', '');

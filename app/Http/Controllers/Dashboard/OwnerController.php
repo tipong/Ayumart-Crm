@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\Cabang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OwnerController extends Controller
@@ -319,5 +320,119 @@ class OwnerController extends Controller
         // Download PDF
         $filename = 'Laporan_Penjualan_' . $namaBulan[$bulan] . '_' . $tahun . '.pdf';
         return $pdf->download($filename);
+    }
+
+    public function transactions(Request $request)
+    {
+        try {
+            // Dynamically check and cancel expired orders first
+            Order::checkAndCancelExpiredOrders();
+
+            $search = $request->get('search', '');
+            $statusFilter = $request->get('status', '');
+            $branchFilter = $request->get('branch', '');
+            $shippingFilter = $request->get('shipping_method', '');
+            $startDate = $request->get('start_date', '');
+            $endDate = $request->get('end_date', '');
+            $sortBy = $request->get('sort_by', 'date_desc');
+            $perPage = 15;
+
+            // Build base query
+            $query = Order::with(['pelanggan.user', 'cancellation', 'cabang']);
+
+            // Apply search
+            if (!empty($search)) {
+                $searchTerm = '%' . $search . '%';
+                $query = $query->where(function ($q) use ($searchTerm) {
+                    $q->where('kode_transaksi', 'like', $searchTerm)
+                      ->orWhereHas('pelanggan', function ($subQ) use ($searchTerm) {
+                          $subQ->where('nama_pelanggan', 'like', $searchTerm);
+                      })
+                      ->orWhereHas('cabang', function ($subQ) use ($searchTerm) {
+                          $subQ->where('nama_cabang', 'like', $searchTerm);
+                      });
+                });
+            }
+
+            // Apply status filter
+            if (!empty($statusFilter)) {
+                $query->where('status_pembayaran', $statusFilter);
+            }
+
+            // Apply branch filter
+            if (!empty($branchFilter)) {
+                $query->where('id_cabang', $branchFilter);
+            }
+
+            // Apply shipping filter
+            if (!empty($shippingFilter)) {
+                $query->where('metode_pengiriman', $shippingFilter);
+            }
+
+            // Apply date filters
+            if (!empty($startDate)) {
+                $query->where('tanggal_transaksi', '>=', $startDate . ' 00:00:00');
+            }
+            if (!empty($endDate)) {
+                $query->where('tanggal_transaksi', '<=', $endDate . ' 23:59:59');
+            }
+
+            // Apply sorting
+            if ($sortBy === 'date_asc') {
+                $query->orderBy('tanggal_transaksi', 'asc');
+            } elseif ($sortBy === 'total_desc') {
+                $query->orderByRaw('(total_harga - total_diskon + ongkir + COALESCE(biaya_membership, 0)) DESC');
+            } elseif ($sortBy === 'total_asc') {
+                $query->orderByRaw('(total_harga - total_diskon + ongkir + COALESCE(biaya_membership, 0)) ASC');
+            } else {
+                // default is date_desc
+                $query->orderBy('tanggal_transaksi', 'desc');
+            }
+
+            // Paginate results
+            $transactions = $query->paginate($perPage);
+
+            // Get status counts (totals)
+            $statusCounts = [
+                'pending' => Order::where('status_pembayaran', 'belum_bayar')->count(),
+                'completed' => Order::where('status_pembayaran', 'sudah_bayar')->count(),
+                'cancelled' => Order::where('status_pembayaran', 'kadaluarsa')->count(),
+            ];
+
+            // Get all active branches for dropdown
+            $branches = Cabang::where('is_active', true)->orderBy('nama_cabang')->get();
+
+            return view('owner.transactions.index', compact(
+                'transactions', 
+                'statusCounts', 
+                'search', 
+                'statusFilter', 
+                'branchFilter', 
+                'shippingFilter', 
+                'startDate', 
+                'endDate', 
+                'sortBy', 
+                'branches'
+            ));
+        } catch (\Exception $e) {
+            Log::error('Error loading owner transactions: ' . $e->getMessage());
+            return back()->with('error', 'Maaf, terjadi kesalahan saat memuat data transaksi.');
+        }
+    }
+
+    public function showTransaction($id)
+    {
+        try {
+            // Dynamically check and cancel expired orders first
+            Order::checkAndCancelExpiredOrders();
+
+            $transaction = Order::with(['pelanggan.user', 'details.product', 'cancellation', 'cabang'])
+                ->findOrFail($id);
+
+            return view('owner.transactions.show', compact('transaction'));
+        } catch (\Exception $e) {
+            Log::error('Error loading owner transaction detail: ' . $e->getMessage());
+            return back()->with('error', 'Maaf, terjadi kesalahan saat memuat detail transaksi.');
+        }
     }
 }

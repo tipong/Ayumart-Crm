@@ -10,14 +10,43 @@
 @endpush
 
 @section('content')
-<div class="container py-5">
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="hero-icon">
+                    <i class="bi bi-pencil-square"></i>
+                </div>
+                <div>
+                    <h1>Edit Alamat</h1>
+                    <p>Ubah detail alamat pengiriman Anda</p>
+                </div>
+            </div>
+            <a href="{{ route('pelanggan.profile') }}" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-3 pb-5">
+    <!-- Breadcrumb -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pelanggan.profile') }}">Profil</a></li>
+            <li class="breadcrumb-item active">Edit Alamat</li>
+        </ol>
+    </nav>
+
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-pencil"></i> Edit Alamat</h5>
+            <div class="ay-card">
+                <div class="ay-card-header">
+                    <i class="bi bi-pencil"></i> Edit Alamat
                 </div>
-                <div class="card-body">
+                <div class="ay-card-body">
                     <form action="{{ route('pelanggan.addresses.update', $address->id) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -87,31 +116,34 @@
                             </div>
 
                             <div class="col-12 mb-3">
-                                <label class="form-label">Lokasi (GPS/Maps)</label>
-                                <div class="btn-group mb-2 d-flex" role="group">
-                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="getGPSLocation()">
-                                        <i class="bi bi-geo-alt-fill"></i> Perbarui Lokasi GPS
-                                    </button>
-                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="pickLocationFromMapsEditPage()">
-                                        <i class="bi bi-map"></i> Pilih dari Maps
-                                    </button>
-                                </div>
+                                <label class="form-label d-block fw-bold">Lokasi Peta (GPS/Maps) <span class="text-danger">*</span></label>
                                 
-                                <div class="row mt-2">
-                                    <div class="col-md-6">
-                                        <label class="form-label small text-muted">Latitude</label>
-                                        <input type="text" class="form-control" name="latitude" id="latitude" value="{{ old('latitude', $address->latitude) }}" readonly placeholder="-6.200000">
-                                    </div>
-                                    <div class="col-md-6 mt-2 mt-md-0">
-                                        <label class="form-label small text-muted">Longitude</label>
-                                        <input type="text" class="form-control" name="longitude" id="longitude" value="{{ old('longitude', $address->longitude) }}" readonly placeholder="106.816666">
+                                <!-- Hidden inputs for coordinates -->
+                                <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $address->latitude) }}">
+                                <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $address->longitude) }}">
+
+                                <!-- Visual status card -->
+                                <div id="locationStatusCard" class="card border-1 mb-2" style="border-radius: 10px; border: 1px dashed #ffc107; background-color: rgba(255, 193, 7, 0.05);">
+                                    <div class="card-body p-3 d-flex align-items-center gap-3">
+                                        <div class="status-icon bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                            <i class="bi bi-geo-alt fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0 fw-bold text-warning-emphasis" style="font-size: 0.9rem;">Titik Koordinat Belum Disematkan</h6>
+                                            <p class="mb-0 text-muted small">Silakan pilih lokasi dari peta atau gunakan GPS untuk menghitung ongkir kurir.</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <small class="text-muted d-block mt-2" id="gpsStatus">
-                                    @if($address->latitude && $address->longitude)
-                                        <i class="bi bi-check-circle text-success"></i> GPS tersimpan: {{ $address->latitude }}, {{ $address->longitude }}
-                                    @endif
-                                </small>
+
+                                <div class="btn-group d-flex gap-2" role="group" style="max-width: 450px;">
+                                    <button type="button" class="btn btn-outline-primary btn-sm rounded-3 py-2" onclick="getGPSLocation()">
+                                        <i class="bi bi-geo-alt-fill"></i> Perbarui GPS
+                                    </button>
+                                    <button type="button" class="btn btn-success text-white btn-sm rounded-3 py-2" onclick="pickLocationFromMapsEditPage()">
+                                        <i class="bi bi-map-fill"></i> Pilih Titik di Maps
+                                    </button>
+                                </div>
+                                <small class="text-muted d-block mt-2" id="gpsStatus"></small>
                             </div>
 
                             <div class="col-12 mb-3">
@@ -141,6 +173,42 @@
 </div>
 
 <script>
+function updateLocationStatusCard() {
+    const lat = document.getElementById('latitude').value;
+    const lng = document.getElementById('longitude').value;
+    const statusCard = document.getElementById('locationStatusCard');
+    
+    if (statusCard) {
+        if (lat && lng && parseFloat(lat) !== 0 && parseFloat(lng) !== 0) {
+            statusCard.style.border = '1px solid #198754';
+            statusCard.style.backgroundColor = 'rgba(25, 135, 84, 0.05)';
+            statusCard.querySelector('.status-icon').className = 'status-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center';
+            statusCard.querySelector('.status-icon i').className = 'bi bi-check-circle-fill fs-5';
+            statusCard.querySelector('h6').className = 'mb-0 fw-bold text-success';
+            statusCard.querySelector('h6').textContent = 'Lokasi Tersemat!';
+            statusCard.querySelector('p').textContent = 'Titik peta telah berhasil disimpan (' + parseFloat(lat).toFixed(5) + ', ' + parseFloat(lng).toFixed(5) + ').';
+        } else {
+            statusCard.style.border = '1px dashed #ffc107';
+            statusCard.style.backgroundColor = 'rgba(255, 193, 7, 0.05)';
+            statusCard.querySelector('.status-icon').className = 'status-icon bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center';
+            statusCard.querySelector('.status-icon i').className = 'bi bi-geo-alt fs-5';
+            statusCard.querySelector('h6').className = 'mb-0 fw-bold text-warning-emphasis';
+            statusCard.querySelector('h6').textContent = 'Titik Koordinat Belum Disematkan';
+            statusCard.querySelector('p').textContent = 'Silakan pilih lokasi dari peta atau gunakan GPS untuk menghitung ongkir kurir.';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    if (latInput && lngInput) {
+        latInput.addEventListener('change', updateLocationStatusCard);
+        lngInput.addEventListener('change', updateLocationStatusCard);
+        updateLocationStatusCard(); // Initial check
+    }
+});
+
 function getGPSLocation() {
     const gpsStatus = document.getElementById('gpsStatus');
 
@@ -149,10 +217,13 @@ function getGPSLocation() {
 
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                document.getElementById('latitude').value = position.coords.latitude;
-                document.getElementById('longitude').value = position.coords.longitude;
-                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diperbarui! (Lat: ' +
-                    position.coords.latitude.toFixed(6) + ', Long: ' + position.coords.longitude.toFixed(6) + ')</span>';
+                const latEl = document.getElementById('latitude');
+                const lngEl = document.getElementById('longitude');
+                latEl.value = position.coords.latitude;
+                lngEl.value = position.coords.longitude;
+                latEl.dispatchEvent(new Event('change', { bubbles: true }));
+                lngEl.dispatchEvent(new Event('change', { bubbles: true }));
+                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diperbarui!</span>';
             },
             function(error) {
                 gpsStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Gagal mengambil lokasi GPS: ' + error.message + '</span>';

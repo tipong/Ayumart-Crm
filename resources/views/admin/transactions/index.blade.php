@@ -12,59 +12,38 @@
     .pagination .page-link {
         padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
-        border-radius: 0.25rem;
+        border-radius: 6px;
         margin: 0 2px;
         cursor: pointer;
-        border: 1px solid #dee2e6;
-        color: #4e73df;
+        border: 1px solid #e5e7eb;
+        color: #0f766e;
         text-decoration: none;
+        transition: all 0.2s ease;
     }
 
     .pagination .page-link:hover:not(.disabled) {
-        background-color: #4e73df;
+        background-color: #10b981;
         color: white;
-        border-color: #4e73df;
+        border-color: #10b981;
     }
 
     .pagination .page-item.active .page-link {
-        background-color: #4e73df;
-        border-color: #4e73df;
+        background-color: #10b981;
+        border-color: #10b981;
         color: white;
     }
 
     .pagination .page-item.disabled .page-link {
-        color: #6c757d;
+        color: #9ca3af;
         cursor: not-allowed;
-        background-color: #e9ecef;
-        border-color: #dee2e6;
+        background-color: #f3f4f6;
+        border-color: #e5e7eb;
     }
 
-    /* Custom button size for review */
     .btn-xs {
-        padding: 0.15rem 0.4rem;
+        padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
-        line-height: 1.2;
-    }
-
-    /* Search Input Styling */
-    #searchInput {
-        border-radius: 0.25rem;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    #searchInput:focus {
-        border-color: #4e73df !important;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
-    }
-
-    .input-group-text {
-        border-radius: 0.25rem 0 0 0.25rem;
-    }
-
-    #searchResults {
-        display: inline-block;
-        padding: 0.375rem 0;
-        color: #858796;
+        border-radius: 6px;
     }
 
     /* Table styling */
@@ -72,78 +51,140 @@
         transition: background-color 0.2s ease;
     }
 
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
+    /* Glow Stat Cards */
+    .stat-card-glow {
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: none;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    
+    .stat-card-glow:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .stat-card-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-card-glow .label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 0.85;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card-glow .value {
+        font-size: 1.85rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .stat-card-glow .icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .card-pending {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .card-completed {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .card-cancelled {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    /* Custom input */
+    .custom-input {
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        padding: 0.6rem 1rem;
+        font-weight: 500;
+        background-color: #f9fafb;
+        transition: all 0.2s ease;
+    }
+
+    .custom-input:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        background-color: #ffffff;
     }
 </style>
 @endpush
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-2">
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-shopping-cart text-primary"></i> Manajemen Transaksi
-        </h1>
+    <div class="page-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
+        <div>
+            <h1 class="fw-extrabold text-success-emphasis">
+                <i class="bi bi-cart-fill text-success"></i> Manajemen Transaksi
+            </h1>
+            <p class="text-muted mb-0">Kelola dan pantau semua data transaksi penjualan AyuMart.</p>
+        </div>
     </div>
 
     <!-- Statistics Row -->
-    <div class="row mb-4">
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Belum Bayar
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $statusCounts['pending'] ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
+    <div class="row g-4 mb-4">
+        <!-- Belum Bayar -->
+        <div class="col-md-4">
+            <div class="stat-card-glow card-pending h-100">
+                <div class="stat-card-body">
+                    <div>
+                        <span class="label">Belum Bayar</span>
+                        <h3 class="value">{{ number_format($statusCounts['pending'] ?? 0) }}</h3>
+                    </div>
+                    <div class="icon-wrapper">
+                        <i class="bi bi-clock-history"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Sudah Bayar
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $statusCounts['completed'] ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                        </div>
+        <!-- Sudah Bayar -->
+        <div class="col-md-4">
+            <div class="stat-card-glow card-completed h-100">
+                <div class="stat-card-body">
+                    <div>
+                        <span class="label">Sudah Bayar</span>
+                        <h3 class="value">{{ number_format($statusCounts['completed'] ?? 0) }}</h3>
+                    </div>
+                    <div class="icon-wrapper">
+                        <i class="bi bi-check-circle-fill"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Kadaluarsa
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $statusCounts['cancelled'] ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
-                        </div>
+        <!-- Kadaluarsa -->
+        <div class="col-md-4">
+            <div class="stat-card-glow card-cancelled h-100">
+                <div class="stat-card-body">
+                    <div>
+                        <span class="label">Kadaluarsa / Batal</span>
+                        <h3 class="value">{{ number_format($statusCounts['cancelled'] ?? 0) }}</h3>
+                    </div>
+                    <div class="icon-wrapper">
+                        <i class="bi bi-x-circle-fill"></i>
                     </div>
                 </div>
             </div>
@@ -151,80 +192,59 @@
     </div>
 
     <!-- Transactions Table Card -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3 ps-4">
             <!-- Search and Filter Row -->
-            <form id="searchForm" method="GET" action="{{ route('admin.transactions.index') }}" class="mb-3">
-                <div class="row">
+            <form id="searchForm" method="GET" action="{{ route('admin.transactions.index') }}" class="mb-0">
+                <div class="row g-3 align-items-center">
                     <div class="col-md-8">
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-search text-muted"></i>
+                                <i class="bi bi-search text-muted"></i>
                             </span>
                             <input type="text"
-                                   class="form-control border-start-0"
+                                   class="form-control border-start-0 custom-input"
                                    id="searchInput"
                                    name="search"
                                    value="{{ $search ?? '' }}"
-                                   placeholder="Cari pelanggan, kode transaksi, atau cabang...">
+                                   placeholder="Cari nama pelanggan, kode transaksi, atau cabang...">
                         </div>
                     </div>
-                    <div class="col-md-4 text-end">
+                    <div class="col-md-4 text-md-end text-start">
                         @if($search)
-                            <a href="{{ route('admin.transactions.index') }}" class="btn btn-sm btn-light">
-                                <i class="fas fa-times"></i> Hapus Filter
+                            <a href="{{ route('admin.transactions.index') }}" class="btn btn-outline-secondary rounded-pill">
+                                <i class="bi bi-x-circle"></i> Hapus Filter
                             </a>
                         @endif
                     </div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-md-12">
-                        <span class="text-muted small" id="searchResults">
+                    <div class="col-12">
+                        <span class="text-muted small fw-semibold" id="searchResults">
                             @if($search)
-                                Hasil pencarian untuk "{{ $search }}" ({{ $transactions->total() }} hasil)
+                                <i class="bi bi-info-circle text-success me-1"></i> Hasil pencarian untuk "{{ $search }}" (<strong>{{ $transactions->total() }}</strong> hasil)
                             @else
-                                Menampilkan semua transaksi (Total: {{ $transactions->total() }})
+                                <i class="bi bi-info-circle text-success me-1"></i> Menampilkan semua transaksi (Total: <strong>{{ $transactions->total() }}</strong>)
                             @endif
                         </span>
                     </div>
                 </div>
             </form>
-
-            <!-- Status Filter Row -->
-            <!-- <div class="d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-list"></i> Daftar Transaksi
-                </h6>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-sm btn-outline-primary active" onclick="filterStatus('all')">
-                        Semua
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="filterStatus('belum_bayar')">
-                        Belum Bayar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-success" onclick="filterStatus('sudah_bayar')">
-                        Sudah Bayar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="filterStatus('kadaluarsa')">
-                        Kadaluarsa
-                    </button>
-                </div>
-            </div> -->
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             @if($transactions->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover" id="transactionsTable">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0" id="transactionsTable">
+                        <thead class="table-light text-secondary">
                             <tr>
-                                <th width="13%">Pelanggan</th>
-                                <th width="10%">Cabang</th>
-                                <th width="12%">Kode Transaksi</th>
-                                <th width="11%">Total</th>
-                                <th width="9%">Status</th>
-                                <th width="11%">Tanggal Transaksi</th>
-                                <th width="12%">Pembatalan</th>
-                                <th width="12%">Aksi</th>
+                                <th scope="col" class="ps-4 py-3">Pelanggan</th>
+                                <th scope="col" class="py-3">Cabang</th>
+                                <th scope="col" class="py-3">Kode Transaksi</th>
+                                <th scope="col" class="py-3">Total Belanja</th>
+                                <th scope="col" class="py-3">Status</th>
+                                <th scope="col" class="py-3">Tanggal Transaksi</th>
+                                <th scope="col" class="py-3">Pembatalan</th>
+                                <th scope="col" class="pe-4 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -234,72 +254,65 @@
                                     if (is_string($tanggalTransaksi)) {
                                         $tanggalTransaksi = \Carbon\Carbon::parse($tanggalTransaksi);
                                     }
-                                    $sortDate = $tanggalTransaksi ? $tanggalTransaksi->format('d/m/Y') : '';
                                 @endphp
                                 <tr>
-                                    <td>
+                                    <td class="ps-4">
                                         @if($transaction->pelanggan && $transaction->pelanggan->user)
-                                            <i class="fas fa-user text-primary"></i>
-                                            <strong>{{ $transaction->pelanggan->user->name }}</strong>
-                                            <br>
-                                            <small class="text-muted">{{ $transaction->pelanggan->user->email }}</small>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold text-dark">{{ $transaction->pelanggan->user->name }}</span>
+                                                <small class="text-muted" style="font-size: 0.8rem;">{{ $transaction->pelanggan->user->email }}</small>
+                                            </div>
                                         @elseif($transaction->pelanggan)
-                                            <i class="fas fa-user text-warning"></i>
-                                            <strong>{{ $transaction->pelanggan->nama_pelanggan }}</strong>
-                                            <br>
-                                            <small class="text-muted badge bg-warning">No User Account</small>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold text-warning-emphasis">{{ $transaction->pelanggan->nama_pelanggan }}</span>
+                                                <small class="text-muted" style="font-size: 0.75rem;">(Tanpa Akun User)</small>
+                                            </div>
                                         @else
                                             <span class="badge bg-secondary">
-                                                <i class="fas fa-user-slash"></i> Data Terhapus
+                                                <i class="bi bi-person-x"></i> Data Terhapus
                                             </span>
                                         @endif
                                     </td>
                                     <td>
                                         @if($transaction->cabang)
-                                            <i class="fas fa-store text-success"></i>
-                                            <strong class="d-block">{{ $transaction->cabang->nama_cabang }}</strong>
-                                            <small class="text-muted">{{ $transaction->cabang->alamat_cabang ?? '-' }}</small>
+                                            <span class="badge bg-light text-dark border"><i class="bi bi-shop text-success me-1"></i> {{ $transaction->cabang->nama_cabang }}</span>
                                         @else
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-question-circle"></i> Tidak Ada
-                                            </span>
+                                            <span class="text-muted small">-</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <i class="fas fa-hashtag"></i>
-                                        <strong>{{ $transaction->kode_transaksi }}</strong>
+                                        <span class="fw-semibold text-dark">{{ $transaction->kode_transaksi }}</span>
                                     </td>
-                                    <td class="font-weight-bold text-success">
-                                        Rp {{ number_format($transaction->getTotalAmount(), 0, ',', '.') }}
+                                    <td>
+                                        <span class="fw-bold text-success">Rp {{ number_format($transaction->getTotalAmount(), 0, ',', '.') }}</span>
                                     </td>
                                     <td>
                                         @php
-                                            // Map status_pembayaran to display
                                             $statusPembayaran = $transaction->status_pembayaran ?? 'unknown';
                                         @endphp
 
                                         @if($statusPembayaran === 'belum_bayar')
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-clock"></i> Belum Bayar
+                                            <span class="badge bg-warning text-dark px-2 py-1">
+                                                <i class="bi bi-clock-history"></i> Belum Bayar
                                             </span>
                                         @elseif($statusPembayaran === 'sudah_bayar')
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-check-circle"></i> Sudah Bayar
+                                            <span class="badge bg-success px-2 py-1">
+                                                <i class="bi bi-check-circle-fill"></i> Sudah Bayar
                                             </span>
                                         @elseif($statusPembayaran === 'kadaluarsa')
-                                            <span class="badge bg-danger">
-                                                <i class="fas fa-times-circle"></i> Kadaluarsa
+                                            <span class="badge bg-danger px-2 py-1">
+                                                <i class="bi bi-x-circle-fill"></i> Kadaluarsa
                                             </span>
                                         @else
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-question"></i> {{ ucfirst($statusPembayaran) }}
+                                            <span class="badge bg-secondary px-2 py-1">
+                                                {{ ucfirst($statusPembayaran) }}
                                             </span>
                                         @endif
 
                                         @if($transaction->status_pengiriman && $transaction->status_pengiriman !== 'pending')
                                             <br>
                                             <small class="badge bg-info mt-1">
-                                                <i class="fas fa-truck"></i>
+                                                <i class="bi bi-truck"></i>
                                                 {{ ucfirst(str_replace('_', ' ', $transaction->status_pengiriman)) }}
                                             </small>
                                         @endif
@@ -308,76 +321,48 @@
                                         @if($transaction->tanggal_transaksi)
                                             @php
                                                 $tanggalTransaksi = $transaction->tanggal_transaksi;
-                                                // Convert to Carbon instance if it's a string
                                                 if (is_string($tanggalTransaksi)) {
                                                     $tanggalTransaksi = \Carbon\Carbon::parse($tanggalTransaksi);
                                                 }
                                             @endphp
-                                            <i class="fas fa-calendar-alt text-info"></i>
-                                            <strong>{{ $tanggalTransaksi->format('d/m/Y') }}</strong>
+                                            <span class="fw-semibold text-dark">{{ $tanggalTransaksi->format('d/m/Y') }}</span>
                                             <br>
                                             <small class="text-muted">{{ $tanggalTransaksi->format('H:i') }}</small>
                                         @else
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-question-circle"></i> -
-                                            </span>
+                                            <span class="text-muted small">-</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if($transaction->cancellation)
                                             @if($transaction->cancellation->status_pembatalan === 'diajukan')
                                                 <span class="badge bg-warning text-dark">
-                                                    <i class="fas fa-exclamation-circle"></i> Perlu Review
+                                                    <i class="bi bi-exclamation-triangle-fill"></i> Perlu Review
                                                 </span>
                                                 <br>
                                                 <a href="{{ route('admin.cancellations.show', $transaction->cancellation->id_pembatalan_transaksi) }}"
                                                    class="btn btn-xs btn-outline-warning mt-1"
                                                    title="Review Pembatalan">
-                                                    <i class="fas fa-eye"></i> Review
+                                                    <i class="bi bi-eye"></i> Review
                                                 </a>
                                             @elseif($transaction->cancellation->status_pembatalan === 'disetujui')
                                                 <span class="badge bg-success">
-                                                    <i class="fas fa-check-circle"></i> Disetujui
+                                                    <i class="bi bi-check-circle"></i> Disetujui
                                                 </span>
-                                                @if($transaction->cancellation->updated_at)
-                                                <br>
-                                                <small class="text-muted">
-                                                    {{ $transaction->cancellation->updated_at->format('d/m/Y') }}
-                                                </small>
-                                                @endif
                                             @elseif($transaction->cancellation->status_pembatalan === 'ditolak')
                                                 <span class="badge bg-danger">
-                                                    <i class="fas fa-times-circle"></i> Ditolak
+                                                    <i class="bi bi-x-circle"></i> Ditolak
                                                 </span>
-                                                @if($transaction->cancellation->updated_at)
-                                                <br>
-                                                <small class="text-muted">
-                                                    {{ $transaction->cancellation->updated_at->format('d/m/Y') }}
-                                                </small>
-                                                @endif
                                             @endif
                                         @else
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-minus-circle"></i> Tidak Ada
-                                            </span>
+                                            <span class="text-muted small">Tidak Ada</span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.transactions.show', $transaction->id_transaksi) }}"
-                                               class="btn btn-sm btn-info"
-                                               title="Lihat Detail">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            {{-- @if($transaction->status_pembayaran !== 'kadaluarsa' && $transaction->status_pembayaran !== 'sudah_bayar')
-                                                <button type="button"
-                                                        class="btn btn-sm btn-danger"
-                                                        onclick="cancelTransaction({{ $transaction->id_transaksi }})"
-                                                        title="Batalkan">
-                                                    <i class="fas fa-ban"></i>
-                                                </button>
-                                            @endif --}}
-                                        </div>
+                                    <td class="pe-4 text-center">
+                                        <a href="{{ route('admin.transactions.show', $transaction->id_transaksi) }}"
+                                           class="btn btn-sm btn-outline-success rounded-pill px-3"
+                                           title="Lihat Detail">
+                                            <i class="bi bi-eye"></i> Detail
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -385,63 +370,23 @@
                     </table>
                 </div>
 
-                <!-- Pagination Info -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="text-muted small">
-                        Menampilkan <strong>{{ $transactions->count() }}</strong> dari
-                        <strong>{{ $transactions->total() }}</strong> transaksi
+                <!-- Pagination Info & Links -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center p-4 border-top">
+                    <div class="text-muted small mb-3 mb-md-0">
+                        Menampilkan <strong>{{ $transactions->firstItem() }}</strong> sampai <strong>{{ $transactions->lastItem() }}</strong> dari <strong>{{ $transactions->total() }}</strong> transaksi
                     </div>
+                    @if($transactions->hasPages())
+                        <div>
+                            {{ $transactions->appends(request()->query())->links('pagination.bootstrap-4') }}
+                        </div>
+                    @endif
                 </div>
-
-                <!-- Laravel Pagination -->
-                @if($transactions->hasPages())
-                    <div class="mt-3 d-flex justify-content-center">
-                        {{ $transactions->appends(request()->query())->render('pagination.bootstrap-4') }}
-                    </div>
-                @endif
+            @else
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                    Belum ada data transaksi masuk.
+                </div>
             @endif
-        </div>
-    </div>
-</div>
-
-<!-- Cancel Transaction Modal -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="cancelModalLabel">
-                    <i class="fas fa-ban"></i> Batalkan Transaksi
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="cancelForm" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Perhatian!</strong> Pembatalan transaksi akan mengembalikan stok produk.
-                    </div>
-                    <div class="mb-3">
-                        <label for="cancellation_reason" class="form-label">
-                            <i class="fas fa-comment"></i> Alasan Pembatalan <span class="text-danger">*</span>
-                        </label>
-                        <textarea class="form-control"
-                                  id="cancellation_reason"
-                                  name="cancellation_reason"
-                                  rows="4"
-                                  placeholder="Masukkan alasan pembatalan transaksi..."
-                                  required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times"></i> Batal
-                    </button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-ban"></i> Batalkan Transaksi
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -460,63 +405,25 @@
                 icon: 'info',
                 title: 'Data Tidak Ditemukan',
                 text: 'Tidak ada transaksi yang cocok dengan pencarian "{{ $search }}".',
-                confirmButtonColor: '#3F4F44'
+                confirmButtonColor: '#10b981'
             }).then(() => {
-                // Redirect to transactions without search after popup
                 window.location.href = "{{ route('admin.transactions.index') }}";
             });
         @endif
 
-        // Bind search input with debounce - TRIGGER FORM SUBMIT
+        // Debounce search submit
         if (searchInput) {
             searchInput.addEventListener('keyup', function(e) {
                 clearTimeout(searchTimeout);
-                // Submit immediately if Enter is pressed
                 if (e.key === 'Enter') {
                     searchForm.submit();
                 } else {
-                    // Otherwise use debounce
                     searchTimeout = setTimeout(() => {
-                        console.log('🔍 Submitting search form with term:', searchInput.value);
                         searchForm.submit();
                     }, 800);
                 }
             });
         }
     });
-
-    function cancelTransaction(transactionId) {
-        Swal.fire({
-            title: 'Batalkan Transaksi?',
-            text: 'Anda akan membatalkan transaksi ini!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Batalkan!',
-            cancelButtonText: 'Batal'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                const form = document.getElementById('cancelForm');
-                form.action = '/admin/transactions/' + transactionId + '/cancel';
-                const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-                modal.show();
-            }
-        });
-    }
-
-    document.getElementById('cancelForm')?.addEventListener('submit', function(e) {
-        const reason = document.getElementById('cancellation_reason').value;
-        if (!reason.trim()) {
-            e.preventDefault();
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Mohon masukkan alasan pembatalan!'
-            });
-            return false;
-        }
-    });
 </script>
 @endsection
-

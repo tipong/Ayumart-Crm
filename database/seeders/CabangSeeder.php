@@ -121,7 +121,10 @@ class CabangSeeder extends Seeder
         ];
 
         foreach ($branches as $branch) {
-            Cabang::create($branch);
+            $exists = Cabang::where('kode_cabang', $branch['kode_cabang'])->exists();
+            if (!$exists) {
+                Cabang::create($branch);
+            }
         }
 
         $this->command->info('Successfully seeded ' . count($branches) . ' branches!');

@@ -1312,7 +1312,7 @@ Tim Kami`
                     icon: 'warning',
                     title: 'Pilih Metode Pengiriman',
                     text: 'Mohon pilih metode pengiriman terlebih dahulu!',
-                    confirmButtonColor: '#4e73df'
+                    confirmButtonColor: '#10b981'
                 });
                 return false;
             }
@@ -1323,7 +1323,7 @@ Tim Kami`
                     icon: 'error',
                     title: 'Form Tidak Lengkap',
                     text: 'Mohon lengkapi semua field yang wajib diisi!',
-                    confirmButtonColor: '#4e73df'
+                    confirmButtonColor: '#10b981'
                 });
                 return false;
             }
@@ -1373,8 +1373,8 @@ Tim Kami`
     }
 
     .form-control:focus {
-        border-color: #4e73df;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15);
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
         outline: none;
     }
 
@@ -1394,14 +1394,14 @@ Tim Kami`
     }
 
     .delivery-option-card:hover {
-        border-color: #4e73df;
-        background: #f8f9ff;
+        border-color: #10b981;
+        background: #f0fdf4;
     }
 
     .delivery-option-card.active {
-        border-color: #4e73df;
-        background: #f0f3ff;
-        box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+        border-color: #10b981;
+        background: #f0fdf4;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
     .delivery-radio {
@@ -1428,16 +1428,16 @@ Tim Kami`
     }
 
     .tier-checkbox-card:hover {
-        border-color: #4e73df;
-        box-shadow: 0 0.125rem 0.25rem rgba(78, 115, 223, 0.15);
+        border-color: #10b981;
+        box-shadow: 0 0.125rem 0.25rem rgba(16, 185, 129, 0.15);
     }
 
     .tier-checkbox-card input[type="checkbox"]:checked + .tier-label {
-        color: #4e73df;
+        color: #10b981;
     }
 
     .tier-checkbox-card input[type="checkbox"]:checked ~ * {
-        color: #4e73df !important;
+        color: #10b981 !important;
     }
 
     .tier-label {
@@ -1515,14 +1515,14 @@ Tim Kami`
     }
 
     .btn-primary {
-        background: #4e73df;
+        background: #10b981;
         border: none;
     }
 
     .btn-primary:hover {
-        background: #3d5cc2;
+        background: #059669;
         transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.4);
+        box-shadow: 0 0.5rem 1rem rgba(16, 185, 129, 0.4);
     }
 
     .btn-outline-secondary {
@@ -1553,7 +1553,7 @@ Tim Kami`
     }
 
     .border-left-primary {
-        border-left: 4px solid #4e73df !important;
+        border-left: 4px solid #10b981 !important;
     }
 
     /* Badge Styles */
@@ -1587,13 +1587,13 @@ Tim Kami`
 
     /* Accessibility */
     .form-check-input:focus {
-        border-color: #4e73df;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
     }
 
     .form-check-input:checked {
-        background-color: #4e73df;
-        border-color: #4e73df;
+        background-color: #10b981;
+        border-color: #10b981;
     }
 
     /* Smooth Transitions */

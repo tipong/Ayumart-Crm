@@ -411,7 +411,7 @@
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         display: flex;
         align-items: center;
@@ -419,7 +419,7 @@
         font-weight: 700;
         font-size: 1.25rem;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
 
     /* Message Bubble Styling */
@@ -436,8 +436,9 @@
     }
 
     .message-bubble.bg-primary {
+        background-color: var(--primary-color) !important;
         border-radius: 0.75rem 0.75rem 0 0.75rem;
-        box-shadow: 0 2px 8px rgba(78, 115, 223, 0.2);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
     }
 
     .message-item:not(.text-end) .message-bubble.bg-white {
@@ -486,8 +487,8 @@
     }
 
     .form-control-lg[name="message"]:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
     }
 
     /* Card Styling */
@@ -510,7 +511,7 @@
 
     .btn-primary.rounded-2:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
     .btn-success.rounded-2:hover {
@@ -549,21 +550,21 @@
     }
 
     .alert-info {
-        border-left-color: #4e73df;
+        border-left-color: #14b8a6;
         background-color: #f8f9fa;
-        color: #4e73df;
+        color: #14b8a6;
     }
 
     .alert-success {
-        border-left-color: #1cc88a;
+        border-left-color: #10b981;
         background-color: #f8f9fa;
-        color: #1cc88a;
+        color: #10b981;
     }
 
     .alert-danger {
-        border-left-color: #e74c3c;
+        border-left-color: #ef4444;
         background-color: #f8f9fa;
-        color: #e74c3c;
+        color: #ef4444;
     }
 
     /* Unread Badge Animation */

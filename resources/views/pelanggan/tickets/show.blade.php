@@ -3,29 +3,52 @@
 @section('title', 'Detail Tiket #' . $ticket->ticket_number)
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Back Button -->
-    <div class="mb-3">
-        <a href="{{ route('pelanggan.tickets.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Kembali ke Daftar Tiket
-        </a>
-
-        @if($ticket->status === 'resolved' && $ticket->status !== 'closed')
-        <form action="{{ route('pelanggan.tickets.close', $ticket->id) }}" method="POST" class="d-inline">
-            @csrf
-            @method('PUT')
-            <button type="submit" class="btn btn-success" onclick="return confirm('Tutup tiket ini? Anda tidak akan bisa mengirim pesan lagi.')">
-                <i class="bi bi-check-circle"></i> Tutup Tiket
-            </button>
-        </form>
-        @endif
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="hero-icon">
+                    <i class="bi bi-ticket-detailed"></i>
+                </div>
+                <div>
+                    <h1>Detail Tiket #{{ $ticket->ticket_number }}</h1>
+                    <p>Subjek: {{ $ticket->subject }}</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('pelanggan.tickets.index') }}" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+                @if($ticket->status === 'resolved' && $ticket->status !== 'closed')
+                <form action="{{ route('pelanggan.tickets.close', $ticket->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="btn btn-success" style="border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;" onclick="return confirm('Tutup tiket ini? Anda tidak akan bisa mengirim pesan lagi.')">
+                        <i class="bi bi-check-circle me-1"></i> Tutup Tiket
+                    </button>
+                </form>
+                @endif
+            </div>
+        </div>
     </div>
+</div>
+
+<div class="container py-3 pb-5">
+    <!-- Breadcrumb -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pelanggan.tickets.index') }}">Pusat Bantuan</a></li>
+            <li class="breadcrumb-item active">Detail Tiket</li>
+        </ol>
+    </nav>
 
     <div class="row g-4">
         <!-- LEFT SIDE: Chat/Messages -->
         <div class="col-lg-8">
-            <div class="card shadow-sm h-100" style="min-height: 600px;">
-                <div class="card-header bg-primary text-white">
+            <div class="ay-card h-100" style="min-height: 600px; display: flex; flex-direction: column;">
+                <div class="ay-card-header bg-primary text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="bi bi-chat-dots"></i> Percakapan dengan Customer Service
@@ -44,13 +67,13 @@
                     </div>
                 </div>
 
-                <div class="card-body bg-light" style="height: 450px; overflow-y: auto;" id="chatContainer">
+                <div class="card-body bg-light" style="flex-grow: 1; height: 450px; overflow-y: auto;" id="chatContainer">
                     @forelse($ticket->messages as $message)
                     <div class="message-item mb-3 {{ $message->user_id === auth()->id() ? 'text-end' : '' }}">
                         <div class="d-inline-block" style="max-width: 70%;">
-                            <div class="card shadow-sm {{ $message->user_id === auth()->id() ? 'bg-primary text-white' : 'bg-white' }}">
-                                <div class="card-body py-2 px-3">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                            <div class="card shadow-none border-0 {{ $message->user_id === auth()->id() ? 'bg-primary text-white' : 'bg-white' }}" style="border-radius: 12px;">
+                                <div class="card-body py-2 px-3 text-start">
+                                    <div class="d-flex align-items-center justify-content-between mb-1 gap-3">
                                         <strong class="small">
                                             @if($message->user_id === auth()->id())
                                                 <i class="bi bi-person-circle"></i> Anda
@@ -58,13 +81,13 @@
                                                 <i class="bi bi-headset"></i> Customer Service
                                             @endif
                                         </strong>
-                                        <small class="{{ $message->user_id === auth()->id() ? 'text-white-50' : 'text-muted' }} ms-2">
+                                        <small class="{{ $message->user_id === auth()->id() ? 'text-white-50' : 'text-muted' }}">
                                             {{ $message->created_at->diffForHumans() }}
                                         </small>
                                     </div>
-                                    <p class="mb-0" style="white-space: pre-wrap;">{{ $message->message }}</p>
+                                    <p class="mb-0" style="white-space: pre-wrap; font-size: 14px;">{{ $message->message }}</p>
                                     <div class="text-end mt-1">
-                                        <small class="{{ $message->user_id === auth()->id() ? 'text-white-50' : 'text-muted' }}">
+                                        <small class="{{ $message->user_id === auth()->id() ? 'text-white-50' : 'text-muted' }}" style="font-size: 10px;">
                                             {{ $message->created_at->format('H:i') }}
                                         </small>
                                     </div>
@@ -82,7 +105,7 @@
                 </div>
 
                 @if($ticket->status !== 'closed' && $ticket->status !== 'resolved')
-                <div class="card-footer bg-white">
+                <div class="ay-card-footer bg-white border-top">
                     <form action="{{ route('pelanggan.tickets.reply', $ticket->id) }}" method="POST" id="replyForm">
                         @csrf
                         <div class="row g-2">
@@ -104,14 +127,14 @@
                     </form>
                 </div>
                 @elseif($ticket->status === 'resolved')
-                <div class="card-footer bg-light text-center">
-                    <div class="alert alert-success mb-0">
+                <div class="ay-card-footer bg-light text-center border-top">
+                    <div class="alert alert-success mb-0" style="border-radius: 8px;">
                         <i class="bi bi-check-circle-fill"></i> Tiket ini sudah diselesaikan. Jika masalah Anda sudah teratasi, silakan tutup tiket.
                     </div>
                 </div>
                 @else
-                <div class="card-footer bg-light text-center">
-                    <div class="alert alert-secondary mb-0">
+                <div class="ay-card-footer bg-light text-center border-top">
+                    <div class="alert alert-secondary mb-0" style="border-radius: 8px;">
                         <i class="bi bi-lock-fill"></i> Tiket ini sudah ditutup. Tidak dapat mengirim pesan baru.
                     </div>
                 </div>
@@ -121,13 +144,11 @@
 
         <!-- RIGHT SIDE: Ticket Details -->
         <div class="col-lg-4">
-            <div class="card shadow-sm mb-3">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="bi bi-info-circle"></i> Detail Tiket
-                    </h5>
+            <div class="ay-card mb-3">
+                <div class="ay-card-header bg-light">
+                    <i class="bi bi-info-circle"></i> Detail Tiket
                 </div>
-                <div class="card-body">
+                <div class="ay-card-body">
                     <div class="mb-3">
                         <small class="text-muted d-block mb-1">Nomor Tiket</small>
                         <h6 class="mb-0">
@@ -214,39 +235,37 @@
             </div>
 
             <!-- Deskripsi Masalah Card -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">
-                        <i class="bi bi-file-text"></i> Deskripsi Masalah
-                    </h6>
+            <div class="ay-card">
+                <div class="ay-card-header bg-light">
+                    <i class="bi bi-file-text"></i> Deskripsi Masalah
                 </div>
-                <div class="card-body">
-                    <p class="mb-0" style="white-space: pre-wrap;">{{ $ticket->description }}</p>
+                <div class="ay-card-body">
+                    <p class="mb-0" style="white-space: pre-wrap; font-size: 14px;">{{ $ticket->description }}</p>
                 </div>
             </div>
 
             <!-- Status Actions -->
             @if($ticket->status !== 'closed')
-            <div class="card shadow-sm mt-3">
-                <div class="card-body">
-                    <h6 class="mb-3">
-                        <i class="bi bi-gear"></i> Aksi
+            <div class="ay-card mt-3">
+                <div class="ay-card-body">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-gear"></i> Status Tiket
                     </h6>
 
                     @if($ticket->status === 'resolved')
-                    <div class="alert alert-success mb-0">
+                    <div class="alert alert-success mb-0" style="border-radius: 8px;">
                         <i class="bi bi-check-circle"></i> Tiket ini sudah diselesaikan!
                         <br>
                         <small>Jika masalah sudah selesai, Anda bisa menutup tiket ini.</small>
                     </div>
                     @elseif($ticket->status === 'in_progress')
-                    <div class="alert alert-info mb-0">
+                    <div class="alert alert-info mb-0" style="border-radius: 8px;">
                         <i class="bi bi-hourglass-split"></i> Customer Service sedang menangani tiket Anda.
                         <br>
                         <small>Harap tunggu respon dari CS.</small>
                     </div>
                     @else
-                    <div class="alert alert-warning mb-0">
+                    <div class="alert alert-warning mb-0" style="border-radius: 8px;">
                         <i class="bi bi-clock"></i> Tiket Anda menunggu respon dari CS.
                         <br>
                         <small>Kami akan segera membantu Anda.</small>
@@ -447,13 +466,15 @@ window.addEventListener('load', function() {
 
 /* Better textarea */
 textarea[name="message"] {
-    border: 2px solid #dee2e6;
-    transition: border-color 0.3s;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.3s;
+    font-size: 14px;
 }
 
 textarea[name="message"]:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(1, 91, 30, 0.1);
 }
 
 /* Status badge animations */
@@ -461,12 +482,12 @@ textarea[name="message"]:focus {
     transition: all 0.3s ease;
 }
 
-/* Card hover effects */
-.card {
+/* Card hover effects - scoped to avoid targeting chat bubbles */
+.ay-card {
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card:hover {
+.ay-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }

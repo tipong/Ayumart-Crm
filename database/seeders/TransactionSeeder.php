@@ -20,8 +20,8 @@ class TransactionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all customers (role_id = 5) that have a pelanggan record
-        $customers = User::where('role_id', 5)
+        // Get all customers (id_role = 5) that have a pelanggan record
+        $customers = User::where('id_role', 5)
             ->whereHas('pelanggan')
             ->with('pelanggan')
             ->get();
@@ -138,14 +138,18 @@ class TransactionSeeder extends Seeder
             // Generate unique transaction code
             $kodeTransaksi = 'TRX-' . $year . str_pad($i + 1, 6, '0', STR_PAD_LEFT);
 
+            // Skip if this transaction code already exists
+            if (Order::where('kode_transaksi', $kodeTransaksi)->exists()) {
+                continue;
+            }
+
             // Create order
             $order = Order::create([
                 'id_pelanggan' => $customer->pelanggan?->id_pelanggan ?? null,
                 'id_cabang' => $branch->id_cabang,
                 'kode_transaksi' => $kodeTransaksi,
-                'tgl_transaksi' => $randomDate,
+                'tanggal_transaksi' => $randomDate,
                 'total_harga' => $total,
-                'metode_pembayaran' => $metodePembayaran,
                 'metode_pengiriman' => $metodePengiriman,
                 'status_pembayaran' => $statusPembayaran,
                 'status_pengiriman' => $statusPembayaran === 'sudah_bayar' ? 'dikemas' : 'pending',
@@ -153,9 +157,6 @@ class TransactionSeeder extends Seeder
                 'total_diskon' => $discount,
                 'ongkir' => $ongkir,
                 'biaya_membership' => $biayaMember,
-                'alamat_pengiriman' => $metodePengiriman === 'kurir' ? 'Alamat pengiriman pelanggan' : null,
-                'created_at' => $randomDate,
-                'updated_at' => $randomDate,
             ]);
 
             // Create order details
@@ -180,7 +181,7 @@ class TransactionSeeder extends Seeder
             // Create membership if this is first transaction and membership fee paid
             if ($biayaMember > 0 && $statusPembayaran === 'sudah_bayar') {
                 Membership::create([
-                    'user_id' => $customer->id,
+                    'user_id' => $customer->id_user,
                     'tier' => 'bronze',
                     'points' => $pointsEarned,
                     'discount_percentage' => 5,

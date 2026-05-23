@@ -64,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/owner/reports', [OwnerController::class, 'reports'])->name('owner.reports');
         Route::get('/owner/reports/generate', [OwnerController::class, 'generateReport'])->name('owner.reports.generate');
         Route::get('/owner/analytics', [OwnerController::class, 'analytics'])->name('owner.analytics');
+        Route::get('/owner/transactions', [OwnerController::class, 'transactions'])->name('owner.transactions.index');
+        Route::get('/owner/transactions/{id}', [OwnerController::class, 'showTransaction'])->name('owner.transactions.show');
     });
 
     Route::middleware(['checkRole:admin'])->group(function () {
@@ -174,6 +176,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['checkRole:pelanggan'])->group(function () {
+        // Notifications Page
+        Route::get('/notifications', [PelangganController::class, 'notifications'])->name('pelanggan.notifications');
+
         // Cart
         Route::get('/cart', [PelangganController::class, 'cart'])->name('pelanggan.cart');
         Route::post('/cart/add/{productId}', [PelangganController::class, 'addToCart'])->name('cart.add');

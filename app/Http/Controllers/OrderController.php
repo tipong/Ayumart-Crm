@@ -32,6 +32,11 @@ class OrderController extends Controller
             return redirect()->route('home')->with('error', 'Data pelanggan tidak ditemukan');
         }
 
+        // Pastikan pelanggan sudah memilih lokasi cabang
+        if (!session()->has('nearest_branch_id')) {
+            return redirect()->route('pelanggan.cart')->with('error', 'Silakan pilih cabang terlebih dahulu sebelum melanjutkan ke checkout.');
+        }
+
         // Load cart items dengan eager loading relasi product (dari integrasi DB)
         $cartItems = Cart::where('id_pelanggan', $pelanggan->id_pelanggan)
             ->with('product') // Eager load relasi ke ProdukIntegrasi
@@ -109,6 +114,11 @@ class OrderController extends Controller
 
         if (!$pelanggan) {
             return redirect()->route('home')->with('error', 'Data pelanggan tidak ditemukan');
+        }
+
+        // Pastikan pelanggan sudah memilih lokasi cabang
+        if (!session()->has('nearest_branch_id') && !$request->id_cabang) {
+            return redirect()->route('pelanggan.cart')->with('error', 'Silakan pilih cabang terlebih dahulu sebelum melanjutkan ke checkout.');
         }
 
         try {
@@ -191,6 +201,11 @@ class OrderController extends Controller
                     return back()->with('error', 'Alamat pengiriman tidak valid')->withInput();
                 }
 
+                // Validate coordinates for courier delivery
+                if (is_null($address->latitude) || is_null($address->longitude) || empty($address->latitude) || empty($address->longitude) || floatval($address->latitude) == 0 || floatval($address->longitude) == 0) {
+                    return back()->with('error', 'Koordinat lokasi alamat pengiriman kurang lengkap. Silakan edit alamat untuk menyematkan lokasi di peta.')->withInput();
+                }
+
                 // ✅ PRIORITAS 1: Use shipping_cost from frontend form (sent by checkout.blade.php)
                 if ($request->has('shipping_cost') && $request->shipping_cost > 0) {
                     $ongkir = (int) $request->shipping_cost;
@@ -237,19 +252,10 @@ class OrderController extends Controller
                     }
                 }
 
-                // ⚠️ LAST RESORT: Use first active branch as fallback
+                // ⚠️ LAST RESORT: Fail if no branch is chosen
                 if ((!isset($idCabang) || !$idCabang)) {
-                    $nearestBranch = Cabang::where('is_active', true)->first();
-                    if ($nearestBranch) {
-                        $idCabang = $nearestBranch->id_cabang;
-                        Log::warning("⚠️ KURIR: Using default/first branch (no form/session)", [
-                            'id_cabang' => $idCabang,
-                            'nama_cabang' => $nearestBranch->nama_cabang
-                        ]);
-                    } else {
-                        DB::rollBack();
-                        return back()->with('error', 'Tidak ada cabang aktif tersedia')->withInput();
-                    }
+                    DB::rollBack();
+                    return redirect()->route('pelanggan.cart')->with('error', 'Silakan pilih cabang terlebih dahulu sebelum melanjutkan ke checkout.');
                 }
 
                 $addressId = $address->id;
@@ -322,20 +328,10 @@ class OrderController extends Controller
                     }
                 }
 
-                // PRIORITAS 4: Fallback ke cabang aktif pertama
+                // PRIORITAS 4: Fail if no branch is chosen
                 if (!isset($idCabang) || !$idCabang) {
-                    $nearestBranch = Cabang::where('is_active', true)->first();
-                    if ($nearestBranch) {
-                        $idCabang = $nearestBranch->id_cabang;
-                        Log::warning("⚠️ PICKUP: Using fallback branch (no form/session/coordinates)", [
-                            'id_cabang' => $idCabang,
-                            'nama_cabang' => $nearestBranch->nama_cabang
-                        ]);
-                    } else {
-                        Log::error("❌ PICKUP: No active branch found!");
-                        DB::rollBack();
-                        return back()->with('error', 'Tidak ada cabang aktif tersedia untuk pickup')->withInput();
-                    }
+                    DB::rollBack();
+                    return redirect()->route('pelanggan.cart')->with('error', 'Silakan pilih cabang terlebih dahulu sebelum melanjutkan ke checkout.');
                 }
 
                 $ongkir = 0;
@@ -1411,6 +1407,9 @@ class OrderController extends Controller
      */
     public function orders()
     {
+        // Dynamically check and expire unpaid orders
+        Order::checkAndCancelExpiredOrders();
+
         $user = Auth::user();
         $pelanggan = $user->getOrCreatePelanggan();
 
@@ -1436,6 +1435,9 @@ class OrderController extends Controller
      */
     public function orderDetail($id)
     {
+        // Dynamically check and expire unpaid orders
+        Order::checkAndCancelExpiredOrders();
+
         $user = Auth::user();
         $pelanggan = $user->getOrCreatePelanggan();
 

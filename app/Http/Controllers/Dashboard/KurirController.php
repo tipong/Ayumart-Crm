@@ -470,6 +470,7 @@ class KurirController extends Controller
                 ->leftJoin('users as pelanggan_user', 'tb_pelanggan.id_user', '=', 'pelanggan_user.id_user')
                 ->leftJoin('tb_staff', 'tb_pengiriman.id_staff', '=', 'tb_staff.id_staff')
                 ->leftJoin('users as staff_user', 'tb_staff.id_user', '=', 'staff_user.id_user')
+                ->leftJoin('customer_addresses', 'tb_pengiriman.id_address', '=', 'customer_addresses.id')
                 ->where('tb_transaksi.status_pembayaran', 'sudah_bayar')
                 ->select(
                     'tb_pengiriman.id_pengiriman',
@@ -479,6 +480,7 @@ class KurirController extends Controller
                     'tb_pengiriman.no_resi',
                     'tb_pengiriman.nama_penerima',
                     'tb_pengiriman.alamat_penerima',
+                    'tb_pengiriman.no_tlp_penerima',
                     'tb_pengiriman.status_pengiriman',
                     'tb_pengiriman.tgl_kirim',
                     'tb_pengiriman.tgl_sampai',
@@ -487,10 +489,18 @@ class KurirController extends Controller
                     'tb_transaksi.total_harga',
                     'tb_transaksi.status_pembayaran',
                     'tb_pelanggan.nama_pelanggan',
+                    'tb_pelanggan.no_tlp_pelanggan',
                     'pelanggan_user.email as email_pelanggan',
                     'tb_staff.nama_staff',
+                    'tb_staff.no_tlp_staff as phone_kurir',
                     'staff_user.email as email_kurir',
-                    'staff_user.id_user as id_kurir' // For backward compatibility
+                    'staff_user.id_user as id_kurir', // For backward compatibility
+                    'customer_addresses.alamat_lengkap',
+                    'customer_addresses.kota',
+                    'customer_addresses.kecamatan',
+                    'customer_addresses.kode_pos',
+                    'customer_addresses.latitude',
+                    'customer_addresses.longitude'
                 )
                 ->orderBy('tb_pengiriman.tgl_kirim', 'desc')
                 ->paginate(20);

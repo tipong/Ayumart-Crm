@@ -66,7 +66,7 @@
     }
 
     .detail-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         padding: 1.25rem 1.5rem;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -76,15 +76,15 @@
     }
 
     .detail-card-header.info {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
     }
 
     .detail-card-header.success {
-        background: linear-gradient(135deg, #1cc88a 0%, #169b6b 100%);
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
     }
 
     .detail-card-header.danger {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     }
 
     .detail-card-header h6 {
@@ -155,7 +155,7 @@
     }
 
     .stat-item {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         padding: 1.25rem;
         border-radius: 0.75rem;
@@ -163,15 +163,15 @@
     }
 
     .stat-item.success {
-        background: linear-gradient(135deg, #1cc88a 0%, #169b6b 100%);
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
     }
 
     .stat-item.info {
-        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
     }
 
     .stat-item.warning {
-        background: linear-gradient(135deg, #f6c23e 0%, #daa520 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
 
     .stat-item h3 {
@@ -209,22 +209,22 @@
     }
 
     .alert-modern.success {
-        border-left-color: #1cc88a;
+        border-left-color: #10b981;
         background: #f0fdf4;
     }
 
     .alert-modern.danger {
-        border-left-color: #e74c3c;
+        border-left-color: #ef4444;
         background: #fef2f2;
     }
 
     .alert-modern.info {
-        border-left-color: #4e73df;
-        background: #f0f7ff;
+        border-left-color: #14b8a6;
+        background: #f0fdfa;
     }
 
     .alert-modern.warning {
-        border-left-color: #f6c23e;
+        border-left-color: #f59e0b;
         background: #fffbf0;
     }
 
@@ -831,11 +831,11 @@
 
     // Chart Color Palette
     const chartColors = {
-        success: '#1cc88a',
-        info: '#4e73df',
-        primary: '#0099ff',
-        warning: '#f6c23e',
-        danger: '#e74c3c',
+        success: '#10b981',
+        info: '#14b8a6',
+        primary: '#0d9488',
+        warning: '#f59e0b',
+        danger: '#ef4444',
         secondary: '#6c757d',
         light: '#f8f9fa',
         dark: '#343a40'

@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\Membership;
 
 class MembershipSeeder extends Seeder
 {
@@ -13,43 +14,31 @@ class MembershipSeeder extends Seeder
      */
     public function run(): void
     {
-        $memberships = [
-            [
-                'name' => 'Bronze',
-                'description' => 'Member Bronze - Level awal',
-                'discount_percentage' => 5.00,
-                'min_purchase' => 0.00,
-                'points_required' => 0,
-                'benefits' => json_encode(['Diskon 5%', 'Priority support']),
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Silver',
-                'description' => 'Member Silver - Level menengah',
-                'discount_percentage' => 10.00,
-                'min_purchase' => 1000000.00,
-                'points_required' => 100,
-                'benefits' => json_encode(['Diskon 10%', 'Free shipping', 'Priority support']),
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Gold',
-                'description' => 'Member Gold - Level premium',
-                'discount_percentage' => 15.00,
-                'min_purchase' => 5000000.00,
-                'points_required' => 500,
-                'benefits' => json_encode(['Diskon 15%', 'Free shipping', 'Exclusive products', 'VIP support']),
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
+        // Get all customer users (role ID 5)
+        $customers = User::where('id_role', 5)->get();
 
-        DB::table('memberships')->insert($memberships);
+        foreach ($customers as $customer) {
+            // Check if membership already exists for this user
+            $existing = Membership::where('user_id', $customer->id_user)->first();
+
+            if (!$existing) {
+                // Let's give some random tier and points
+                $points = rand(50, 450);
+                $tier = Membership::calculateTier($points);
+                $discount = Membership::getDiscountForTier($tier);
+
+                Membership::create([
+                    'user_id' => $customer->id_user,
+                    'tier' => $tier,
+                    'points' => $points,
+                    'discount_percentage' => $discount,
+                    'valid_from' => now()->subMonths(3),
+                    'valid_until' => now()->addYear(),
+                    'is_active' => true,
+                ]);
+
+                echo "✓ Created membership for {$customer->email}: Tier {$tier}, Points {$points}\n";
+            }
+        }
     }
 }
-

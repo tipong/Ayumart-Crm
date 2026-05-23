@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- DataTables -->
@@ -32,6 +34,9 @@
     @endphp
 
     <style>
+        /* Premium Typography & Variable Tokens */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         :root {
             --primary-color: #10b981;
             --secondary-color: #059669;
@@ -40,156 +45,221 @@
             --warning-color: #f6c23e;
             --danger-color: #e74a3b;
             --light-color: #f8f9fc;
-            --dark-color: #5a5c69;
+            --dark-color: #374151;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif !important;
             background-color: var(--light-color);
+            color: var(--dark-color);
         }
 
-        /* Sidebar */
+        /* Sidebar Styling */
         #sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
+            background: linear-gradient(180deg, #115e59 0%, #134e4a 100%);
+            box-shadow: 0 0 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            width: 250px;
+            z-index: 1000;
         }
 
         #sidebar .sidebar-brand {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: white;
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #ffffff;
             text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            letter-spacing: -0.5px;
         }
 
         #sidebar .sidebar-brand i {
-            font-size: 1.6rem;
+            font-size: 1.65rem;
         }
 
         #sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.75);
             padding: 0.75rem 1rem;
-            margin: 0.25rem 0.5rem;
-            border-radius: 0.35rem;
-            transition: all 0.3s;
+            margin: 0.25rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        #sidebar .nav-link:hover,
+        #sidebar .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255,255,255,0.08);
+            transform: translateX(4px);
+        }
+
         #sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
+            color: #ffffff;
+            background-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            font-weight: 600;
         }
 
         #sidebar .nav-link i {
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
             width: 20px;
             text-align: center;
+            font-size: 1.05rem;
         }
 
-        /* Main Content */
         #content {
             width: 100%;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .sidebar-header {
-            padding: 1.5rem 1.25rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1.75rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             text-align: center;
         }
 
-        /* Top Navigation */
+        /* Topbar Header */
         .topbar {
-            background-color: white;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,0.15);
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.02);
         }
 
         .topbar .nav-link {
             color: var(--dark-color);
+            font-weight: 500;
         }
 
-        /* Cards */
+        /* Custom Cards style */
         .card {
-            border: none;
-            border-radius: 0.5rem;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
             margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
         }
 
         .card-header {
             background-color: transparent;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            font-weight: 600;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            font-weight: 700;
+            padding: 1.25rem;
+            color: #1f2937;
         }
 
-        .border-left-primary {
-            border-left: 0.25rem solid var(--primary-color)!important;
-        }
-
-        .border-left-success {
-            border-left: 0.25rem solid var(--success-color)!important;
-        }
-
-        .border-left-info {
-            border-left: 0.25rem solid var(--info-color)!important;
-        }
-
-        .border-left-warning {
-            border-left: 0.25rem solid var(--warning-color)!important;
-        }
-
-        .border-left-danger {
-            border-left: 0.25rem solid var(--danger-color)!important;
-        }
-
-        /* Buttons */
+        /* Custom buttons style */
         .btn {
-            border-radius: 0.35rem;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.2s ease;
         }
 
-        /* Tables */
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+            border-color: #059669;
+        }
+
+        .btn-primary {
+            background-color: #14b8a6;
+            border-color: #14b8a6;
+        }
+
+        .btn-primary:hover {
+            background-color: #0f766e;
+            border-color: #0f766e;
+        }
+
+        /* Border highlights */
+        .border-left-primary { border-left: 0.25rem solid var(--primary-color)!important; }
+        .border-left-success { border-left: 0.25rem solid var(--success-color)!important; }
+        .border-left-info { border-left: 0.25rem solid var(--info-color)!important; }
+        .border-left-warning { border-left: 0.25rem solid var(--warning-color)!important; }
+        .border-left-danger { border-left: 0.25rem solid var(--danger-color)!important; }
+
+        /* Tables style */
         .table {
             color: var(--dark-color);
         }
 
         .table thead th {
-            border-bottom: 2px solid #dee2e6;
-            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            color: var(--primary-color);
+            font-size: 0.75rem;
+            color: #0f766e;
+            letter-spacing: 0.5px;
+            background: #f9fafb;
+            padding: 0.75rem 1rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Custom inputs */
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 0.55rem 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
         }
 
         /* Badges */
         .badge {
-            padding: 0.35rem 0.65rem;
+            padding: 0.35rem 0.75rem;
             font-weight: 600;
+            border-radius: 6px;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            #sidebar {
-                margin-left: -250px;
-            }
-
-            #sidebar.active {
-                margin-left: 0;
-            }
-
-            #content {
-                width: 100%;
-            }
+        .role-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.18);
+            color: white;
+            padding: 0.25rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
@@ -197,12 +267,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
+            background: #0d9488;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #34d399;
+            background: #0f766e;
         }
 
         /* Loading Overlay */
@@ -221,17 +291,6 @@
 
         .loading-overlay.active {
             display: flex;
-        }
-
-        .role-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
         }
     </style>
 
@@ -252,48 +311,48 @@
             <nav class="nav flex-column py-3">
                 <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                    href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
                 </a>
 
-                <hr class="sidebar-divider my-2" style="border-color: rgba(255,255,255,0.1);">
+                <hr class="sidebar-divider my-2" style="border-color: rgba(255,255,255,0.08);">
 
-                <div class="px-3 mb-1" style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">
+                <div class="px-4 mb-2" style="color: rgba(255,255,255,0.4); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
                     Manajemen
                 </div>
 
                 <a class="nav-link {{ request()->routeIs('admin.discounts.*') ? 'active' : '' }}"
                    href="{{ route('admin.discounts.index') }}">
-                    <i class="fas fa-tags"></i> Diskon
+                    <i class="bi bi-tags-fill"></i> Diskon Cabang
                 </a>
 
                 <a class="nav-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}"
                    href="{{ route('admin.transactions.index') }}">
-                    <i class="fas fa-shopping-cart"></i> Transaksi
+                    <i class="bi bi-cart-fill"></i> Transaksi
                 </a>
 
                 <a class="nav-link {{ request()->routeIs('admin.cancellations.*') ? 'active' : '' }}"
                    href="{{ route('admin.cancellations.index') }}">
-                    <i class="fas fa-ban"></i> Pembatalan Transaksi
+                    <i class="bi bi-x-octagon-fill"></i> Pembatalan
                 </a>
 
                 <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}"
                    href="{{ route('admin.staff.index') }}">
-                    <i class="fas fa-users"></i> Staff
+                    <i class="bi bi-people-fill"></i> Data Staff
                 </a>
 
                 <a class="nav-link {{ request()->routeIs('admin.memberships.*') ? 'active' : '' }}"
                    href="{{ route('admin.memberships.index') }}">
-                    <i class="fas fa-crown"></i> Membership
+                    <i class="bi bi-award-fill"></i> Membership
                 </a>
 
-                <hr class="sidebar-divider my-2" style="border-color: rgba(255,255,255,0.1);">
+                <hr class="sidebar-divider my-2" style="border-color: rgba(255,255,255,0.08);">
 
-                <div class="px-3 mb-1" style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">
+                <div class="px-4 mb-2" style="color: rgba(255,255,255,0.4); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
                     Akun
                 </div>
 
                 <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
 
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -308,26 +367,28 @@
             <nav class="topbar d-flex justify-content-between align-items-center">
                 <div>
                     <button class="btn btn-light d-md-none" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
+                        <i class="bi bi-list"></i>
                     </button>
                 </div>
 
                 <div class="d-flex align-items-center">
-                    <span class="me-3 d-none d-md-inline text-muted">
-                        <i class="far fa-calendar-alt"></i>
-                        {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
+                    <span class="me-3 d-none d-md-inline text-muted small fw-semibold">
+                        <i class="bi bi-calendar3 text-success me-1"></i>
+                        {{ \Carbon\Carbon::now()->translatedFormat('dddd, D F Y') }}
                     </span>
 
                     <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle fa-lg"></i>
-                            <span class="ms-2 d-none d-md-inline">{{ Auth::user()->name }}</span>
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: 700; font-size: 0.9rem;">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                            <span class="d-none d-md-inline font-medium text-dark">{{ Auth::user()->name }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                             <li>
                                 <a class="dropdown-item" href="#"
                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                    <i class="bi bi-box-arrow-right me-2 text-danger"></i> Logout
                                 </a>
                             </li>
                         </ul>

@@ -819,8 +819,8 @@
     }
 
     .form-control-lg:focus {
-        border-color: #4e73df;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15);
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
     }
 
     .text-gray-900 {

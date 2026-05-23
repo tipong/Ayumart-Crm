@@ -3,18 +3,34 @@
 @section('title', 'Tiket Bantuan Saya')
 
 @section('content')
-<div class="container py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2><i class="bi bi-ticket-perforated"></i> Tiket Bantuan Saya</h2>
-                    <p class="text-muted mb-0">Kelola pertanyaan dan keluhan Anda</p>
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="hero-icon">
+                    <i class="bi bi-ticket-perforated"></i>
                 </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTicketModal">
-                    <i class="bi bi-plus-circle"></i> Buat Tiket Baru
-                </button>
+                <div>
+                    <h1>Pusat Bantuan</h1>
+                    <p>Kelola pertanyaan, keluhan, dan tiket bantuan Anda</p>
+                </div>
             </div>
+            <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;" data-bs-toggle="modal" data-bs-target="#createTicketModal">
+                <i class="bi bi-plus-lg me-1"></i> Tiket Baru
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container py-3 pb-5">
+    <!-- Breadcrumb -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item active">Pusat Bantuan</li>
+        </ol>
+    </nav>
 
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
@@ -31,8 +47,11 @@
             @endif
 
             <!-- Tickets List -->
-            <div class="card shadow-sm">
-                <div class="card-body">
+            <div class="ay-card">
+                <div class="ay-card-header">
+                    <i class="bi bi-list-stars"></i> Riwayat Tiket Bantuan
+                </div>
+                <div class="ay-card-body">
                     @if($tickets && count($tickets) > 0)
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
@@ -113,10 +132,10 @@
 <!-- Create Ticket Modal -->
 <div class="modal fade" id="createTicketModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: var(--primary); border: none;">
                 <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Buat Tiket Baru</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ route('pelanggan.tickets.store') }}" method="POST">
                 @csrf
@@ -158,9 +177,9 @@
                         <small>Tim CS kami akan merespon tiket Anda dalam waktu 1x24 jam.</small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" style="border-radius:100px;">Batal</button>
+                    <button type="submit" class="btn btn-primary" style="border-radius:100px;">
                         <i class="bi bi-send"></i> Kirim Tiket
                     </button>
                 </div>

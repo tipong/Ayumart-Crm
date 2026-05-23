@@ -281,10 +281,13 @@ function getGPSLocationAdd() {
 
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                document.getElementById('modal_latitude').value = position.coords.latitude;
-                document.getElementById('modal_longitude').value = position.coords.longitude;
-                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diambil! (Lat: ' +
-                    position.coords.latitude.toFixed(6) + ', Long: ' + position.coords.longitude.toFixed(6) + ')</span>';
+                const latEl = document.getElementById('modal_latitude');
+                const lngEl = document.getElementById('modal_longitude');
+                latEl.value = position.coords.latitude;
+                lngEl.value = position.coords.longitude;
+                latEl.dispatchEvent(new Event('change', { bubbles: true }));
+                lngEl.dispatchEvent(new Event('change', { bubbles: true }));
+                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diambil!</span>';
             },
             function(error) {
                 gpsStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Gagal mengambil lokasi GPS: ' + error.message + '</span>';
@@ -312,10 +315,13 @@ function getGPSLocationEdit() {
 
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                document.getElementById('edit_latitude').value = position.coords.latitude;
-                document.getElementById('edit_longitude').value = position.coords.longitude;
-                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diambil! (Lat: ' +
-                    position.coords.latitude.toFixed(6) + ', Long: ' + position.coords.longitude.toFixed(6) + ')</span>';
+                const latEl = document.getElementById('edit_latitude');
+                const lngEl = document.getElementById('edit_longitude');
+                latEl.value = position.coords.latitude;
+                lngEl.value = position.coords.longitude;
+                latEl.dispatchEvent(new Event('change', { bubbles: true }));
+                lngEl.dispatchEvent(new Event('change', { bubbles: true }));
+                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diambil!</span>';
             },
             function(error) {
                 gpsStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Gagal mengambil lokasi GPS: ' + error.message + '</span>';

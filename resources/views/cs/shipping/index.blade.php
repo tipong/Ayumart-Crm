@@ -10,16 +10,27 @@
 
     <div class="sidebar-divider"></div>
 
-    <div class="menu-section-title">Layanan</div>
+    <div class="menu-section-title">Layanan Pelanggan</div>
 
     <a class="nav-link" href="{{ route('cs.tickets.index') }}">
-        <i class="bi bi-headset"></i>
-        <span>Tickets</span>
+        <i class="bi bi-ticket-perforated"></i>
+        <span>Ticketing</span>
+        @php
+            $unreadCount = \App\Models\Ticket::where('is_read', false)->count();
+        @endphp
+        @if($unreadCount > 0)
+            <span class="badge bg-danger ms-auto">{{ $unreadCount }}</span>
+        @endif
     </a>
 
     <a class="nav-link" href="{{ route('cs.newsletters.index') }}">
-        <i class="bi bi-envelope"></i>
+        <i class="bi bi-envelope-paper"></i>
         <span>Newsletter</span>
+    </a>
+
+    <a class="nav-link" href="{{ route('cs.dashboard') }}#subscribers">
+        <i class="bi bi-people"></i>
+        <span>Subscribers</span>
     </a>
 
     <a class="nav-link active" href="{{ route('cs.shipping.index') }}">
@@ -212,7 +223,7 @@
                                         <form action="{{ route('cs.shipping.unassign', $shipment->id_pengiriman) }}"
                                               method="POST"
                                               class="d-inline"
-                                              onsubmit="return confirm('Yakin ingin unassign kurir {{ $shipment->nama_kurir }}?')">
+                                              onsubmit="confirmUnassign(event, this)">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-danger">
                                                 <i class="bi bi-x-circle"></i> Unassign
@@ -228,7 +239,7 @@
                                 @if($shipment->latitude && $shipment->longitude)
                                 <a href="https://maps.google.com/?q={{ $shipment->latitude }},{{ $shipment->longitude }}"
                                    target="_blank"
-                                   class="btn btn-sm btn-outline-primary ms-1"
+                                   class="btn btn-sm btn-outline-success ms-1"
                                    title="Lihat di Maps">
                                     <i class="bi bi-geo-alt"></i>
                                 </a>
@@ -270,7 +281,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 h-100">
                         <div class="d-flex align-items-center">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <div class="text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: var(--primary-color);">
                                 <i class="bi bi-person" style="font-size: 1.5rem;"></i>
                             </div>
                             <div class="ms-3">
@@ -301,5 +312,23 @@
     setTimeout(function() {
         $('.alert').fadeOut('slow');
     }, 5000);
+
+    function confirmUnassign(event, form) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Konfirmasi Unassign',
+            text: 'Apakah Anda yakin ingin unassign kurir dari pengiriman ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Unassign!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
 </script>
 @endpush

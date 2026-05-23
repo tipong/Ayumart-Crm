@@ -470,6 +470,29 @@
                             window.location.href = '{{ route("pelanggan.orders") }}';
                         }, 3000);
 
+                    } else if (data.status_pembayaran === 'kadaluarsa') {
+                        console.log('❌ PAYMENT CANCELLED OR EXPIRED');
+                        if (paymentStatus) {
+                            paymentStatus.textContent = 'Pembayaran Kadaluarsa / Dibatalkan';
+                            paymentStatus.classList.remove('bg-warning', 'bg-info');
+                            paymentStatus.classList.add('bg-danger');
+                        }
+
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                        alertDiv.innerHTML = `
+                            <i class="bi bi-x-circle"></i> <strong>Pembayaran Dibatalkan / Kadaluarsa!</strong><br>
+                            Halaman akan dialihkan kembali ke daftar pesanan Anda.
+                        `;
+                        const container = document.querySelector('.container');
+                        if (container) {
+                            container.insertBefore(alertDiv, container.firstChild);
+                        }
+
+                        setTimeout(() => {
+                            window.location.href = '{{ route("pelanggan.orders") }}';
+                        }, 2500);
+
                     } else if (attempt < maxAttempts) {
                         // Not paid yet, retry after delay with progressive backoff
                         // First 3 attempts: 1s, 2s, 3s (checking frequently)
@@ -533,10 +556,14 @@
                 })
                 .then(data => {
                     const isPaid = data.is_paid === true || data.status_pembayaran === 'sudah_bayar';
+                    const isCancelled = data.status_pembayaran === 'kadaluarsa';
 
                     if (isPaid) {
                         console.log('✅ Payment detected in periodic check!');
                         verifyPaymentWithRetry(true); // Force fresh verification
+                    } else if (isCancelled) {
+                        console.log('❌ Cancellation/expiry detected in periodic check!');
+                        verifyPaymentWithRetry(true); // Force fresh verification which will trigger the cancellation redirect
                     } else {
                         setTimeout(periodicCheck, checkInterval);
                     }

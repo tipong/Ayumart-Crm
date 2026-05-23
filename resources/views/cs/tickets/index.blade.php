@@ -43,19 +43,19 @@
     }
 
     .stat-card.bg-primary-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
 
     .stat-card.bg-warning-gradient {
-        background: linear-gradient(135deg, #f6c23e 0%, #daa520 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
 
     .stat-card.bg-info-gradient {
-        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
     }
 
     .stat-card.bg-success-gradient {
-        background: linear-gradient(135deg, #1cc88a 0%, #169b6b 100%);
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
     }
 
     .stat-icon {
@@ -111,8 +111,8 @@
     }
 
     .form-select:focus, .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
     }
 
     /* Table Card */
@@ -126,7 +126,7 @@
     }
 
     .table-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         padding: 1.25rem 1.5rem;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -174,13 +174,13 @@
     }
 
     .table tbody tr:hover {
-        background-color: rgba(102, 126, 234, 0.04);
+        background-color: rgba(16, 185, 129, 0.04);
         transform: translateX(2px);
     }
 
     .table tbody tr.table-unread {
-        background-color: #f0f7ff !important;
-        border-left: 4px solid #4e73df;
+        background-color: #f0fdf4 !important;
+        border-left: 4px solid #10b981;
     }
 
     /* Badge Styling */
@@ -196,7 +196,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         display: flex;
         align-items: center;
@@ -596,13 +596,13 @@
 <style>
 .avatar-circle {
     width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white; display: flex; align-items: center; justify-content: center;
     font-weight: 600; font-size: 1rem;
 }
 .stat-subtitle { font-size: 0.75rem; opacity: 0.9; margin-top: 0.25rem; }
 .table tbody tr { transition: all 0.2s; }
-.table tbody tr:hover { background-color: rgba(102, 126, 234, 0.05); transform: translateY(-1px); }
+.table tbody tr:hover { background-color: rgba(16, 185, 129, 0.05); transform: translateY(-1px); }
 .btn-group-sm .btn { padding: 0.25rem 0.5rem; }
 </style>
 @endpush

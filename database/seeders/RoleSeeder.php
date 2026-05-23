@@ -51,7 +51,11 @@ class RoleSeeder extends Seeder
             ],
         ];
 
-        DB::table('roles')->insert($roles);
+        if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
+            DB::table('roles')->insert($roles);
+        } else {
+            echo "ℹ Schema table 'roles' does not exist. Skipping RoleSeeder...\n";
+        }
     }
 }
 

@@ -5,15 +5,16 @@
 @push('styles')
 <style>
     :root {
-        --primary-color: #3F4F44;
-        --primary-hover: #2E3A31;
-        --secondary-color: #556B58;
-        --text-dark: #333;
-        --text-muted: #666;
-        --border-color: #e5e5e5;
-        --bg-light: #f8f9fa;
-        --success-color: #10b981;
-        --danger-color: #ef4444;
+        /* Menggunakan design system dari layout */
+        --primary-color: var(--primary, #015b1e);
+        --primary-hover: var(--primary-dark, #013d14);
+        --secondary-color: #027826;
+        --text-dark: var(--text-dark, #1a1a1a);
+        --text-muted: var(--text-muted, #777);
+        --border-color: var(--border, #e0e0e0);
+        --bg-light: #f5f5f5;
+        --success-color: #015b1e;
+        --danger-color: #e7482e;
         --warning-color: #f59e0b;
     }
 
@@ -472,16 +473,34 @@
 @endpush
 
 @section('content')
-    <div class="cart-container">
-        <!-- Header -->
-        <div class="page-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2><i class="bi bi-cart3"></i> Keranjang Belanja</h2>
-                <a href="{{ route('home') }}" class="btn btn-primary">
-                    <i class="bi bi-arrow-left"></i> Lanjut Belanja
-                </a>
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="hero-icon">
+                    <i class="bi bi-cart3"></i>
+                </div>
+                <div>
+                    <h1>Keranjang Belanja</h1>
+                    <p>{{ $cartItems->count() }} produk dalam keranjang</p>
+                </div>
             </div>
+            <a href="{{ route('home') }}" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;">
+                <i class="bi bi-arrow-left me-1"></i> Lanjut Belanja
+            </a>
         </div>
+    </div>
+</div>
+
+    <div class="cart-container">
+        <!-- Breadcrumb -->
+        <nav class="mb-4" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+                <li class="breadcrumb-item active">Keranjang Belanja</li>
+            </ol>
+        </nav>
 
         <div class="row">
             <!-- Cart Items -->
@@ -607,10 +626,56 @@
                         <span class="text-primary" id="total-amount">Rp {{ number_format($total, 0, ',', '.') }}</span>
                     </div>
 
+                    <!-- Pemilihan Cabang -->
+                    <div class="card mb-3 border-0 bg-light rounded-3 shadow-sm">
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold mb-2 text-dark d-flex align-items-center gap-1" style="font-size: 14px;">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> Cabang Pengiriman
+                            </h6>
+                            @if(session()->has('nearest_branch_id') && session('nearest_branch'))
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="fw-semibold text-success small" style="font-size: 13px;">{{ session('nearest_branch')['nama_cabang'] }}</span>
+                                    @if(session('nearest_branch')['distance'])
+                                        <span class="badge bg-secondary text-white" style="font-size: 10px;">
+                                            <i class="bi bi-pin-map"></i> {{ number_format(session('nearest_branch')['distance'], 1) }} km
+                                        </span>
+                                    @endif
+                                </div>
+                            @else
+                                <div class="alert alert-warning py-2 px-3 mb-2 small d-flex align-items-center gap-1" style="border-radius: 8px; font-size: 11px; font-weight: 500;">
+                                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                                    <span>Pilih cabang untuk checkout</span>
+                                </div>
+                            @endif
+
+                            <div class="mb-2">
+                                <select id="cartBranchSelector" class="form-select form-select-sm" style="border-radius: 8px; font-size: 13px;">
+                                    <option value="">Pilih Cabang</option>
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id_cabang }}"
+                                            {{ session('nearest_branch') && session('nearest_branch')['id_cabang'] == $branch->id_cabang ? 'selected' : '' }}>
+                                            {{ $branch->nama_cabang }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <button type="button" id="cartDetectLocationBtn" class="btn btn-sm btn-outline-success w-100" style="border-radius: 8px; font-size: 12px; font-weight: 600;">
+                                <i class="bi bi-crosshair"></i> Deteksi Lokasi Otomatis
+                            </button>
+                        </div>
+                    </div>
+
                     @if($cartItems->count() > 0)
-                        <a href="{{ route('checkout') }}" class="btn btn-checkout">
-                            <i class="bi bi-bag-check"></i> Checkout
-                        </a>
+                        @if(session()->has('nearest_branch_id'))
+                            <a href="{{ route('checkout') }}" class="btn btn-checkout">
+                                <i class="bi bi-bag-check"></i> Checkout
+                            </a>
+                        @else
+                            <button type="button" class="btn btn-checkout btn-checkout-blocked">
+                                <i class="bi bi-bag-check"></i> Checkout
+                            </button>
+                        @endif
                     @else
                         <button class="btn btn-checkout" disabled>
                             <i class="bi bi-bag-check"></i> Checkout
@@ -778,6 +843,161 @@
                     });
                 });
             }
+
+            // Handle blocked checkout button click
+            const blockedBtn = document.querySelector('.btn-checkout-blocked');
+            if (blockedBtn) {
+                blockedBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pilih Cabang Terlebih Dahulu',
+                        text: 'Silakan pilih lokasi cabang terdekat Anda sebelum melanjutkan ke checkout.',
+                        confirmButtonColor: '#015b1e'
+                    });
+                });
+            }
+
+            // Handle branch selection dropdown change
+            document.getElementById('cartBranchSelector')?.addEventListener('change', function() {
+                const id = this.value;
+                if (!id) return;
+                
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Mengubah cabang toko...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/api/change-branch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ id_cabang: id })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cabang Berhasil Diubah',
+                            text: `Sekarang memilih cabang: ${data.branch.nama_cabang}`,
+                            confirmButtonColor: '#015b1e',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat mengubah cabang.',
+                            confirmButtonColor: '#015b1e'
+                        });
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Terjadi kesalahan koneksi.',
+                        confirmButtonColor: '#015b1e'
+                    });
+                });
+            });
+
+            // Handle geolocation location detection
+            document.getElementById('cartDetectLocationBtn')?.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Browser Tidak Mendukung',
+                        text: 'Browser Anda tidak mendukung deteksi lokasi.',
+                        confirmButtonColor: '#015b1e'
+                    });
+                    return;
+                }
+
+                const btn = this;
+                const originalHTML = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mencari lokasi...';
+
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        Swal.fire({
+                            title: 'Mencari Cabang Terdekat...',
+                            text: 'Menghitung jarak koordinat...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        fetch('/api/set-user-location', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                latitude: pos.coords.latitude,
+                                longitude: pos.coords.longitude
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success && data.branch) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Lokasi Ditemukan',
+                                    text: `Cabang terdekat: ${data.branch.nama_cabang} (${data.branch.distance} km)`,
+                                    confirmButtonColor: '#015b1e',
+                                    timer: 2500,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                }).then(() => window.location.reload());
+                            } else {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Informasi',
+                                    text: 'Cabang terdekat tidak ditemukan.',
+                                    confirmButtonColor: '#015b1e'
+                                });
+                                btn.disabled = false;
+                                btn.innerHTML = originalHTML;
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan saat mendeteksi lokasi.',
+                                confirmButtonColor: '#015b1e'
+                            });
+                            btn.disabled = false;
+                            btn.innerHTML = originalHTML;
+                        });
+                    },
+                    err => {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Izin Lokasi Diperlukan',
+                            text: 'Izinkan akses lokasi pada browser Anda untuk mendeteksi cabang terdekat.',
+                            confirmButtonColor: '#015b1e'
+                        });
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
+                    }
+                );
+            });
 
             // Load cart and wishlist counts
             function loadCounts() {

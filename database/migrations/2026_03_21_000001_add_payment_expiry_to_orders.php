@@ -12,7 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Check if columns don't already exist
         if (!Schema::hasColumn('tb_transaksi', 'payment_expired_at')) {
             Schema::table('tb_transaksi', function (Blueprint $table) {
                 $table->timestamp('payment_expired_at')->nullable()->after('catatan')->comment('Payment expiry time (15 minutes from order creation)');
@@ -20,8 +19,15 @@ return new class extends Migration
 
                 // Add indexes
                 $table->index('payment_expired_at');
-                $table->index('status_pembayaran');
             });
+
+            try {
+                Schema::table('tb_transaksi', function (Blueprint $table) {
+                    $table->index('status_pembayaran');
+                });
+            } catch (\Exception $e) {
+                // Index might already exist, ignore
+            }
         }
     }
 

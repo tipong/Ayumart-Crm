@@ -9,13 +9,14 @@ use App\Models\ProductMemberDiscount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Integrasi\Jenis as JenisIntegrasi;
 
 class DiscountController extends Controller
 {
     /**
      * Tampilkan daftar produk beserta info diskon dari database integrasi.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             // Auto-nonaktifkan diskon yang sudah kedaluwarsa
@@ -24,24 +25,86 @@ class DiscountController extends Controller
                 Log::info("Auto-nonaktifkan $expiredCount diskon yang kedaluwarsa");
             }
 
-            $products = ProdukIntegrasi::with('jenis')
-                ->where('status_produk', 'aktif')
-                ->orderBy('nama_produk')
-                ->paginate(15);
+            // Build query
+            $query = ProdukIntegrasi::with('jenis')
+                ->where('status_produk', 'aktif');
+
+            // 1. Filter Search (Product Name or Code)
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_produk', 'like', '%' . $search . '%')
+                      ->orWhere('kode_produk', 'like', '%' . $search . '%');
+                });
+            }
+
+            // 2. Filter Kategori
+            if ($request->filled('category')) {
+                $query->where('id_jenis', $request->input('category'));
+            }
+
+            // 3. Filter Target
+            if ($request->filled('target')) {
+                $query->where('discount_target', $request->input('target'));
+            }
+
+            // 4. Filter Status
+            if ($request->filled('status')) {
+                $status = $request->input('status');
+                if ($status === 'active') {
+                    $query->where('is_diskon_active', true)
+                        ->whereNotNull('tanggal_mulai_diskon')
+                        ->whereNotNull('tanggal_akhir_diskon')
+                        ->where('tanggal_mulai_diskon', '<=', now())
+                        ->where('tanggal_akhir_diskon', '>=', now()->startOfDay());
+                } elseif ($status === 'inactive') {
+                    $query->where('is_diskon_active', false)
+                        ->where(function ($q) {
+                            $q->whereNotNull('harga_diskon')
+                              ->orWhere('discount_target', 'tier');
+                        });
+                } elseif ($status === 'expired') {
+                    $query->whereNotNull('tanggal_akhir_diskon')
+                        ->where('tanggal_akhir_diskon', '<', now()->startOfDay());
+                } elseif ($status === 'none') {
+                    $query->whereNull('harga_diskon')
+                        ->where(function ($q) {
+                            $q->whereNull('discount_target')
+                              ->orWhere('discount_target', '!=', 'tier');
+                        });
+                }
+            }
+
+            $products = $query->orderBy('nama_produk')
+                ->paginate(15)
+                ->withQueryString();
+
+            // Kategori untuk dropdown filter
+            $categories = JenisIntegrasi::orderBy('nama_jenis')->get();
 
             $totalActiveDiscounts = ProdukIntegrasi::where('is_diskon_active', true)
                 ->where('status_produk', 'aktif')
                 ->count();
-            $totalInactiveDiscounts = ProdukIntegrasi::whereNotNull('harga_diskon')
-                ->where('is_diskon_active', false)
+            
+            $totalInactiveDiscounts = ProdukIntegrasi::where('is_diskon_active', false)
                 ->where('status_produk', 'aktif')
+                ->where(function($q) {
+                    $q->whereNotNull('harga_diskon')
+                      ->orWhere('discount_target', 'tier');
+                })
                 ->count();
-            $totalNoDiscounts = ProdukIntegrasi::whereNull('harga_diskon')
-                ->where('status_produk', 'aktif')
+
+            $totalNoDiscounts = ProdukIntegrasi::where('status_produk', 'aktif')
+                ->whereNull('harga_diskon')
+                ->where(function($q) {
+                    $q->whereNull('discount_target')
+                      ->orWhere('discount_target', '!=', 'tier');
+                })
                 ->count();
 
             return view('admin.discounts.index', compact(
                 'products',
+                'categories',
                 'totalActiveDiscounts',
                 'totalInactiveDiscounts',
                 'totalNoDiscounts'

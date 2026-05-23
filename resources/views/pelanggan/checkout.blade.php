@@ -103,30 +103,56 @@
                                 <div class="mb-3">
                                     <label class="form-label">Pilih Alamat</label>
                                     @foreach($addresses as $address)
-                                        <div class="card mb-2 address-card" data-address-id="{{ $address->id }}">
-                                            <div class="card-body">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="address_id"
-                                                            id="address_{{ $address->id }}" value="{{ $address->id }}"
-                                                           {{ $address->is_default ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="address_{{ $address->id }}">
-                                                        <div class="d-flex justify-content-between align-items-start">
-                                                            <div>
-                                                                <strong>{{ $address->label }}</strong>
-                                                                @if($address->is_default)
-                                                                    <span class="badge bg-success ms-2">Default</span>
-                                                                @endif
-                                                                <p class="mb-1 mt-1">{{ $address->nama_penerima }} - {{ $address->no_telp_penerima }}</p>
-                                                                <p class="text-muted small mb-0">{{ $address->formatted_address }}</p>
-                                                            </div>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                         @php
+                                             $hasCoords = !is_null($address->latitude) && !is_null($address->longitude) && $address->latitude != 0 && $address->longitude != 0;
+                                         @endphp
+                                         <div class="card mb-2 address-card" data-address-id="{{ $address->id }}" data-has-coords="{{ $hasCoords ? 'true' : 'false' }}">
+                                             <div class="card-body">
+                                                 <div class="form-check">
+                                                     <input class="form-check-input" type="radio" name="address_id"
+                                                             id="address_{{ $address->id }}" value="{{ $address->id }}"
+                                                            {{ $address->is_default ? 'checked' : '' }}>
+                                                     <label class="form-check-label w-100" for="address_{{ $address->id }}">
+                                                         <div class="d-flex justify-content-between align-items-start w-100">
+                                                             <div class="flex-grow-1">
+                                                                 <strong>{{ $address->label }}</strong>
+                                                                 @if($address->is_default)
+                                                                     <span class="badge bg-success ms-2">Default</span>
+                                                                 @endif
+                                                                 @if(!$hasCoords)
+                                                                     <span class="badge bg-danger ms-2" title="Alamat ini belum memiliki koordinat peta">
+                                                                         <i class="bi bi-exclamation-triangle-fill"></i> Butuh Peta
+                                                                     </span>
+                                                                 @endif
+                                                                 <p class="mb-1 mt-1">{{ $address->nama_penerima }} - {{ $address->no_telp_penerima }}</p>
+                                                                 <p class="text-muted small mb-0">{{ $address->formatted_address }}</p>
+                                                             </div>
+                                                             <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="event.stopPropagation(); editAddress({{ $address->id }});" style="font-size: 0.75rem; border-radius: 6px;">
+                                                                 <i class="bi bi-pencil-square"></i> Edit
+                                                             </button>
+                                                         </div>
+                                                     </label>
+                                                 </div>
+                                             </div>
+                                         </div>
                                     @endforeach
                                 </div>
-                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+
+                                <!-- Alert warning for missing address coordinates -->
+                                <div id="addressCoordsWarning" class="alert alert-danger mt-2 mb-3" style="display: none; border-radius: 10px; border: 1px solid rgba(220, 53, 69, 0.2);">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                                        <div>
+                                            <h6 class="alert-heading fw-bold mb-1" style="font-size: 0.95rem;">Lokasi Peta Belum Ditentukan</h6>
+                                            <p class="mb-1 text-dark small">Alamat yang Anda pilih belum memiliki titik lokasi peta (koordinat GPS). Mohon perbarui alamat Anda dengan menyematkan titik lokasi di peta agar ongkir kurir dapat dihitung.</p>
+                                            <button type="button" class="btn btn-sm btn-danger mt-2 fw-bold" id="btnFixSelectedAddress" style="font-size: 0.8rem; border-radius: 6px;">
+                                                <i class="bi bi-geo-fill me-1"></i> Atur Titik Lokasi Peta Sekarang
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
                                     <i class="bi bi-plus-circle"></i> Tambah Alamat Baru
                                 </button>
                             @else
@@ -379,24 +405,34 @@
                             <textarea class="form-control" name="alamat_lengkap" rows="3" required></textarea>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Lokasi (GPS/Maps)</label>
-                            <div class="btn-group mb-2" role="group">
-                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="getGPSLocation()">
-                                    <i class="bi bi-geo-alt-fill"></i> Gunakan GPS Saya
+                            <label class="form-label d-block fw-bold">Lokasi Peta (GPS/Maps) <span class="text-danger">*</span></label>
+                            
+                            <!-- Hidden inputs for coordinates -->
+                            <input type="hidden" id="modal_latitude" name="latitude">
+                            <input type="hidden" id="modal_longitude" name="longitude">
+
+                            <!-- Visual status card inside add address modal -->
+                            <div id="modalAddLocationStatusCard" class="card border-1 mb-2" style="border-radius: 10px; border: 1px dashed #ffc107; background-color: rgba(255, 193, 7, 0.05);">
+                                <div class="card-body p-3 d-flex align-items-center gap-3">
+                                    <div class="modal-add-status-icon bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                        <i class="bi bi-geo-alt fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0 fw-bold text-warning-emphasis modal-add-status-title" style="font-size: 0.9rem;">Titik Koordinat Belum Disematkan</h6>
+                                        <p class="mb-0 text-muted small modal-add-status-desc">Silakan pilih lokasi dari peta atau gunakan GPS untuk menghitung ongkir kurir.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="btn-group d-flex gap-2" role="group" style="max-width: 450px;">
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-3 py-2" onclick="getGPSLocation()">
+                                    <i class="bi bi-geo-alt-fill"></i> Deteksi GPS Saya
                                 </button>
-                                <button type="button" class="btn btn-outline-success btn-sm" onclick="pickLocationFromMapsAdd()">
-                                    <i class="bi bi-map"></i> Pilih dari Maps
+                                <button type="button" class="btn btn-success text-white btn-sm rounded-3 py-2" onclick="pickLocationFromMapsAdd()">
+                                    <i class="bi bi-map-fill"></i> Pilih Titik di Maps
                                 </button>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" id="modal_latitude" name="latitude" placeholder="Latitude (contoh: -6.200000)" readonly>
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" id="modal_longitude" name="longitude" placeholder="Longitude (contoh: 106.816666)" readonly>
-                                </div>
-                            </div>
-                            <small class="text-muted d-block mt-1" id="gpsStatus"></small>
+                            <small class="text-muted d-block mt-2" id="gpsStatus"></small>
                         </div>
                         <div class="col-12">
                             <div class="form-check">
@@ -623,6 +659,19 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return distance;
 }
 
+function incompleteCoordsShipping() {
+    const shippingBadge = document.getElementById('shippingBadge');
+    const warningEl = document.getElementById('addressCoordsWarning');
+    currentShippingCost = 0;
+    if (shippingBadge) {
+        shippingBadge.innerHTML = '<i class="bi bi-x-circle-fill"></i> Ongkos Kirim: Rp 0 <small class="d-block mt-1 text-white-50">(Lokasi peta tidak lengkap)</small>';
+        shippingBadge.className = 'badge bg-danger mt-2';
+        shippingBadge.style.fontSize = '0.75rem';
+    }
+    if (warningEl) warningEl.style.display = 'block';
+    updateShippingCost(0);
+}
+
 function detectNearestBranchForDelivery(addressId) {
     const shippingBadge = document.getElementById('shippingBadge');
     const SHIPPING_COST_PER_KM = 10000; // Rp 10.000 per km
@@ -644,7 +693,18 @@ function detectNearestBranchForDelivery(addressId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success && data.address && data.address.latitude && data.address.longitude) {
+        if (data.success && data.address) {
+            const deliveryAddress = data.address;
+            const lat = parseFloat(deliveryAddress.latitude);
+            const lng = parseFloat(deliveryAddress.longitude);
+
+            // Check if coordinates are valid, non-zero and non-null
+            if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+                console.warn('⚠️ Selected address has incomplete or zero coordinates!');
+                incompleteCoordsShipping();
+                return;
+            }
+
             // Get session branch info (cabang yang sudah dipilih di awal)
             fetch('/api/get-session-branch', {
                 method: 'GET',
@@ -657,30 +717,26 @@ function detectNearestBranchForDelivery(addressId) {
             .then(branchSessionData => {
                 if (branchSessionData.success && branchSessionData.branch) {
                     const sessionBranch = branchSessionData.branch;
-                    const deliveryAddress = data.address;
 
                     console.log('📍 Branch from session (untuk pengiriman kurir):', sessionBranch.nama_cabang);
                     console.log('📍 Branch coordinates:', 'Lat=' + sessionBranch.latitude + ', Lon=' + sessionBranch.longitude);
                     console.log('📍 Delivery address:', deliveryAddress);
-                    console.log('📍 Address coordinates:', 'Lat=' + deliveryAddress.latitude + ', Lon=' + deliveryAddress.longitude);
+                    console.log('📍 Address coordinates:', 'Lat=' + lat + ', Lon=' + lng);
 
                     // Validate coordinates are valid numbers
                     const branchLat = parseFloat(sessionBranch.latitude);
                     const branchLon = parseFloat(sessionBranch.longitude);
-                    const addressLat = parseFloat(deliveryAddress.latitude);
-                    const addressLon = parseFloat(deliveryAddress.longitude);
 
                     // Check if all coordinates are valid numbers (not NaN)
-                    if (isNaN(branchLat) || isNaN(branchLon) || isNaN(addressLat) || isNaN(addressLon)) {
-                        console.error('❌ Invalid coordinates detected!');
-                        console.error('Branch Lat: ' + branchLat + ' (NaN: ' + isNaN(branchLat) + ')');
-                        console.error('Branch Lon: ' + branchLon + ' (NaN: ' + isNaN(branchLon) + ')');
-                        console.error('Address Lat: ' + addressLat + ' (NaN: ' + isNaN(addressLat) + ')');
-                        console.error('Address Lon: ' + addressLon + ' (NaN: ' + isNaN(addressLon) + ')');
-                        console.warn('Menggunakan biaya estimasi fallback karena data lokasi tidak lengkap');
-                        fallbackShippingCost();
+                    if (isNaN(branchLat) || isNaN(branchLon)) {
+                        console.error('❌ Invalid branch coordinates detected!');
+                        incompleteCoordsShipping();
                         return;
                     }
+
+                    // Hide warning since we have valid coords
+                    const warningEl = document.getElementById('addressCoordsWarning');
+                    if (warningEl) warningEl.style.display = 'none';
 
                     // Keep the branch that was selected at the beginning
                     document.getElementById('id_cabang').value = sessionBranch.id_cabang;
@@ -689,15 +745,14 @@ function detectNearestBranchForDelivery(addressId) {
                     const distance = calculateDistance(
                         branchLat,
                         branchLon,
-                        addressLat,
-                        addressLon
+                        lat,
+                        lng
                     );
 
                     // Validate distance is a valid number
                     if (isNaN(distance)) {
                         console.error('❌ Distance calculation resulted in NaN!');
-                        console.warn('Menggunakan biaya estimasi fallback karena perhitungan jarak gagal');
-                        fallbackShippingCost();
+                        incompleteCoordsShipping();
                         return;
                     }
 
@@ -721,32 +776,21 @@ function detectNearestBranchForDelivery(addressId) {
                     updateShippingCost(shippingCost);
                 } else {
                     console.warn('⚠️ Tidak ada cabang dalam session, menggunakan biaya estimasi');
-                    fallbackShippingCost();
+                    incompleteCoordsShipping();
                 }
             })
             .catch(error => {
                 console.error('❌ Error fetching session branch:', error);
-                fallbackShippingCost();
+                incompleteCoordsShipping();
             });
         } else {
-            fallbackShippingCost();
+            incompleteCoordsShipping();
         }
     })
     .catch(error => {
         console.error('❌ Error fetching address:', error);
-        fallbackShippingCost();
+        incompleteCoordsShipping();
     });
-}
-
-function fallbackShippingCost() {
-    const shippingBadge = document.getElementById('shippingBadge');
-    currentShippingCost = 15000;
-    if (shippingBadge) {
-        shippingBadge.innerHTML = 'Biaya: Rp 15.000 <small class="d-block mt-1 text-white-50">(estimasi - data lokasi tidak lengkap)</small>';
-        shippingBadge.className = 'badge bg-warning mt-2';
-        shippingBadge.style.fontSize = '0.75rem';
-    }
-    updateShippingCost(currentShippingCost);
 }
 
 function updateShippingCost(cost) {
@@ -776,10 +820,15 @@ function getGPSLocation() {
 
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                document.getElementById('modal_latitude').value = position.coords.latitude;
-                document.getElementById('modal_longitude').value = position.coords.longitude;
-                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diambil! (Lat: ' +
-                    position.coords.latitude.toFixed(6) + ', Long: ' + position.coords.longitude.toFixed(6) + ')</span>';
+                const latEl = document.getElementById('modal_latitude');
+                const lngEl = document.getElementById('modal_longitude');
+                latEl.value = position.coords.latitude;
+                lngEl.value = position.coords.longitude;
+                
+                latEl.dispatchEvent(new Event('change', { bubbles: true }));
+                lngEl.dispatchEvent(new Event('change', { bubbles: true }));
+
+                gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Lokasi GPS berhasil diambil!</span>';
             },
             function(error) {
                 gpsStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Gagal mengambil lokasi GPS: ' + error.message + '</span>';
@@ -1304,8 +1353,79 @@ function initializeShippingCostOnLoad() {
     }
 }
 
+// Watch Add Address Modal coordinates
+function updateModalAddLocationStatusCard() {
+    const lat = document.getElementById('modal_latitude').value;
+    const lng = document.getElementById('modal_longitude').value;
+    const statusCard = document.getElementById('modalAddLocationStatusCard');
+    
+    if (statusCard) {
+        if (lat && lng && parseFloat(lat) !== 0 && parseFloat(lng) !== 0) {
+            statusCard.style.border = '1px solid #198754';
+            statusCard.style.backgroundColor = 'rgba(25, 135, 84, 0.05)';
+            const iconEl = statusCard.querySelector('.modal-add-status-icon');
+            if (iconEl) {
+                iconEl.className = 'modal-add-status-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center';
+                const iEl = iconEl.querySelector('i');
+                if (iEl) iEl.className = 'bi bi-check-circle-fill fs-5';
+            }
+            const titleEl = statusCard.querySelector('.modal-add-status-title');
+            if (titleEl) {
+                titleEl.className = 'mb-0 fw-bold text-success modal-add-status-title';
+                titleEl.textContent = 'Lokasi Tersemat!';
+            }
+            const descEl = statusCard.querySelector('.modal-add-status-desc');
+            if (descEl) {
+                descEl.textContent = 'Titik peta telah berhasil disimpan (' + parseFloat(lat).toFixed(5) + ', ' + parseFloat(lng).toFixed(5) + ').';
+            }
+        } else {
+            statusCard.style.border = '1px dashed #ffc107';
+            statusCard.style.backgroundColor = 'rgba(255, 193, 7, 0.05)';
+            const iconEl = statusCard.querySelector('.modal-add-status-icon');
+            if (iconEl) {
+                iconEl.className = 'modal-add-status-icon bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center';
+                const iEl = iconEl.querySelector('i');
+                if (iEl) iEl.className = 'bi bi-geo-alt fs-5';
+            }
+            const titleEl = statusCard.querySelector('.modal-add-status-title');
+            if (titleEl) {
+                titleEl.className = 'mb-0 fw-bold text-warning-emphasis modal-add-status-title';
+                titleEl.textContent = 'Titik Koordinat Belum Disematkan';
+            }
+            const descEl = statusCard.querySelector('.modal-add-status-desc');
+            if (descEl) {
+                descEl.textContent = 'Silakan pilih lokasi dari peta atau gunakan GPS untuk menghitung ongkir kurir.';
+            }
+        }
+    }
+}
+
 // Form validation
 document.addEventListener('DOMContentLoaded', function() {
+    const modalLatInput = document.getElementById('modal_latitude');
+    const modalLngInput = document.getElementById('modal_longitude');
+    if (modalLatInput && modalLngInput) {
+        modalLatInput.addEventListener('change', updateModalAddLocationStatusCard);
+        modalLngInput.addEventListener('change', updateModalAddLocationStatusCard);
+        
+        const addModalEl = document.getElementById('addAddressModal');
+        if (addModalEl) {
+            addModalEl.addEventListener('shown.bs.modal', function() {
+                setTimeout(updateModalAddLocationStatusCard, 150);
+            });
+        }
+    }
+
+    const btnFixSelectedAddress = document.getElementById('btnFixSelectedAddress');
+    if (btnFixSelectedAddress) {
+        btnFixSelectedAddress.addEventListener('click', function() {
+            const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+            if (selectedAddress) {
+                editAddress(selectedAddress.value);
+            }
+        });
+    }
+
     const checkoutForm = document.getElementById('checkoutForm');
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
@@ -1332,10 +1452,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (metode.value === 'kurir') {
-                const address = document.querySelector('input[name="address_id"]:checked');
-                console.log('Selected address:', address?.value || 'NONE');
+                const addressRadio = document.querySelector('input[name="address_id"]:checked');
+                console.log('Selected address:', addressRadio?.value || 'NONE');
 
-                if (!address) {
+                if (!addressRadio) {
                     e.preventDefault();
                     console.warn('⚠ Validation failed: No address selected for kurir delivery');
 
@@ -1352,6 +1472,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
 
+                // Check if selected address is missing coordinates
+                const addressCard = addressRadio.closest('.address-card');
+                const hasCoords = addressCard ? addressCard.dataset.hasCoords === 'true' : false;
+
+                if (!hasCoords) {
+                    e.preventDefault();
+                    console.warn('⚠️ Validation failed: Selected address is missing GPS coordinates');
+
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lokasi Peta Belum Ditentukan',
+                            html: '<div class="text-start">' +
+                                  '<p>Alamat pengiriman yang Anda pilih belum memiliki titik lokasi di peta (koordinat GPS).</p>' +
+                                  '<p class="mb-0"><strong>Langkah perbaikan:</strong></p>' +
+                                  '<ol class="ps-3 mt-1">' +
+                                  '  <li>Klik tombol <strong>Atur Titik Lokasi Peta Sekarang</strong> di bawah deskripsi alamat, atau</li>' +
+                                  '  <li>Klik tombol <strong>Edit</strong> pada kartu alamat Anda, lalu gunakan fitur <strong>Pilih Titik di Maps</strong> untuk menandai lokasi persis rumah Anda.</li>' +
+                                  '</ol>' +
+                                  '</div>',
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: '<i class="bi bi-geo-fill"></i> Atur Lokasi Peta Sekarang'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Trigger edit for the selected address
+                                editAddress(addressRadio.value);
+                            }
+                        });
+                    } else {
+                        alert('Alamat pengiriman belum memiliki titik lokasi peta. Silakan edit alamat untuk menentukan titik peta.');
+                    }
+                    return false;
+                }
+
                 // Check if shipping cost has been calculated
                 const shippingCostField = document.getElementById('shipping_cost');
                 const shippingCostValue = shippingCostField ? parseInt(shippingCostField.value) : 0;
@@ -1360,18 +1514,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (shippingCostValue <= 0) {
                     e.preventDefault();
-                    console.warn('⚠️  Validation failed: Biaya pengiriman belum terhitung (nilai: ' + shippingCostValue + ')');
+                    console.warn('⚠️  Validation failed: Biaya pengiriman belum terhitung atau 0 rupiah');
 
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Biaya Pengiriman Belum Terhitung',
-                            html: '<p>Biaya pengiriman belum berhasil dihitung.</p>' +
-                                  '<p class="small text-muted mt-2">💡 Coba: Pilih ulang alamat pengiriman atau periksa apakah data lokasi lengkap.</p>',
+                            html: '<p>Biaya pengiriman belum berhasil dihitung karena data lokasi tidak lengkap.</p>' +
+                                  '<p class="small text-muted mt-2">💡 Coba: Pastikan alamat Anda memiliki koordinat lokasi yang valid dengan mengedit alamat dan memilih titik lokasi di peta.</p>',
                             confirmButtonColor: '#3085d6'
                         });
                     } else {
-                        alert('Mohon pilih ulang alamat pengiriman agar biaya pengiriman terhitung!');
+                        alert('Mohon lengkapi titik peta alamat agar ongkos kirim dapat dihitung!');
                     }
                     return false;
                 }

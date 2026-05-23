@@ -7,19 +7,19 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
-     
+
     <style>
         :root {
-            --primary-color: #3F4F44;
-            --primary-hover: #2E3A31;
-            --secondary-color: #556B58;
-            --text-dark: #333;
-            --text-muted: #666;
-            --border-color: #e5e5e5;
-            --bg-light: #f8f9fa;
-            --success-color: #3F4F44;
+            --primary-color: #015b1e;
+            --primary-hover: #013d14;
+            --secondary-color: #027826;
+            --text-dark: #1a1a1a;
+            --text-muted: #777;
+            --border-color: #e0e0e0;
+            --bg-light: #f5f5f5;
+            --success-color: #015b1e;
             --warning-color: #f59e0b;
-            --info-color: #3b82f6;
+            --info-color: #007bff;
         }
 
         * {
@@ -145,33 +145,36 @@
         }
 
         .page-header {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #f0fdf4 0%, #f5f9f2 100%);
+            border-radius: 16px;
+            padding: 2.5rem 2.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 4px 15px rgba(1, 91, 30, 0.1);
+            border-left: 5px solid var(--primary-color);
+            border-right: 1px solid rgba(1, 91, 30, 0.1);
         }
 
         .page-header h2 {
-            color: var(--text-dark);
-            font-size: 1.75rem;
-            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 800;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
         .page-header h2 i {
             color: var(--primary-color);
-            font-size: 2rem;
+            font-size: 2.5rem;
+            opacity: 0.9;
         }
 
         .page-header p {
-            margin: 0.5rem 0 0 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            margin: 0.75rem 0 0 3.5rem;
+            color: #555;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         /* Tab Navigation */
@@ -181,102 +184,10 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             margin-bottom: 2rem;
             overflow: hidden;
-            border: 1px solid rgba(63, 79, 68, 0.1);
+            border: 1px solid rgba(1, 91, 30, 0.08);
         }
 
-        .nav-tabs {
-            border: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            background: linear-gradient(to bottom, #fafafa, #ffffff);
-        }
 
-        .nav-tabs .nav-item {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .nav-tabs .nav-link {
-            border: none;
-            border-bottom: 4px solid transparent;
-            border-right: 1px solid rgba(0,0,0,0.05);
-            background: transparent;
-            color: var(--text-muted);
-            padding: 1.5rem 1.5rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-tabs .nav-item:last-child .nav-link {
-            border-right: none;
-        }
-
-        .nav-tabs .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: 0;
-        }
-
-        .nav-tabs .nav-link:hover {
-            color: var(--primary-color);
-            background: linear-gradient(to bottom, rgba(63, 79, 68, 0.05), rgba(63, 79, 68, 0.02));
-            transform: translateY(-2px);
-        }
-
-        .nav-tabs .nav-link.active {
-            color: white;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-bottom-color: transparent;
-            box-shadow: 0 4px 12px rgba(63, 79, 68, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .nav-tabs .nav-link.active::before {
-            opacity: 1;
-        }
-
-        .nav-tabs .nav-link i,
-        .nav-tabs .nav-link span {
-            position: relative;
-            z-index: 1;
-        }
-
-        .nav-tabs .nav-link i {
-            font-size: 1.3rem;
-            transition: transform 0.3s ease;
-        }
-
-        .nav-tabs .nav-link:hover i {
-            transform: scale(1.15);
-        }
-
-        .nav-tabs .nav-link.active i {
-            transform: scale(1.1);
-        }
-
-        /* Tab Content */
-        .tab-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
 
         .profile-card {
             background: white;
@@ -288,26 +199,21 @@
             border: none;
         }
 
-        .profile-card:hover {
-            box-shadow: none;
-            transform: none;
-        }
-
         .card-title {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--primary-color);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0fdf4;
         }
 
         .card-title i {
             color: var(--primary-color);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
 
         .form-label {
@@ -322,58 +228,62 @@
 
         .form-label i {
             color: var(--primary-color);
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .form-control {
-            border: 1px solid var(--border-color);
+            border: 1.5px solid #ddd;
             border-radius: 8px;
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1rem;
             transition: all 0.3s;
             font-size: 0.95rem;
+            background: #fafafa;
         }
 
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.1);
-            transform: none;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(1, 91, 30, 0.08);
         }
 
         .form-control:hover:not(:focus) {
-            border-color: #ccc;
+            border-color: var(--primary-color);
+            background: #fafafa;
         }
 
         .btn-primary {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             border: none;
-            padding: 0.85rem 2rem;
+            padding: 0.9rem 2rem;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(238, 77, 45, 0.3);
+            box-shadow: 0 4px 12px rgba(1, 91, 30, 0.2);
+            cursor: pointer;
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
+            background: linear-gradient(135deg, var(--primary-hover), #016b24);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
+            box-shadow: 0 6px 20px rgba(1, 91, 30, 0.3);
         }
 
         .btn-outline-secondary {
-            border: 1px solid var(--border-color);
+            border: 2px solid #ddd;
             color: var(--text-dark);
-            padding: 0.75rem 1.25rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s;
             background: white;
+            cursor: pointer;
         }
 
         .btn-outline-secondary:hover {
-            background: var(--primary-color);
+            background: #f5f5f5;
             border-color: var(--primary-color);
-            color: white;
+            color: var(--primary-color);
             transform: translateY(-2px);
         }
 
@@ -461,11 +371,11 @@
 
         /* Member Card Styles */
         .member-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #015b1e 0%, #027826 100%);
             border-radius: 16px;
             padding: 2rem;
             color: white;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgba(1, 91, 30, 0.2);
             margin-bottom: 1.5rem;
             position: relative;
             overflow: hidden;
@@ -620,18 +530,27 @@
         .alert {
             border-radius: 12px;
             border: none;
-            padding: 1rem 1.5rem;
+            padding: 1.25rem 1.5rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
         }
 
         .alert-success {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: #166534;
+            border-left: 4px solid #15803d;
         }
 
         .alert-danger {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
             color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #1e40af;
+            border-left: 4px solid #0284c7;
         }
 
         .section-divider {
@@ -642,16 +561,18 @@
         }
 
         .input-group-text {
-            background: var(--bg-light);
-            border: 2px solid var(--border-color);
+            background: #f5f5f5;
+            border: 1.5px solid #ddd;
             border-right: none;
-            border-radius: 10px 0 0 10px;
-            color: var(--text-muted);
+            border-radius: 8px 0 0 8px;
+            color: #999;
+            font-weight: 600;
         }
 
         .input-group .form-control {
             border-left: none;
-            border-radius: 0 10px 10px 0;
+            border-radius: 0 8px 8px 0;
+            background: #fafafa;
         }
 
         /* Password Toggle Styles */
@@ -685,89 +606,517 @@
             font-size: 1.2rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar-icons {
-                gap: 1rem;
-            }
+        /* Form Section Styling */
+        .form-section {
+            background: linear-gradient(to right, #f9fdf7 0%, #ffffff 100%);
+            border: 1px solid rgba(1, 91, 30, 0.1);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
 
-            .nav-icon {
-                font-size: 1.1rem;
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Address Card Styling */
+        .address-card {
+            border: 1.5px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .address-card:hover {
+            box-shadow: 0 6px 20px rgba(1, 91, 30, 0.1);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .address-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .address-card .badge {
+            background: linear-gradient(135deg, #15803d, #16a34a);
+            font-size: 0.75rem;
+            padding: 0.4rem 0.75rem;
+        }
+
+        /* Button Group Styling */
+        .btn-group-spacing {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        /* Divider */
+        .form-divider {
+            border-top: 2px solid #f0fdf4;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .form-divider-label {
+            position: absolute;
+            left: 1rem;
+            top: -12px;
+            background: white;
+            padding: 0 0.5rem;
+            color: #999;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.75rem 1.5rem;
             }
 
             .page-header h2 {
                 font-size: 1.5rem;
             }
 
-            .nav-tabs {
+            .page-header h2 i {
+                font-size: 1.75rem;
+            }
+
+            .page-header p {
+                margin-left: 2.5rem;
+                font-size: 0.85rem;
+            }
+
+
+
+            .form-section {
+                padding: 1.25rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .btn-group-spacing {
                 flex-direction: column;
             }
 
-            .nav-tabs .nav-item {
+            .btn-group-spacing .btn {
                 width: 100%;
             }
+        }
 
-            .nav-tabs .nav-link {
-                font-size: 0.9rem;
-                padding: 1.25rem 1.5rem;
-                justify-content: flex-start;
-                border-right: none !important;
-                border-bottom: 1px solid rgba(0,0,0,0.05);
+        /* Password Strength Indicator */
+        .password-strength-meter {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: linear-gradient(90deg, #dc2626, #ea580c, #f59e0b, #15803d);
+            background-size: 400% 100%;
+        }
+
+        .password-strength-bar.weak {
+            width: 25%;
+            background-color: #dc2626;
+            box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+        }
+
+        .password-strength-bar.fair {
+            width: 50%;
+            background-color: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+        }
+
+        .password-strength-bar.good {
+            width: 75%;
+            background-color: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .password-strength-bar.strong {
+            width: 100%;
+            background-color: #15803d;
+            box-shadow: 0 0 8px rgba(21, 128, 61, 0.4);
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .password-strength-text.weak {
+            color: #dc2626;
+        }
+
+        .password-strength-text.fair {
+            color: #f59e0b;
+        }
+
+        .password-strength-text.good {
+            color: #3b82f6;
+        }
+
+        .password-strength-text.strong {
+            color: #15803d;
+        }
+
+        /* Password Requirements */
+        .password-requirements {
+            background: #f9fdf7;
+            border: 1px solid rgba(1, 91, 30, 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .password-requirements h6 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .requirement-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0;
+            font-size: 0.85rem;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .requirement-item.met {
+            color: #15803d;
+        }
+
+        .requirement-item i {
+            min-width: 18px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .requirement-item i.bi-circle {
+            color: #ccc;
+        }
+
+        .requirement-item.met i.bi-check-circle-fill {
+            color: #15803d;
+        }
+
+        /* Form Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(1, 91, 30, 0.1);
+        }
+
+        .section-header h5 {
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .section-header i {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+        }
+
+        .section-header .badge {
+            margin-left: auto;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Personal Info Card */
+        .personal-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-input-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .info-input-group i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .info-input-group .form-control {
+            transition: all 0.3s;
+        }
+
+        .info-input-group .form-control:focus {
+            box-shadow: 0 0 0 4px rgba(1, 91, 30, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        /* Address Cards Enhancement */
+        .address-card-wrapper {
+            transition: all 0.3s ease;
+        }
+
+        .address-card-wrapper:hover {
+            transform: translateY(-4px);
+        }
+
+        .address-card-header-enhanced {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .address-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .address-badge-enhanced {
+            background: linear-gradient(135deg, #15803d, #16a34a);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .address-info-enhanced {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .address-info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .address-info-row i {
+            color: var(--primary-color);
+            margin-top: 0.2rem;
+            min-width: 20px;
+        }
+
+        .address-info-row strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .address-actions-enhanced {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding-top: 1rem;
+            border-top: 1px solid #f0fdf4;
+        }
+
+        .address-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.65rem 0.75rem;
+            border-radius: 8px;
+            border: 1.5px solid #ddd;
+            background: white;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .address-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(1, 91, 30, 0.15);
+        }
+
+        .address-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: transparent;
+        }
+
+        .address-btn.primary:hover {
+            box-shadow: 0 4px 12px rgba(1, 91, 30, 0.25);
+        }
+
+        .info-helper-text {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .info-helper-text i {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: linear-gradient(135deg, #f9fdf7 0%, #f0fdf4 100%);
+            border-radius: 12px;
+            border: 2px dashed rgba(1, 91, 30, 0.2);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            opacity: 0.7;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+        }
+
+        .empty-state .btn {
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .personal-info-grid {
+                grid-template-columns: 1fr;
             }
 
-            .nav-tabs .nav-link::after {
-                content: '';
-                position: absolute;
-                right: 1.5rem;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: white;
-                opacity: 0;
-                transition: opacity 0.3s ease;
+            .address-actions-enhanced {
+                flex-direction: column;
             }
 
-            .nav-tabs .nav-link.active::after {
-                opacity: 1;
-            }
-
-            .nav-tabs .nav-link span {
-                display: inline;
-            }
-
-            .nav-tabs .nav-link i {
-                font-size: 1.3rem;
-            }
-
-            .tab-content {
-                padding: 1.5rem;
-            }
-
-            .member-card {
-                padding: 1.5rem;
+            .address-btn {
+                min-width: unset;
             }
         }
 
         @media (max-width: 576px) {
             .profile-container {
-                padding: 1rem;
+                padding: 0.75rem;
             }
 
             .page-header {
+                padding: 1.25rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .page-header h2 {
+                font-size: 1.25rem;
+                gap: 0.5rem;
+            }
+
+            .page-header h2 i {
+                font-size: 1.5rem;
+            }
+
+            .page-header p {
+                margin-left: 2rem;
+                font-size: 0.8rem;
+            }
+
+            .form-section {
                 padding: 1rem;
+                margin-bottom: 1.25rem;
             }
 
-            .nav-tabs .nav-item {
-                min-width: auto;
+            .card-title {
+                font-size: 1rem;
+                margin-bottom: 1rem;
             }
 
-            .nav-tabs .nav-link {
-                padding: 1rem 1.25rem;
-                font-size: 0.85rem;
+            .row > .col-md-6 {
+                margin-bottom: 1rem;
             }
 
-            .nav-tabs .nav-link i {
-                font-size: 1.2rem;
+            .alert {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-header .badge {
+                margin-left: 0;
+                margin-top: 0.5rem;
             }
         }
     </style>
@@ -803,157 +1152,217 @@
             </div>
         @endif
 
-        <!-- Tab Navigation -->
-        <div class="profile-tabs">
-            <ul class="nav nav-tabs" id="profileTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active bg-danger" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
-                        <i class="bi bi-person-vcard"></i>
-                        <span>Informasi Pribadi</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link bg-danger" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
-                        <i class="bi bi-shield-lock"></i>
-                        <span>Keamanan</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link bg-danger" id="membership-tab" data-bs-toggle="tab" data-bs-target="#membership" type="button" role="tab">
-                        <i class="bi bi-award"></i>
-                        <span>Membership</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link bg-danger" id="member-card-tab" data-bs-toggle="tab" data-bs-target="#member-card" type="button" role="tab">
-                        <i class="bi bi-credit-card-2-front"></i>
-                        <span>Kartu Member</span>
-                    </button>
-                </li>
-            </ul>
-        </div>
+        <!-- Main Content Section -->
+                <!-- Personal Info Section -->
+                <div class="form-section">
+                    <form action="{{ route('profile.update') }}" method="POST">
+                        @csrf
+                        @method('PUT')
 
-        <!-- Tab Content -->
-        <div class="tab-content" id="profileTabContent">
-        <!-- Tab Content -->
-        <div class="tab-content" id="profileTabContent">
-            <!-- Informasi Pribadi Tab -->
-            <div class="tab-pane fade show active" id="info" role="tabpanel">
-                <form action="{{ route('profile.update') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-person"></i> Nama Lengkap
-                            </label>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                                   value="{{ old('name', auth()->user()->name) }}"
-                                   placeholder="Masukkan nama lengkap"
-                                   required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="mb-3">
+                            <h5 style="color: var(--primary-color); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.1rem;">
+                                <i class="bi bi-person-check me-2"></i>Informasi Pribadi
+                            </h5>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-envelope"></i> Email
-                            </label>
-                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                                   value="{{ old('email', auth()->user()->email) }}"
-                                   placeholder="email@example.com"
-                                   required>
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-phone"></i> No. Telepon
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text">+62</span>
-                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                                       value="{{ old('phone', auth()->user()->phone) }}"
-                                       placeholder="812xxxxxxxx">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-person"></i> Nama Lengkap
+                                </label>
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                                       value="{{ old('name', auth()->user()->name) }}"
+                                       placeholder="Masukkan nama lengkap"
+                                       required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            @error('phone')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </label>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                                       value="{{ old('email', auth()->user()->email) }}"
+                                       placeholder="email@example.com"
+                                       required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('home') }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-circle"></i> Batal
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save"></i> Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-telephone"></i> No. Telepon
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">+62</span>
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                                           value="{{ old('phone', auth()->user()->phone) }}"
+                                           placeholder="812xxxxxxxx">
+                                </div>
+                                @error('phone')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
 
+                        <div class="btn-group-spacing">
+                            <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Security Section / Keamanan -->
+                <div class="form-section">
+                    <form action="{{ route('profile.update.password') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="mb-4">
+                            <h5 style="color: var(--primary-color); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.1rem;">
+                                <i class="bi bi-lock-fill me-2"></i>Ubah Password
+                            </h5>
+                            <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Perhatian:</strong> Isi semua field untuk mengubah password Anda. Password minimal 8 karakter dan harus kombinasi huruf, angka, dan simbol.
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-key"></i> Password Lama <span class="text-danger">*</span>
+                                </label>
+                                <div class="password-toggle-wrapper">
+                                    <input type="password" name="current_password" id="current_password" class="form-control @error('current_password') is-invalid @enderror"
+                                           placeholder="Masukkan password lama Anda"
+                                           required>
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('current_password')">
+                                        <i class="bi bi-eye" id="current_password-icon"></i>
+                                    </button>
+                                    @error('current_password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-shield-lock"></i> Password Baru <span class="text-danger">*</span>
+                                </label>
+                                <div class="password-toggle-wrapper">
+                                    <input type="password" name="password" id="new_password" class="form-control @error('password') is-invalid @enderror"
+                                           placeholder="Masukkan password baru (min 8 karakter)"
+                                           required>
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('new_password')">
+                                        <i class="bi bi-eye" id="new_password-icon"></i>
+                                    </button>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-shield-check"></i> Konfirmasi Password <span class="text-danger">*</span>
+                                </label>
+                                <div class="password-toggle-wrapper">
+                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
+                                           placeholder="Ulangi password baru"
+                                           required>
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password_confirmation')">
+                                        <i class="bi bi-eye" id="password_confirmation-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group-spacing">
+                            <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
                 <!-- Saved Addresses Section -->
-                <div class="mt-5 pt-4 border-top">
-                    <h5 class="mb-4">
-                        <i class="bi bi-pin-map"></i> Daftar Alamat Tersimpan
-                        <a href="{{ route('pelanggan.addresses.create') }}" class="btn btn-sm btn-success float-end">
-                            <i class="bi bi-plus-lg"></i> Tambah Alamat
-                        </a>
-                    </h5>
+                <div class="form-section">
+                    <div class="mb-3">
+                        <h5 style="color: var(--primary-color); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="bi bi-pin-map me-2"></i>Daftar Alamat Tersimpan</span>
+                            <a href="{{ route('pelanggan.addresses.create') }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Tambah
+                            </a>
+                        </h5>
+                    </div>
 
                     @if($addresses && count($addresses) > 0)
-                        <div class="row">
+                        <div class="row g-3">
                             @foreach($addresses as $address)
-                                <div class="col-md-6 mb-3">
-                                    <div class="card address-card h-100" style="border-left: 4px solid {{ $address->is_default ? 'var(--primary-color)' : '#e5e5e5' }}">
+                                <div class="col-md-6">
+                                    <div class="address-card" style="border-left: 4px solid {{ $address->is_default ? 'var(--primary-color)' : '#e0e0e0' }}">
                                         <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="bi bi-tag"></i> {{ $address->label }}
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <h6 class="card-title mb-0" style="color: var(--primary-color); font-size: 1rem;">
+                                                    <i class="bi bi-tag me-1"></i>{{ $address->label }}
                                                 </h6>
                                                 @if($address->is_default)
-                                                    <span class="badge bg-success">
-                                                        <i class="bi bi-check-circle"></i> Utama
+                                                    <span class="badge">
+                                                        <i class="bi bi-check-circle me-1"></i>Utama
                                                     </span>
                                                 @endif
                                             </div>
 
-                                            <p class="mb-2 text-muted">
-                                                <i class="bi bi-person"></i> <strong>{{ $address->nama_penerima }}</strong>
+                                            <p class="mb-2" style="font-size: 0.9rem; color: #555;">
+                                                <i class="bi bi-person me-2" style="color: var(--primary-color);"></i>
+                                                <strong>{{ $address->nama_penerima }}</strong>
                                                 <br>
-                                                <i class="bi bi-telephone"></i> {{ $address->no_telp_penerima }}
+                                                <i class="bi bi-telephone me-2" style="color: var(--primary-color); margin-left: 1.2rem;"></i>
+                                                {{ $address->no_telp_penerima }}
                                             </p>
 
-                                            <p class="mb-2 text-muted">
-                                                <i class="bi bi-geo-alt"></i> {{ $address->alamat_lengkap }}
+                                            <p class="mb-2" style="font-size: 0.9rem; color: #555;">
+                                                <i class="bi bi-geo-alt me-2" style="color: var(--primary-color);"></i>
+                                                {{ $address->alamat_lengkap }}
                                             </p>
 
-                                            <p class="mb-3 text-muted">
-                                                <i class="bi bi-building"></i> {{ $address->kecamatan }}, {{ $address->kota }}<br>
-                                                <i class="bi bi-mailbox"></i> Kode Pos: {{ $address->kode_pos }}
+                                            <p class="mb-3" style="font-size: 0.9rem; color: #555;">
+                                                <i class="bi bi-building me-2" style="color: var(--primary-color);"></i>
+                                                {{ $address->kecamatan }}, {{ $address->kota }}
+                                                <br>
+                                                <i class="bi bi-mailbox me-2" style="color: var(--primary-color); margin-left: 1.2rem;"></i>
+                                                Kode Pos: {{ $address->kode_pos }}
                                             </p>
 
-                                            <div class="d-flex gap-2">
+                                            <div class="d-flex gap-2 flex-wrap">
                                                 @if(!$address->is_default)
-                                                    <a href="{{ route('pelanggan.addresses.set-default', $address->id) }}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="bi bi-star"></i> Jadikan Utama
+                                                    <a href="{{ route('pelanggan.addresses.set-default', $address->id) }}" class="btn btn-sm btn-outline-primary" style="border-color: var(--primary-color); color: var(--primary-color);">
+                                                        <i class="bi bi-star me-1"></i>Jadikan Utama
                                                     </a>
                                                 @endif
                                                 <a href="{{ route('pelanggan.addresses.edit', $address->id) }}" class="btn btn-sm btn-outline-warning">
-                                                    <i class="bi bi-pencil"></i> Edit
+                                                    <i class="bi bi-pencil me-1"></i>Edit
                                                 </a>
                                                 <form action="{{ route('pelanggan.addresses.destroy', $address->id) }}" method="POST" style="display: inline;"
                                                       onsubmit="return confirm('Apakah Anda yakin ingin menghapus alamat ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i> Hapus
+                                                        <i class="bi bi-trash me-1"></i>Hapus
                                                     </button>
                                                 </form>
                                             </div>
@@ -963,656 +1372,24 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i>
-                            <strong>Belum ada alamat tersimpan.</strong>
-                            <a href="{{ route('pelanggan.addresses.create') }}">Tambah alamat baru</a> untuk memudahkan checkout.
+                        <div class="alert alert-info" style="border-radius: 12px; text-align: center; padding: 2rem;">
+                            <i class="bi bi-info-circle me-2" style="font-size: 1.5rem;"></i>
+                            <strong>Belum ada alamat tersimpan</strong>
+                            <p style="margin-top: 0.75rem; margin-bottom: 1rem; color: inherit;">
+                                Tambahkan alamat pengiriman untuk mempermudah checkout di masa depan
+                            </p>
+                            <a href="{{ route('pelanggan.addresses.create') }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Tambah Alamat Pertama
+                            </a>
                         </div>
                     @endif
                 </div>
             </div>
-
-            <!-- Keamanan Tab -->
-            <div class="tab-pane fade" id="security" role="tabpanel">
-                <form action="{{ route('profile.update.password') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i>
-                        <strong>Info:</strong> Isi semua field untuk mengubah password Anda
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-key"></i> Password Lama <span class="text-danger">*</span>
-                            </label>
-                            <div class="password-toggle-wrapper">
-                                <input type="password" name="current_password" id="current_password" class="form-control @error('current_password') is-invalid @enderror"
-                                       placeholder="Masukkan password lama"
-                                       required>
-                                <button type="button" class="password-toggle-btn" onclick="togglePassword('current_password')">
-                                    <i class="bi bi-eye" id="current_password-icon"></i>
-                                </button>
-                                @error('current_password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-key-fill"></i> Password Baru <span class="text-danger">*</span>
-                            </label>
-                            <div class="password-toggle-wrapper">
-                                <input type="password" name="password" id="new_password" class="form-control @error('password') is-invalid @enderror"
-                                       placeholder="Minimal 8 karakter"
-                                       required>
-                                <button type="button" class="password-toggle-btn" onclick="togglePassword('new_password')">
-                                    <i class="bi bi-eye" id="new_password-icon"></i>
-                                </button>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <small class="text-muted">Password minimal 8 karakter</small>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-key-fill"></i> Konfirmasi Password Baru <span class="text-danger">*</span>
-                            </label>
-                            <div class="password-toggle-wrapper">
-                                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                                       placeholder="Ulangi password baru"
-                                       required>
-                                <button type="button" class="password-toggle-btn" onclick="togglePassword('password_confirmation')">
-                                    <i class="bi bi-eye" id="password_confirmation-icon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('home') }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-circle"></i> Batal
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-shield-check"></i> Update Password
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Membership Tab -->
-            <!-- Membership Tab -->
-            <div class="tab-pane fade" id="membership" role="tabpanel">
-                @if(auth()->user()->membership && auth()->user()->membership->isValid())
-                    <div class="text-center mb-4">
-                        <span class="membership-badge {{ strtolower(auth()->user()->membership->tier) }}">
-                            <i class="bi bi-star-fill"></i>
-                            {{ strtoupper(auth()->user()->membership->tier) }} MEMBER
-                        </span>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="membership-info-card">
-                                <div class="membership-info-item">
-                                    <i class="bi bi-percent"></i>
-                                    <div>
-                                        <strong>Diskon Member</strong>
-                                        <p>{{ auth()->user()->membership->discount_percentage }}%</p>
-                                    </div>
-                                </div>
-
-                                <div class="membership-info-item">
-                                    <i class="bi bi-star"></i>
-                                    <div>
-                                        <strong>Total Poin</strong>
-                                        <p>{{ number_format(auth()->user()->membership->points, 0, ',', '.') }} poin</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <div class="membership-info-card">
-                                <div class="membership-info-item">
-                                    <i class="bi bi-calendar-check"></i>
-                                    <div>
-                                        <strong>Bergabung Sejak</strong>
-                                        <p>{{ auth()->user()->membership->created_at->format('d M Y') }}</p>
-                                    </div>
-                                </div>
-
-                                <div class="membership-info-item">
-                                    <i class="bi bi-calendar-event"></i>
-                                    <div>
-                                        <strong>Berlaku Hingga</strong>
-                                        <p>{{ auth()->user()->membership->valid_until ? auth()->user()->membership->valid_until->format('d M Y') : '-' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @php
-                        $nextTier = auth()->user()->membership->getNextTierInfo();
-                    @endphp
-
-                    @if($nextTier['next_tier'] != 'Maximum')
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>Info:</strong> Kumpulkan <strong>{{ number_format($nextTier['points_needed'], 0, ',', '.') }}</strong> poin lagi untuk naik ke tier <strong>{{ $nextTier['next_tier'] }}</strong>!
-                        </div>
-                    @else
-                        <div class="alert alert-success">
-                            <i class="bi bi-trophy-fill me-2"></i>
-                            <strong>Selamat!</strong> Anda sudah mencapai tier tertinggi!
-                        </div>
-                    @endif
-
-                    <div class="alert alert-success">
-                        <i class="bi bi-gift me-2"></i>
-                        <strong>Cara Mendapatkan Poin:</strong> Dapatkan 1 poin dari setiap Rp 20.000 belanja!
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-4 text-center mb-3">
-                            <div class="card border-0 shadow-sm p-3">
-                                <i class="bi bi-trophy text-warning" style="font-size: 3rem;"></i>
-                                <h6 class="mt-2 mb-0">Bronze</h6>
-                                <small class="text-muted">0-100 poin</small>
-                                <p class="mb-0 mt-1"><strong>5% diskon</strong></p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <div class="card border-0 shadow-sm p-3">
-                                <i class="bi bi-trophy text-secondary" style="font-size: 3rem;"></i>
-                                <h6 class="mt-2 mb-0">Silver</h6>
-                                <small class="text-muted">101-250 poin</small>
-                                <p class="mb-0 mt-1"><strong>10% diskon</strong></p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <div class="card border-0 shadow-sm p-3">
-                                <i class="bi bi-trophy text-warning" style="font-size: 3rem;"></i>
-                                <h6 class="mt-2 mb-0">Gold</h6>
-                                <small class="text-muted">251-400 poin</small>
-                                <p class="mb-0 mt-1"><strong>15% diskon</strong></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 offset-md-4 text-center mb-3">
-                            <div class="card border-0 shadow-sm p-3 border-primary">
-                                <i class="bi bi-trophy text-primary" style="font-size: 3rem;"></i>
-                                <h6 class="mt-2 mb-0">Platinum</h6>
-                                <small class="text-muted">401+ poin</small>
-                                <p class="mb-0 mt-1"><strong>20% diskon</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="bi bi-emoji-frown" style="font-size: 5rem; color: var(--text-muted);"></i>
-                        <h4 class="mt-3 mb-2">Belum Memiliki Membership</h4>
-                        <p class="text-muted mb-4">Lakukan transaksi pertama untuk mendapatkan membership dan nikmati berbagai keuntungan!</p>
-                        <a href="{{ route('home') }}" class="btn btn-primary">
-                            <i class="bi bi-shop"></i> Belanja Sekarang
-                        </a>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Member Card Tab -->
-            <!-- Member Card Tab -->
-            <div class="tab-pane fade" id="member-card" role="tabpanel">
-                @if(auth()->user()->membership && auth()->user()->membership->isValid())
-                    <div class="row justify-content-center">
-                        <div class="col-lg-6">
-                            <div class="member-card">
-                                <div class="member-card-header">
-                                    <span class="member-card-title">Ayu Mart Member</span>
-                                    <span class="member-card-title">{{ strtoupper(auth()->user()->membership->tier) }}</span>
-                                </div>
-
-                                <div class="member-id">
-                                    {{ 'AYU-' . str_pad(auth()->user()->id_user, 6, '0', STR_PAD_LEFT) }}
-                                </div>
-
-                                <div class="member-name">
-                                    {{ auth()->user()->name }}
-                                </div>
-
-                                <div class="qr-barcode-container">
-                                    <div class="code-tabs">
-                                        <button class="code-tab active" onclick="switchTab('qr')">
-                                            <i class="bi bi-qr-code"></i> QR Code
-                                        </button>
-                                        <button class="code-tab" onclick="switchTab('barcode')">
-                                            <i class="bi bi-upc-scan"></i> Barcode
-                                        </button>
-                                    </div>
-
-                                    <!-- QR Code Tab -->
-                                    <div id="qr-tab" class="code-content active">
-                                        <div id="qrcode" style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-center mt-2">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="generateCodes()">
-                                                <i class="bi bi-arrow-clockwise"></i> Refresh QR Code
-                                            </button>
-                                        </div>
-                                        <div class="code-instructions">
-                                            <i class="bi bi-info-circle"></i>
-                                            Tunjukkan QR Code ini di kasir untuk mendapatkan poin & diskon
-                                        </div>
-                                        <button class="btn-download" onclick="downloadQRCode()">
-                                            <i class="bi bi-download"></i> Download QR Code
-                                        </button>
-                                    </div>
-
-                                    <!-- Barcode Tab -->
-                                    <div id="barcode-tab" class="code-content">
-                                        <div style="min-height: 150px; display: flex; align-items: center; justify-content: center;">
-                                            <svg id="barcode"></svg>
-                                        </div>
-                                        <div class="text-center mt-2">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="generateCodes()">
-                                                <i class="bi bi-arrow-clockwise"></i> Refresh Barcode
-                                            </button>
-                                        </div>
-                                        <div class="code-instructions">
-                                            <i class="bi bi-info-circle"></i>
-                                            Scan barcode ini di kasir untuk mendapatkan poin & diskon
-                                        </div>
-                                        <button class="btn-download" onclick="downloadBarcode()">
-                                            <i class="bi bi-download"></i> Download Barcode
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="alert alert-warning mt-3">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Penting:</strong> Jangan bagikan kode member Anda kepada orang lain.
-                                Kode ini bersifat pribadi dan hanya untuk digunakan oleh Anda.
-                            </div>
-
-                            <div class="alert alert-info mt-3">
-                                <i class="bi bi-lightbulb me-2"></i>
-                                <strong>Cara Menggunakan:</strong>
-                                <ol class="mb-0 mt-2 ps-3">
-                                    <li>Tunjukkan kartu member digital ini di kasir Ayu Mart</li>
-                                    <li>Kasir akan scan QR Code atau Barcode Anda</li>
-                                    <li>Dapatkan diskon {{ auth()->user()->membership->discount_percentage }}% dan poin otomatis!</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="bi bi-credit-card-2-front" style="font-size: 5rem; color: var(--text-muted);"></i>
-                        <h4 class="mt-3 mb-2">Kartu Member Belum Tersedia</h4>
-                        <p class="text-muted mb-4">Lakukan transaksi pertama untuk mendapatkan kartu member digital!</p>
-                        <a href="{{ route('home') }}" class="btn btn-primary">
-                            <i class="bi bi-shop"></i> Belanja Sekarang
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
 @endsection
 
 @push('scripts')
-<!-- QR Code Library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
-<!-- Barcode Library -->
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js" crossorigin="anonymous"></script>
 
 <script>
-    console.log('=== Scripts Loading ===');
-
-    // Check if libraries are loaded with retry
-    function checkLibraries(attempt = 1, maxAttempts = 5) {
-        return new Promise((resolve, reject) => {
-            if (typeof QRCode !== 'undefined' && typeof JsBarcode !== 'undefined') {
-                console.log('✓ All libraries loaded successfully on attempt', attempt);
-                resolve(true);
-            } else if (attempt < maxAttempts) {
-                console.log(`⏳ Waiting for libraries... (attempt ${attempt}/${maxAttempts})`);
-                setTimeout(() => {
-                    checkLibraries(attempt + 1, maxAttempts).then(resolve).catch(reject);
-                }, 500);
-            } else {
-                console.error('✗ Libraries not loaded after', maxAttempts, 'attempts');
-                console.error('QRCode available:', typeof QRCode !== 'undefined');
-                console.error('JsBarcode available:', typeof JsBarcode !== 'undefined');
-                reject(new Error('Libraries failed to load'));
-            }
-        });
-    }
-
-    // Member Code
-    const memberCode = 'AYU-{{ str_pad(auth()->user()->id_user, 6, "0", STR_PAD_LEFT) }}';
-    const memberName = '{{ auth()->user()->name }}';
-    const memberTier = '{{ auth()->user()->membership ? strtoupper(auth()->user()->membership->tier) : "" }}';
-
-    // Generate QR Code and Barcode
-    @if(auth()->user()->membership && auth()->user()->membership->isValid())
-    console.log('=== Membership detected, preparing to generate codes ===');
-
-    // Wait for DOM and libraries
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeCodes);
-    } else {
-        initializeCodes();
-    }
-
-    function initializeCodes() {
-        console.log('=== Member Card Generator Started ===');
-        console.log('Member Code:', memberCode);
-        console.log('Member Name:', memberName);
-        console.log('Member Tier:', memberTier);
-
-        // Check if we're on the member card tab
-        const memberCardTab = document.getElementById('member-card-tab');
-        if (memberCardTab) {
-            memberCardTab.addEventListener('shown.bs.tab', function (e) {
-                console.log('Member card tab shown, generating codes...');
-                generateCodes();
-            });
-        }
-
-        // Also try to generate on page load if tab is already active
-        setTimeout(() => {
-            const memberCardContent = document.getElementById('member-card');
-            if (memberCardContent && memberCardContent.classList.contains('active')) {
-                console.log('Member card tab already active, generating codes...');
-                generateCodes();
-            }
-        }, 500);
-    }
-
-    function generateCodes() {
-        checkLibraries()
-            .then(() => {
-                console.log('📱 Starting code generation...');
-                generateQRCode();
-                generateBarcode();
-            })
-            .catch(error => {
-                console.error('Failed to load libraries:', error);
-                showError('qrcode', 'Library belum dimuat. Silakan refresh halaman.');
-            });
-    }
-
-    function generateQRCode() {
-        try {
-            const qrcodeContainer = document.getElementById("qrcode");
-            if (!qrcodeContainer) {
-                console.error('❌ QR Code container not found!');
-                return;
-            }
-
-            console.log('🔄 Generating QR Code...');
-
-            // Clear container
-            qrcodeContainer.innerHTML = '';
-            qrcodeContainer.style.minHeight = 'auto';
-            qrcodeContainer.style.display = 'block';
-            qrcodeContainer.style.textAlign = 'center';
-
-            // Check if QRCode library is available
-            if (typeof QRCode === 'undefined') {
-                console.warn('⚠️ QRCode library not available, using API fallback');
-                // Use API fallback
-                const img = document.createElement('img');
-                img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(memberCode)}`;
-                img.alt = 'QR Code';
-                img.style.maxWidth = '200px';
-                img.style.height = 'auto';
-                img.onerror = function() {
-                    qrcodeContainer.innerHTML = '<div class="alert alert-danger small">Gagal memuat QR Code</div>';
-                };
-                qrcodeContainer.appendChild(img);
-                console.log('✅ QR Code loaded via API');
-                return;
-            }
-
-            // Generate QR Code using library
-            new QRCode(qrcodeContainer, {
-                text: memberCode,
-                width: 200,
-                height: 200,
-                colorDark: "#333333",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            console.log('✅ QR Code generated successfully!');
-        } catch (error) {
-            console.error('❌ Error generating QR Code:', error);
-            showError('qrcode', 'Gagal membuat QR Code: ' + error.message);
-        }
-    }
-
-    function generateBarcode() {
-        try {
-            const barcodeElement = document.getElementById("barcode");
-            if (!barcodeElement) {
-                console.error('❌ Barcode element not found!');
-                return;
-            }
-
-            console.log('🔄 Generating Barcode...');
-
-            // Generate Barcode
-            JsBarcode("#barcode", memberCode, {
-                format: "CODE128",
-                width: 2,
-                height: 80,
-                displayValue: true,
-                fontSize: 16,
-                margin: 10,
-                background: "#ffffff",
-                lineColor: "#000000"
-            });
-
-            console.log('✅ Barcode generated successfully!');
-        } catch (error) {
-            console.error('❌ Error generating Barcode:', error);
-            showError('barcode', 'Gagal membuat Barcode: ' + error.message);
-        }
-    }
-
-    function showError(elementId, message) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            if (element.tagName === 'svg') {
-                element.parentElement.innerHTML = '<div class="alert alert-danger small"><i class="bi bi-x-circle"></i> ' + message + '</div>';
-            } else {
-                element.innerHTML = '<div class="alert alert-danger small"><i class="bi bi-x-circle"></i> ' + message + '</div>';
-            }
-        }
-    }
-    @else
-    console.log('ℹ️ No active membership found');
-    @endif
-
-    // Switch between QR Code and Barcode tabs
-    function switchTab(tab) {
-        // Remove active class from all tabs
-        document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.code-content').forEach(c => c.classList.remove('active'));
-
-        // Add active class to selected tab
-        if (tab === 'qr') {
-            document.querySelectorAll('.code-tab')[0].classList.add('active');
-            document.getElementById('qr-tab').classList.add('active');
-        } else {
-            document.querySelectorAll('.code-tab')[1].classList.add('active');
-            document.getElementById('barcode-tab').classList.add('active');
-        }
-    }
-
-    // Download QR Code
-    function downloadQRCode() {
-        const qrCanvas = document.querySelector('#qrcode canvas');
-        if (!qrCanvas) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'QR Code belum di-generate!'
-            });
-            return;
-        }
-
-        // Create a new canvas with member info
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // Set canvas size
-        canvas.width = 400;
-        canvas.height = 500;
-
-        // Background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Add gradient header
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        gradient.addColorStop(0, '#667eea');
-        gradient.addColorStop(1, '#764ba2');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, 80);
-
-        // Title
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Ayu Mart Member Card', canvas.width / 2, 35);
-        ctx.font = 'bold 16px Arial';
-        ctx.fillText(memberTier, canvas.width / 2, 60);
-
-        // Member info
-        ctx.fillStyle = '#333333';
-        ctx.font = 'bold 18px Arial';
-        ctx.fillText(memberName, canvas.width / 2, 120);
-        ctx.font = '16px Arial';
-        ctx.fillText(memberCode, canvas.width / 2, 145);
-
-        // Draw QR Code
-        ctx.drawImage(qrCanvas, 100, 170, 200, 200);
-
-        // Footer text
-        ctx.font = '12px Arial';
-        ctx.fillStyle = '#666666';
-        ctx.fillText('Tunjukkan kode ini di kasir', canvas.width / 2, 400);
-        ctx.fillText('untuk mendapatkan poin & diskon', canvas.width / 2, 420);
-
-        // Download
-        const link = document.createElement('a');
-        link.download = `Ayu Mart_QR_${memberCode}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'QR Code berhasil diunduh',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
-
-    // Download Barcode
-    function downloadBarcode() {
-        const barcodeSvg = document.querySelector('#barcode');
-        if (!barcodeSvg) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Barcode belum di-generate!'
-            });
-            return;
-        }
-
-        // Create canvas
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = 500;
-        canvas.height = 400;
-
-        // Background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Add gradient header
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        gradient.addColorStop(0, '#667eea');
-        gradient.addColorStop(1, '#764ba2');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, 80);
-
-        // Title
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Ayu Mart Member Card', canvas.width / 2, 35);
-        ctx.font = 'bold 16px Arial';
-        ctx.fillText(memberTier, canvas.width / 2, 60);
-
-        // Member info
-        ctx.fillStyle = '#333333';
-        ctx.font = 'bold 18px Arial';
-        ctx.fillText(memberName, canvas.width / 2, 120);
-
-        // Convert SVG to image and draw
-        const svgData = new XMLSerializer().serializeToString(barcodeSvg);
-        const img = new Image();
-        const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-        const url = URL.createObjectURL(svgBlob);
-
-        img.onload = function() {
-            ctx.drawImage(img, 50, 150, 400, 150);
-
-            // Footer text
-            ctx.font = '12px Arial';
-            ctx.fillStyle = '#666666';
-            ctx.fillText('Scan barcode ini di kasir', canvas.width / 2, 330);
-            ctx.fillText('untuk mendapatkan poin & diskon', canvas.width / 2, 350);
-
-            // Download
-            const link = document.createElement('a');
-            link.download = `Ayu Mart_Barcode_${memberCode}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-
-            URL.revokeObjectURL(url);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Barcode berhasil diunduh',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        };
-
-        img.src = url;
-    }
-
     // Load cart and wishlist counts
     function loadCounts() {
         fetch('/api/cart/count')

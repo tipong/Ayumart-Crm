@@ -1,597 +1,534 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $product->nama_produk }} Ayu Mart</title>
+    <title>{{ $product->nama_produk }} - AyuMart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700;800&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
-            --primary-color: #3F4F44;
-            --secondary-color: #64748b;
-            --success-color: #3F4F44;
-            --danger-color: #ef4444;
-            --green: #3F4F44;
-            --light-green: #f6ffed;
-            --dark-green: #556B58;
+            --primary:       #015b1e;
+            --primary-dark:  #013d14;
+            --primary-light: #e8f5e9;
+            --accent:        #e7482e;
+            --accent-dark:   #c43520;
+            --text-dark:     #1a1a1a;
+            --text-mid:      #444;
+            --text-muted:    #777;
+            --border:        #e0e0e0;
+            --white:         #ffffff;
+            --body-bg:       #e8f5e9;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: var(--body-bg);
+            font-size: 15px;
         }
 
-        /* Navbar Style */
+        a { text-decoration: none !important; }
+
+        /* NAVBAR */
         .navbar {
-            background: linear-gradient(135deg, #3F4F44 0%, #2E3A31 100%);
-            box-shadow: 0 2px 8px 0 rgba(82,196,26,.15);
-            padding: 0.8rem 0;
+            background: #fff !important;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-
         .navbar-brand {
-            font-weight: 700;
-            font-size: 1.8rem;
-            color: white !important;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700; font-size: 1.6rem;
+            color: var(--primary) !important; letter-spacing: 0.5px;
         }
-
-        .nav-link {
-            color: rgba(255,255,255,0.95) !important;
-            font-weight: 500;
-            transition: all 0.3s;
-            padding: 0.5rem 1rem !important;
+        .navbar-brand img { height: 45px; width: auto; }
+        .navbar .nav-link {
+            color: var(--text-dark) !important;
+            font-weight: 600; font-size: 14px;
+            padding: 0.55rem 1rem !important;
+            transition: all 0.25s; border-radius: 5px;
         }
-
-        .nav-link:hover {
-            color: white !important;
-            opacity: 0.8;
-        }
-
-        .btn-outline-light {
-            border: 2px solid rgba(255,255,255,0.8);
-            font-weight: 600;
-        }
-
-        .btn-outline-light:hover {
-            background-color: white;
-            color: #3F4F44;
-        }
-
-        /* Search Bar in Navbar */
-        .navbar-search {
-            max-width: 500px;
-            flex-grow: 1;
-        }
-
+        .navbar .nav-link:hover { color: var(--white) !important; background-color: var(--primary); }
+        /* Search */
+        .navbar-search { max-width: 480px; flex-grow: 1; }
         .navbar-search input {
-            border: none;
-            border-radius: 2px;
-            padding: 8px 15px;
-            background: rgba(255,255,255,0.9);
+            border: 2px solid var(--border); border-right: none;
+            border-radius: 100px 0 0 100px; padding: 8px 18px;
+            font-family: 'Source Sans Pro', sans-serif; font-size: 14px;
         }
-
-        .navbar-search input:focus {
-            background: white;
-            outline: none;
-            box-shadow: 0 0 4px rgba(0,0,0,0.15);
-        }
-
+        .navbar-search input:focus { border-color: var(--primary); box-shadow: none; }
         .navbar-search button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 2px;
-            transition: all 0.3s;
+            background: var(--primary); border: 2px solid var(--primary);
+            color: white; padding: 8px 20px;
+            border-radius: 0 100px 100px 0; font-size: 15px;
         }
-
-        .navbar-search button:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* User Menu Icons */
+        .navbar-search button:hover { background: var(--primary-dark); }
+        /* Nav icons */
         .nav-icon {
-            position: relative;
-            padding: 8px 12px;
-            color: rgba(255,255,255,0.95) !important;
-            transition: all 0.2s;
+            position: relative; display: inline-flex;
+            align-items: center; justify-content: center;
+            width: 40px; height: 40px;
+            color: var(--text-dark) !important;
+            border-radius: 50%; transition: all 0.25s; font-size: 1.25rem;
         }
-
-        .nav-icon:hover {
-            color: white !important;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
-
-        .nav-icon i {
-            font-size: 1.3rem;
-        }
-
+        .nav-icon:hover { background-color: var(--primary-light); color: var(--primary) !important; }
+        .nav-icon i { font-size: 1.3rem; }
         .nav-icon .badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            font-size: 0.65rem;
-            padding: 2px 5px;
-            min-width: 18px;
+            position: absolute; top: 2px; right: 2px;
+            font-size: 0.6rem; padding: 2px 5px; min-width: 17px;
+            border-radius: 10px; background: var(--accent) !important;
         }
-
+        /* User btn */
         .user-dropdown {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--primary); color: #fff !important;
+            border-radius: 100px; padding: 6px 16px;
+            font-weight: 600; font-size: 14px; transition: all 0.25s;
         }
-
-        .user-dropdown:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
+        .user-dropdown:hover { background: var(--primary-dark); }
         .user-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: white;
-            color: #3F4F44;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.75rem;
-            margin-right: 8px;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.75rem; margin-right: 0;
         }
-
+        /* Dropdown */
         .dropdown-menu {
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border-radius: 4px;
-            margin-top: 8px;
+            border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 8px 0;
+        }
+        .dropdown-item {
+            padding: 10px 20px; font-size: 14px;
+            font-weight: 600; color: var(--text-mid); transition: all 0.2s;
+        }
+        .dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
+        .dropdown-item i { margin-right: 8px; width: 20px; color: var(--primary); }
+        .navbar-toggler { border: 2px solid var(--primary); padding: 4px 8px; }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23015b1e' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
-        .dropdown-item {
-            padding: 10px 20px;
-            font-size: 0.9rem;
+        /* BRANCH BAR */
+        .branch-location-section {
+            background: var(--primary-light);
+            border-bottom: 1.5px solid rgba(1,91,30,0.1);
+            padding: 10px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        #branchSelector {
+            border: 1.5px solid var(--primary);
+            font-size: 13px;
+            padding: 5px 12px;
+            font-weight: 600;
+            min-width: 180px;
+            border-radius: 8px;
+            color: var(--primary);
+            background-color: #fff;
+        }
+        #branchSelector:focus {
+            box-shadow: 0 0 0 0.2rem rgba(1,91,30,0.15);
+            border-color: var(--primary);
+        }
+        #detectLocationBtn {
+            font-size: 13px; 
+            padding: 5px 14px; 
+            border-radius: 8px; 
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
             transition: all 0.2s;
         }
-
-        .dropdown-item:hover {
-            background: #fff5f3;
-            color: #3F4F44;
+        #detectLocationBtn:hover { 
+            background: var(--primary); 
+            color: #fff !important; 
         }
+        .notification-item { transition: background-color 0.2s; }
+        .notification-item:hover { background-color: var(--primary-light) !important; }
+        .unread-notification { background-color: #f0fdf4; border-left: 3px solid var(--primary); }
 
-        .dropdown-item i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Branch Location Section */
-        .branch-location-section {
-            background: #fff3cd;
-            border-bottom: 1px solid #ffd966;
-            padding: 10px 0;
-            margin-bottom: 0;
-        }
-
-        .branch-info-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .branch-current {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-
-        .branch-current i.bi-geo-alt-fill {
-            font-size: 1.2rem;
-        }
-
-        .branch-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #branchSelector {
-            min-width: 200px;
-            border: 1px solid #ffc107;
-            background: white;
-        }
-
-        #detectLocationBtn {
-            white-space: nowrap;
-        }
-
-        /* Notification Styles */
-        .notification-item {
-            transition: background-color 0.2s;
-        }
-
-        .notification-item:hover {
-            background-color: #f8f9fa !important;
-        }
-
-        .unread-notification {
-            background-color: #fff5f3;
-            border-left: 3px solid #3F4F44;
-        }
-
-        .unread-notification:hover {
-            background-color: #ffe8e3 !important;
-        }
-
-        #notificationDropdownMenu {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        #notificationDropdownMenu .dropdown-header {
-            background-color: #f8f9fa;
-            padding: 12px 20px;
-            font-size: 0.95rem;
-        }
-
-        #markAllReadBtn {
-            color: #3F4F44;
-            font-size: 0.8rem;
-        }
-
-        #markAllReadBtn:hover {
-            color: #d73211;
-        }
-
-        /* Product Detail */
+        /* PRODUCT DETAIL */
         .product-container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
-
         .product-card {
             background: white;
-            border-radius: 8px;
+            border-radius: 14px;
             padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
             margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
         }
-
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            cursor: zoom-in;
+        }
         .product-image {
             width: 100%;
             height: 400px;
             object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e5e5e5;
+            transition: transform 0.4s ease, opacity 0.15s ease-in-out;
         }
-
+        .product-image-container:hover .product-image {
+            transform: scale(1.06);
+        }
         .product-gallery {
             display: flex;
             gap: 0.5rem;
             margin-top: 1rem;
             flex-wrap: wrap;
         }
-
         .gallery-thumb {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             object-fit: cover;
-            border-radius: 6px;
-            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            border: 2px solid var(--border);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.25s;
         }
-
-        .gallery-thumb:hover,
-        .gallery-thumb.active {
-            border-color: #3F4F44;
-        }
-
+        .gallery-thumb:hover, .gallery-thumb.active { border-color: var(--primary); }
         .product-title {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             font-weight: 700;
-            color: #333;
+            color: var(--text-dark);
             margin-bottom: 1rem;
+            font-family: 'Source Sans Pro', sans-serif;
         }
-
         .product-price {
             font-size: 2rem;
             font-weight: 700;
-            color: #3F4F44;
+            color: var(--accent);
             margin-bottom: 0.5rem;
         }
-
         .product-price-old {
-            font-size: 1.2rem;
-            color: #666;
+            font-size: 1.1rem;
+            color: var(--text-muted);
             text-decoration: line-through;
         }
-
         .discount-badge {
             display: inline-block;
-            background: #3F4F44;
+            background: var(--accent);
             color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            padding: 0.3rem 0.9rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.85rem;
             margin-left: 0.5rem;
         }
-
         .stock-info {
             padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 6px;
+            background: var(--primary-light);
+            border-radius: 10px;
             margin: 1rem 0;
+            border: 1px solid rgba(1,91,30,0.15);
         }
-
         .btn-primary {
-            background: #3F4F44;
+            background: var(--primary);
             border: none;
             padding: 0.8rem 2rem;
-            border-radius: 6px;
-            font-weight: 600;
+            border-radius: 100px;
+            font-weight: 700;
             transition: all 0.3s;
+            font-family: 'Source Sans Pro', sans-serif;
         }
-
         .btn-primary:hover {
-            background: #556B58;
+            background: var(--accent);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(238, 77, 45, 0.3);
+            box-shadow: 0 4px 14px rgba(231,72,46,0.35);
         }
-
         .btn-outline-primary {
-            border-color: #3F4F44;
-            color: #3F4F44;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 100px;
+            font-weight: 700;
         }
-
         .btn-outline-primary:hover {
-            background: #3F4F44;
-            border-color: #3F4F44;
+            background: var(--primary);
+            border-color: var(--primary);
             color: white;
         }
-
         .quantity-control {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin: 1rem 0;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 12px;
+            width: fit-content;
+            border: 1px solid var(--border);
         }
-
+        .quantity-control label {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-right: 1rem;
+            margin-bottom: 0;
+        }
         .quantity-control button {
-            width: 40px;
-            height: 40px;
-            border-radius: 6px;
-            border: 1px solid #e5e5e5;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
             background: white;
+            color: var(--primary);
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
         }
-
-        .quantity-control button:hover {
-            background: #3F4F44;
+        .quantity-control button:hover:not(:disabled) {
+            background: var(--primary);
             color: white;
-            border-color: #3F4F44;
+            border-color: var(--primary);
+            transform: scale(1.05);
         }
-
+        .quantity-control button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .quantity-control input {
-            width: 80px;
-            text-align: center;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            padding: 0.5rem;
-            font-weight: 600;
+            width: 50px; text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
         }
-
         /* Reviews */
-        .rating-summary {
-            border: 1px solid #e5e5e5;
-        }
-
         .review-card {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1rem;
-            border: 1px solid #e5e5e5;
-            transition: all 0.3s;
+            border: 1.5px solid var(--border);
+            transition: all 0.25s;
+        }
+        .review-card:hover { border-color: var(--primary); box-shadow: 0 4px 14px rgba(1,91,30,0.1); }
+        .review-author { font-weight: 700; color: var(--text-dark); font-size: 1rem; }
+        .review-rating { color: #f59e0b; margin-top: 0.2rem; }
+        .review-date { color: var(--text-muted); font-size: 0.82rem; margin-top: 0.2rem; }
+        .review-content { color: var(--text-mid); line-height: 1.8; font-style: italic; }
+        .user-avatar-review img { border: 2px solid var(--primary); }
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: rgba(255,255,255,0.85);
+            padding: 40px 0 0;
+            margin-top: 50px;
+        }
+        footer h5, footer h6 {
+            color: #fff; font-weight: 700;
+            font-size: 0.95rem; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 14px;
+        }
+        footer p, footer li, footer a {
+            color: rgba(255,255,255,0.78);
+            font-size: 0.88rem; line-height: 1.9;
+        }
+        footer a:hover { color: #fff; }
+        footer ul { list-style: none; padding: 0; }
+        .footer-social a {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%; color: #fff !important;
+            margin-right: 7px; transition: all 0.25s;
+        }
+        .footer-social a:hover { background: var(--accent); transform: translateY(-2px); }
+        .footer-bottom {
+            background: var(--primary-dark); padding: 11px 0;
+            text-align: center; font-size: 0.82rem;
+            color: rgba(255,255,255,0.6); margin-top: 28px;
+        }
+        /* ============================================
+           MICRO-INTERACTIONS & USER-FRIENDLY CONTROLS
+        ============================================ */
+        @keyframes badgePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+        .badge-pulse {
+            animation: badgePulse 0.4s ease-out;
         }
 
-        .review-card:hover {
-            border-color: #3F4F44;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        /* Scroll to Top Button */
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            z-index: 99;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        #scrollToTopBtn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #scrollToTopBtn:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
         }
 
-        .review-header {
-            margin-bottom: 1rem;
+        /* Floating Cart Button */
+        #floatingCartBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231,72,46,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
-
-        .review-author {
-            font-weight: 600;
-            color: #333;
-            font-size: 1.1rem;
+        #floatingCartBtn i {
+            font-size: 1.5rem;
         }
-
-        .review-rating {
-            color: #fbbf24;
-            margin-top: 0.25rem;
+        #floatingCartBtn .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--primary);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            padding: 3px 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
         }
-
-        .review-rating i {
-            font-size: 1rem;
-        }
-
-        .review-date {
-            color: #666;
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-        }
-
-        .review-content {
-            color: #333;
-            line-height: 1.8;
-            font-style: italic;
-        }
-
-        .review-photo img {
-            transition: all 0.3s;
-        }
-
-        .review-photo img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .user-avatar-review img {
-            border: 2px solid #3F4F44;
+        #floatingCartBtn:hover {
+            background: var(--accent-dark);
+            transform: scale(1.1);
         }
 
         @media (max-width: 768px) {
-            .product-image {
-                height: 300px;
-            }
-
-            .product-title {
-                font-size: 1.4rem;
-            }
-
-            .product-price {
-                font-size: 1.6rem;
-            }
+            .product-image { height: 280px; }
+            .product-title { font-size: 1.3rem; }
+            .product-price { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
+    <!-- Top Bar -->
+    <div class="d-none d-md-block" style="background:var(--primary);color:rgba(255,255,255,0.9);font-size:13px;padding:5px 0;">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-telephone-fill me-1"></i> +62 85 955 202 267 &nbsp;|&nbsp; <i class="bi bi-envelope-fill me-1"></i> tigaayumart@gmail.com</span>
+            <span>
+                <a href="https://www.facebook.com/3aayumart" class="me-2" style="color:rgba(255,255,255,0.9);"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/3aayumart12/" style="color:rgba(255,255,255,0.9);"><i class="bi bi-instagram"></i></a>
+            </span>
+        </div>
+    </div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('images/logo.png') }}" alt="AyuMart" height="36" class="d-inline-block align-text-top me-2">
-                Ayu Mart
+                <img src="{{ asset('images/logo.png') }}" alt="AyuMart">
+                <span>Ayu Mart</span>
             </a>
-
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Search Bar -->
+                <!-- Search -->
                 <div class="navbar-search mx-lg-3 my-2 my-lg-0">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Cari Barang disini..." id="searchInput">
-                        <button class="btn" type="button">
+                        <input type="text" class="form-control" placeholder="Cari produk di sini..." id="searchInput"
+                               onkeydown="if(event.key==='Enter'){window.location.href='{{ route('home') }}?search='+encodeURIComponent(this.value);}">
+                        <button class="btn" type="button"
+                                onclick="window.location.href='{{ route('home') }}?search='+encodeURIComponent(document.getElementById('searchInput').value);">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
                 </div>
-
                 <!-- Right Menu -->
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">
-                                <i class="bi bi-box-arrow-in-right"></i> Masuk
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('register') }}">
-                                <i class="bi bi-person-plus"></i> Daftar
+                                <i class="bi bi-person-plus me-1"></i> Daftar
                             </a>
                         </li>
                     @else
-                        <!-- Notifikasi -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link nav-icon dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" title="Notifikasi" id="notificationDropdown">
-                                <i class="bi bi-bell"></i>
-                                <span class="badge bg-danger" id="notification-count" style="display: none;">0</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" style="width: 350px; max-height: 500px; overflow-y: auto;" id="notificationDropdownMenu">
-                                <li class="dropdown-header d-flex justify-content-between align-items-center">
-                                    <span><strong>Notifikasi</strong></span>
-                                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllAsRead()" id="markAllReadBtn">
-                                        <small>Tandai Semua Dibaca</small>
-                                    </button>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li id="notificationList">
-                                    <div class="text-center py-3">
-                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                        <p class="mb-0 mt-2 small text-muted">Memuat notifikasi...</p>
-                                    </div>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li class="text-center">
-                                    <a class="dropdown-item small" href="{{ route('pelanggan.orders') }}">
-                                        <i class="bi bi-eye"></i> Lihat Semua Pesanan
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <!-- Ticketing -->
+                        <!-- Ticket -->
                         <li class="nav-item">
-                            <a class="nav-link nav-icon" href="{{ route('pelanggan.tickets.index') }}" title="Ticketing">
+                            <a class="nav-icon" href="{{ route('pelanggan.tickets.index') }}" title="Bantuan">
                                 <i class="bi bi-headset"></i>
-                                <span class="badge bg-info" id="ticket-count">0</span>
+                                <span class="badge" id="ticket-count" style="display:none;">0</span>
                             </a>
                         </li>
-
                         <!-- Wishlist -->
                         <li class="nav-item">
-                            <a class="nav-link nav-icon" href="{{ route('pelanggan.wishlist') }}" title="Wishlist">
+                            <a class="nav-icon" href="{{ route('pelanggan.wishlist') }}" title="Wishlist">
                                 <i class="bi bi-heart"></i>
-                                <span class="badge bg-danger" id="wishlist-count">0</span>
+                                <span class="badge" id="wishlist-count" style="display:none;">0</span>
                             </a>
                         </li>
-
-                        <!-- Keranjang -->
+                        <!-- Cart -->
                         <li class="nav-item">
-                            <a class="nav-link nav-icon" href="{{ route('pelanggan.cart') }}" title="Keranjang">
+                            <a class="nav-icon" href="{{ route('pelanggan.cart') }}" title="Keranjang">
                                 <i class="bi bi-cart3"></i>
-                                <span class="badge bg-danger" id="cart-count">0</span>
+                                <span class="badge" id="cart-count" style="display:none;">0</span>
                             </a>
                         </li>
-
-                        <!-- User Menu Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle user-dropdown" href="#" role="button" data-bs-toggle="dropdown">
+                        <!-- User -->
+                        <li class="nav-item dropdown ms-1">
+                            <a class="user-dropdown dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <span class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                                 <span class="d-none d-lg-inline">{{ Auth::user()->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('pelanggan.profile') }}">
-                                        <i class="bi bi-person-circle"></i> Profil Saya
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('pelanggan.orders') }}">
-                                        <i class="bi bi-bag-check"></i> Pesanan Saya
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('pelanggan.reviews.index') }}">
-                                        <i class="bi bi-star-fill text-warning"></i> Review Saya
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" href="{{ route('pelanggan.profile') }}"><i class="bi bi-person-circle"></i> Profil Saya</a></li>
+                                <li><a class="dropdown-item" href="{{ route('pelanggan.orders') }}"><i class="bi bi-bag-check"></i> Pesanan Saya</a></li>
+                                <li><a class="dropdown-item" href="{{ route('pelanggan.reviews.index') }}"><i class="bi bi-star-fill" style="color:#f59e0b;"></i> Review Saya</a></li>
+                                <li><a class="dropdown-item" href="{{ route('membership') }}"><i class="bi bi-award"></i> Membership</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                                    <a class="dropdown-item" href="{{ route('logout') }}" style="color:var(--accent);"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <i class="bi bi-box-arrow-right"></i> Keluar
+                                        <i class="bi bi-box-arrow-right" style="color:var(--accent);"></i> Keluar
                                     </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                 </li>
                             </ul>
                         </li>
@@ -602,29 +539,28 @@
     </nav>
 
 
-    <!-- Branch Location Section -->
-    <section class="branch-location-section" style="background: #fff3cd; border-bottom: 1px solid #ffd966; padding: 10px 0; margin-bottom: 0;">
+    <!-- Branch Bar -->
+    <section class="branch-location-section">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
-                <div class="d-flex align-items-center" style="gap: 8px; font-size: 0.95rem;">
-                    <i class="bi bi-geo-alt-fill text-danger" style="font-size: 1.2rem;"></i>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-geo-alt-fill text-danger"></i>
                     <span id="branch-info">
                         @if(session('nearest_branch'))
                             <strong>{{ session('nearest_branch')['nama_cabang'] }}</strong>
                             @if(session('nearest_branch')['distance'])
-                                <small class="text-muted ms-2">
-                                    <i class="bi bi-pin-map"></i>
-                                    {{ number_format(session('nearest_branch')['distance'], 1) }} km
-                                </small>
+                                <span class="text-muted ms-1" style="font-weight:400;">
+                                    <i class="bi bi-pin-map"></i> {{ number_format(session('nearest_branch')['distance'], 1) }} km
+                                </span>
                             @endif
                         @else
                             <strong>Pilih Cabang Terdekat</strong>
                         @endif
                     </span>
                 </div>
-                <div class="d-flex align-items-center" style="gap: 8px;">
-                    <select id="branchSelector" class="form-select form-select-sm" style="min-width: 200px; border: 1px solid #ffc107; background: white;">
-                        <option value="">Ganti Cabang</option>
+                <div class="d-flex align-items-center gap-2">
+                    <select id="branchSelector" class="form-select form-select-sm">
+                        <option value="">Pilih Cabang</option>
                         @foreach($branches as $branch)
                             <option value="{{ $branch->id_cabang }}"
                                 {{ session('nearest_branch') && session('nearest_branch')['id_cabang'] == $branch->id_cabang ? 'selected' : '' }}>
@@ -632,7 +568,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <button id="detectLocationBtn" class="btn btn-sm btn-outline-primary" style="white-space: nowrap;" title="Deteksi Lokasi Saya">
+                    <button id="detectLocationBtn" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-crosshair"></i> Deteksi Lokasi
                     </button>
                 </div>
@@ -654,10 +590,12 @@
             <!-- Product Images -->
             <div class="col-md-5">
                 <div class="product-card">
-                    <img src="{{ $product->foto_produk ? \App\Helpers\ImageHelper::getProductImage($product->foto_produk) : 'https://via.placeholder.com/400' }}"
-                         alt="{{ $product->nama_produk }}"
-                         class="product-image"
-                         id="mainImage">
+                    <div class="product-image-container">
+                        <img src="{{ $product->foto_produk ? \App\Helpers\ImageHelper::getProductImage($product->foto_produk) : 'https://via.placeholder.com/400' }}"
+                             alt="{{ $product->nama_produk }}"
+                             class="product-image"
+                             id="mainImage">
+                    </div>
 
                     @if($images->count() > 0)
                     <div class="product-gallery">
@@ -823,22 +761,35 @@
 
                     <!-- Action Buttons -->
                     <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-primary flex-fill" onclick="addToCart({{ $product->id_produk }})">
+                        <button id="btnAddToCartDetail" class="btn btn-primary flex-fill" onclick="addToCart({{ $product->id_produk }})">
                             <i class="bi bi-cart-plus"></i> Tambah ke Keranjang
                         </button>
-                        <button class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id_produk }})">
+                        <button id="btnWishlistDetail" class="btn btn-outline-primary" onclick="addToWishlist({{ $product->id_produk }})" title="Tambah ke Wishlist">
                             <i class="bi bi-heart"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="shareProduct()" title="Bagikan Produk">
+                            <i class="bi bi-share"></i>
                         </button>
                     </div>
                     @else
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle"></i> Produk ini sedang tidak tersedia di cabang yang dipilih. Silakan pilih cabang lain.
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <i class="bi bi-exclamation-triangle"></i> Produk ini sedang tidak tersedia di cabang yang dipilih. Silakan pilih cabang lain.
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="shareProduct()" title="Bagikan Produk">
+                            <i class="bi bi-share text-dark"></i>
+                        </button>
                     </div>
                     @endif
                     @else
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i>
-                        <a href="{{ route('login') }}">Login</a> untuk membeli produk ini
+                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <i class="bi bi-info-circle"></i>
+                            <a href="{{ route('login') }}" class="fw-bold">Login</a> untuk membeli produk ini
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="shareProduct()" title="Bagikan Produk">
+                            <i class="bi bi-share text-dark"></i>
+                        </button>
                     </div>
                     @endauth
                 </div>
@@ -952,6 +903,58 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="{{ asset('images/logo.png') }}" alt="AyuMart" height="50" style="background:white;border-radius:50%;padding:2px;">
+                        <div>
+                            <h5 class="mb-0" style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;">AYU MART</h5>
+                            <small style="color:rgba(255,255,255,0.65);font-style:italic;">Always Fresh, Be Healthy</small>
+                        </div>
+                    </div>
+                    <p>Supermarket online terpercaya pilihan keluarga Indonesia.</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6>Ikuti Kami</h6>
+                    <div class="footer-social mb-3">
+                        <a href="https://www.facebook.com/3aayumart"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com/3aayumart12/"><i class="bi bi-instagram"></i></a>
+                        <a href="https://wa.me/6285955202267"><i class="bi bi-whatsapp"></i></a>
+                    </div>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>+62 85 955 202 267</p>
+                    <p><i class="bi bi-envelope-fill me-2"></i>tigaayumart@gmail.com</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6>Layanan</h6>
+                    <ul>
+                        <li><a href="{{ route('pelanggan.tickets.index') }}">Pusat Bantuan</a></li>
+                        <li><a href="{{ route('pelanggan.orders') }}">Pesanan Saya</a></li>
+                        <li><a href="{{ route('home') }}">Belanja</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; {{ date('Y') }} AyuMart Supermarket. Hak Cipta Dilindungi.
+        </div>
+    </footer>
+
+    @auth
+    <!-- Floating Cart Button -->
+    <a href="{{ route('pelanggan.cart') }}" id="floatingCartBtn" title="Keranjang Belanja">
+        <i class="bi bi-cart3"></i>
+        <span class="badge" id="floating-cart-count" style="display:none;">0</span>
+    </a>
+    @endauth
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Kembali ke Atas">
+        <i class="bi bi-arrow-up-short" style="font-size: 1.8rem;"></i>
+    </button>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -963,8 +966,16 @@
         const maxQty = {{ $stok }};
 
         // Change main image
+        // Change main image
         function changeImage(src, element) {
-            document.getElementById('mainImage').src = src;
+            const mainImg = document.getElementById('mainImage');
+            if (mainImg) {
+                mainImg.style.opacity = 0;
+                setTimeout(() => {
+                    mainImg.src = src;
+                    mainImg.style.opacity = 1;
+                }, 150);
+            }
             document.querySelectorAll('.gallery-thumb').forEach(thumb => {
                 thumb.classList.remove('active');
             });
@@ -988,9 +999,49 @@
             }
         }
 
+        // Share product function
+        function shareProduct() {
+            const tempInput = document.createElement('input');
+            tempInput.value = window.location.href;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            // Toast feedback
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: 'Tautan disalin ke papan klip!'
+            });
+        }
+
         // Add to cart
         function addToCart(productId) {
-            const qty = parseInt(document.getElementById('quantity').value);
+            const qtyInput = document.getElementById('quantity');
+            const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1800,
+                timerProgressBar: true
+            });
+
+            const btn = document.getElementById('btnAddToCartDetail');
+            let originalContent = '';
+            if (btn) {
+                originalContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+            }
 
             fetch(`/cart/add/${productId}`, {
                 method: 'POST',
@@ -1004,34 +1055,67 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    Swal.fire({
+                    Toast.fire({
                         icon: 'success',
-                        title: 'Berhasil!',
-                        text: data.message,
-                        timer: 2000,
-                        showConfirmButton: false
+                        title: 'Produk ditambahkan ke keranjang'
                     });
                     loadCounts();
+
+                    if (btn) {
+                        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Berhasil!';
+                        btn.className = 'btn btn-success flex-fill text-white';
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            btn.className = 'btn btn-primary flex-fill';
+                        }, 1500);
+                    }
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Oops...',
-                        text: data.message,
+                        title: 'Gagal',
+                        text: data.message || 'Terjadi kesalahan',
+                        confirmButtonColor: '#015b1e'
                     });
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
+                    title: 'Gagal',
                     text: 'Terjadi kesalahan',
+                    confirmButtonColor: '#015b1e'
                 });
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
             });
         }
 
         // Add to wishlist
         function addToWishlist(productId) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1800,
+                timerProgressBar: true
+            });
+
+            const btn = document.getElementById('btnWishlistDetail');
+            let originalContent = '';
+            if (btn) {
+                originalContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            }
+
             fetch(`/wishlist/add/${productId}`, {
                 method: 'POST',
                 headers: {
@@ -1043,46 +1127,82 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    Swal.fire({
+                    Toast.fire({
                         icon: 'success',
-                        title: 'Berhasil!',
-                        text: data.message,
-                        timer: 2000,
-                        showConfirmButton: false
+                        title: 'Produk ditambahkan ke wishlist'
                     });
                     loadCounts();
+
+                    if (btn) {
+                        btn.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                        btn.className = 'btn btn-success text-white';
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            btn.className = 'btn btn-outline-primary';
+                        }, 1500);
+                    }
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Oops...',
-                        text: data.message,
+                        title: 'Gagal',
+                        text: data.message || 'Terjadi kesalahan',
+                        confirmButtonColor: '#015b1e'
                     });
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
+                    title: 'Gagal',
                     text: 'Terjadi kesalahan',
+                    confirmButtonColor: '#015b1e'
                 });
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
             });
         }
 
         // Load cart and wishlist counts
         @auth
         function loadCounts() {
+            const triggerBadgeAnimation = (el, newVal) => {
+                if (!el) return;
+                const prevVal = el.textContent;
+                el.textContent = newVal;
+                el.style.display = newVal > 0 ? 'inline-block' : 'none';
+                if (prevVal !== String(newVal)) {
+                    el.classList.remove('badge-pulse');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('badge-pulse');
+                }
+            };
+
             fetch('/api/cart/count')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('cart-count').textContent = data.count || 0;
+                    const count = data.count || 0;
+                    const c = document.getElementById('cart-count');
+                    triggerBadgeAnimation(c, count);
+                    
+                    const fc = document.getElementById('floating-cart-count');
+                    triggerBadgeAnimation(fc, count);
                 })
                 .catch(error => console.error('Error loading cart count:', error));
 
             fetch('/api/wishlist/count')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('wishlist-count').textContent = data.count || 0;
+                    const count = data.count || 0;
+                    const w = document.getElementById('wishlist-count');
+                    triggerBadgeAnimation(w, count);
                 })
                 .catch(error => console.error('Error loading wishlist count:', error));
         }
@@ -1179,90 +1299,41 @@
 
         // Branch Selector - Detect Location
         document.getElementById('detectLocationBtn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    fetch('/api/set-user-location', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({ latitude: lat, longitude: lon })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.branch) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Lokasi Ditemukan',
-                                text: `Cabang terdekat: ${data.branch.nama_cabang} (${data.branch.distance} km)`,
-                                confirmButtonColor: '#3F4F44',
-                                timer: 2000,
-                                timerProgressBar: true,
-                                showConfirmButton: false
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Informasi',
-                                text: 'Cabang terdekat tidak ditemukan',
-                                confirmButtonColor: '#3F4F44'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat mendeteksi lokasi',
-                            confirmButtonColor: '#3F4F44'
-                        });
-                    });
-                }, function() {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Perijinan Diperlukan',
-                        text: 'Izinkan akses lokasi untuk mendeteksi cabang terdekat',
-                        confirmButtonColor: '#3F4F44'
-                    });
-                });
-            } else {
+            if (!navigator.geolocation) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Browser Tidak Mendukung',
                     text: 'Browser Anda tidak mendukung fitur deteksi lokasi',
-                    confirmButtonColor: '#3F4F44'
+                    confirmButtonColor: '#015b1e'
                 });
+                return;
             }
-        });
 
-        // Branch Selector - Change Branch
-        document.getElementById('branchSelector').addEventListener('change', function() {
-            const branchId = this.value;
+            const btn = this;
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mencari...';
 
-            if (branchId) {
-                fetch('/api/change-branch', {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                fetch('/api/set-user-location', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({ id_cabang: branchId })
+                    body: JSON.stringify({ latitude: lat, longitude: lon })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.success && data.branch) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Cabang Berhasil Diubah',
-                            text: `Anda sekarang memilih cabang: ${data.branch.nama_cabang}`,
-                            confirmButtonColor: '#3F4F44',
+                            title: 'Lokasi Ditemukan',
+                            text: `Cabang terdekat: ${data.branch.nama_cabang} (${data.branch.distance} km)`,
+                            confirmButtonColor: '#015b1e',
                             timer: 2000,
                             timerProgressBar: true,
                             showConfirmButton: false
@@ -1271,11 +1342,13 @@
                         });
                     } else {
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat mengubah cabang',
-                            confirmButtonColor: '#3F4F44'
+                            icon: 'info',
+                            title: 'Informasi',
+                            text: 'Cabang terdekat tidak ditemukan',
+                            confirmButtonColor: '#015b1e'
                         });
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
                     }
                 })
                 .catch(error => {
@@ -1283,19 +1356,83 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: 'Terjadi kesalahan saat mengubah cabang',
-                        confirmButtonColor: '#3F4F44'
+                        text: 'Terjadi kesalahan saat mendeteksi lokasi',
+                        confirmButtonColor: '#015b1e'
                     });
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
                 });
+            }, function() {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Perijinan Diperlukan',
+                    text: 'Izinkan akses lokasi untuk mendeteksi cabang terdekat',
+                    confirmButtonColor: '#015b1e'
+                });
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            });
+        });
+
+        // Branch Selector - Change Branch
+        document.getElementById('branchSelector').addEventListener('change', function() {
+            const branchId = this.value;
+            if (!branchId) return;
+
+            fetch('/api/change-branch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ id_cabang: branchId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Cabang Diubah',
+                        text: `Sekarang memilih cabang: ${data.branch.nama_cabang}`,
+                        confirmButtonColor: '#015b1e',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Terjadi kesalahan saat mengubah cabang',
+                        confirmButtonColor: '#015b1e'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Terjadi kesalahan saat mengubah cabang',
+                    confirmButtonColor: '#015b1e'
+                });
+            });
+        });
+
+        // ===================== SCROLL TO TOP VISIBILITY =====================
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById('scrollToTopBtn');
+            if (btn) {
+                if (window.scrollY > 300) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
             }
         });
     </script>
 
-    @auth
-    <!-- Logout Form -->
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
-    @endauth
 </body>
 </html>

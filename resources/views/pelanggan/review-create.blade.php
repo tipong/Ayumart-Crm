@@ -29,54 +29,43 @@
 @endpush
 
 @section('content')
-<div class="container py-5">
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="hero-icon">
+                    <i class="bi bi-star"></i>
+                </div>
+                <div>
+                    <h1>Berikan Ulasan</h1>
+                    <p>Bagikan pengalaman Anda tentang produk yang telah Anda beli</p>
+                </div>
+            </div>
+            <a href="{{ route('pelanggan.orders') }}" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-3 pb-5">
+    <!-- Breadcrumb -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pelanggan.orders') }}">Pesanan</a></li>
+            <li class="breadcrumb-item active">Tulis Ulasan</li>
+        </ol>
+    </nav>
+
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <!-- Back Button -->
-            <a href="{{ route('pelanggan.orders') }}" class="btn btn-outline-secondary mb-3">
-                <i class="bi bi-arrow-left"></i> Kembali ke Pesanan
-            </a>
-
-            <!-- Alert Messages -->
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
-            @if(session('info'))
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <i class="bi bi-info-circle"></i> {{ session('info') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
-            @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i>
-                <strong>Terjadi kesalahan:</strong>
-                <ul class="mb-0 mt-2">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-star"></i> Berikan Review</h4>
+            <div class="ay-card">
+                <div class="ay-card-header">
+                    <i class="bi bi-star-fill" style="color:#fbbf24;"></i> Tulis Ulasan Produk
                 </div>
-                <div class="card-body">
+                <div class="ay-card-body">
                     <!-- Order Info -->
                     <div class="alert alert-info">
                         <div class="d-flex justify-content-between align-items-center">
@@ -199,9 +188,9 @@
                         </div>
 
                         <!-- Submit Buttons -->
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('pelanggan.orders') }}" class="btn btn-secondary">
-                                <i class="bi bi-x"></i> Batal
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ route('pelanggan.orders') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Batal
                             </a>
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-send"></i> Kirim Review

@@ -1,1259 +1,838 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Home - Supermarket CRM</title>
+    <title>AyuMart - Supermarket Online | Always Fresh, Be Healthy</title>
+    <meta name="description" content="Belanja kebutuhan supermarket online di AyuMart. Produk segar, harga terjangkau, pengiriman cepat.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <!-- SweetAlert2 CSS -->
+    <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <style>
+        /* ============================================
+           VARIABLES & BASE
+        ============================================ */
         :root {
-            --primary-color: #3F4F44;
-            --secondary-color: #64748b;
-            --success-color: #3F4F44;
-            --danger-color: #ef4444;
-            --green: #3F4F44;
-            --light-green: #f6ffed;
-            --dark-green: #556B58;
+            --primary:        #015b1e;
+            --primary-dark:   #013d14;
+            --primary-light:  #e8f5e9;
+            --accent:         #e7482e;
+            --accent-dark:    #c43520;
+            --text-dark:      #1a1a1a;
+            --text-mid:       #444;
+            --text-muted:     #777;
+            --border:         #e0e0e0;
+            --white:          #ffffff;
+            --body-bg:        #e8f5e9;
+            --card-shadow:    0 3px 12px rgba(0,0,0,0.08);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-dark);
+            font-size: 15px;
         }
 
-        /* Navbar Style */
+        a { text-decoration: none !important; color: inherit; }
+
+        /* ============================================
+           TOP BAR
+        ============================================ */
+        .top-bar {
+            background: var(--primary);
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            padding: 5px 0;
+        }
+        .top-bar a { color: rgba(255,255,255,0.9); }
+        .top-bar a:hover { color: #fff; }
+
+        /* ============================================
+           NAVBAR
+        ============================================ */
         .navbar {
-            background: linear-gradient(135deg, #3F4F44 0%, #2E3A31 100%);
-            box-shadow: 0 2px 8px 0 rgba(82,196,26,.15);
-            padding: 0.8rem 0;
+            background: #fff !important;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
             font-weight: 700;
-            font-size: 1.8rem;
-            color: white !important;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            font-size: 1.6rem;
+            color: var(--primary) !important;
+            letter-spacing: 0.5px;
         }
+        .navbar-brand img { height: 45px; width: auto; }
 
-        .nav-link {
-            color: rgba(255,255,255,0.95) !important;
-            font-weight: 500;
-            transition: all 0.3s;
-            padding: 0.5rem 1rem !important;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-            opacity: 0.8;
-        }
-
-        .btn-outline-light {
-            border: 2px solid rgba(255,255,255,0.8);
+        .navbar .nav-link {
+            color: var(--text-dark) !important;
             font-weight: 600;
+            font-size: 14px;
+            padding: 0.55rem 1rem !important;
+            transition: all 0.25s;
+            border-radius: 5px;
+        }
+        .navbar .nav-link:hover {
+            color: var(--white) !important;
+            background-color: var(--primary);
         }
 
-        .btn-outline-light:hover {
-            background-color: white;
-            color: #3F4F44;
-        }
-
-        /* Search Bar in Navbar */
-        .navbar-search {
-            max-width: 500px;
-            flex-grow: 1;
-        }
-
+        /* Search bar */
+        .navbar-search { max-width: 480px; flex-grow: 1; }
         .navbar-search input {
-            border: none;
-            border-radius: 2px;
-            padding: 8px 15px;
-            background: rgba(255,255,255,0.9);
+            border: 2px solid var(--border);
+            border-right: none;
+            border-radius: 100px 0 0 100px;
+            padding: 8px 18px;
+            background: #fff;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 14px;
         }
-
         .navbar-search input:focus {
-            background: white;
+            border-color: var(--primary);
+            box-shadow: none;
             outline: none;
-            box-shadow: 0 0 4px rgba(0,0,0,0.15);
         }
-
         .navbar-search button {
-            background: rgba(255,255,255,0.2);
-            border: none;
+            background: var(--primary);
+            border: 2px solid var(--primary);
             color: white;
             padding: 8px 20px;
-            border-radius: 2px;
-            transition: all 0.3s;
+            border-radius: 0 100px 100px 0;
+            transition: all 0.25s;
+            font-size: 15px;
         }
+        .navbar-search button:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
 
-        .navbar-search button:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* User Menu Icons */
-        .nav-icon {
+        /* Nav icon buttons */
+        .nav-icon-btn {
             position: relative;
-            padding: 8px 12px;
-            color: rgba(255,255,255,0.95) !important;
-            transition: all 0.2s;
-        }
-
-        .nav-icon:hover {
-            color: white !important;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
-
-        .nav-icon i {
-            font-size: 1.3rem;
-        }
-
-        .nav-icon .badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            font-size: 0.65rem;
-            padding: 2px 5px;
-            min-width: 18px;
-        }
-
-        .user-dropdown {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .user-dropdown:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .user-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: white;
-            color: #3F4F44;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            width: 40px;
+            height: 40px;
+            color: var(--text-dark) !important;
+            border-radius: 50%;
+            transition: all 0.25s;
+            font-size: 1.25rem;
+        }
+        .nav-icon-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary) !important;
+        }
+        .nav-icon-btn .badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.6rem;
+            padding: 2px 5px;
+            min-width: 17px;
+            border-radius: 10px;
+            background: var(--accent) !important;
+        }
+
+        /* User button */
+        .user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: #fff !important;
+            border-radius: 100px;
+            padding: 6px 16px;
             font-weight: 600;
-            font-size: 0.75rem;
-            margin-right: 8px;
+            font-size: 14px;
+            transition: all 0.25s;
+        }
+        .user-btn:hover { background: var(--primary-dark); color: #fff !important; }
+        .user-avatar {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.75rem;
         }
 
+        /* Dropdown */
         .dropdown-menu {
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border-radius: 4px;
-            margin-top: 8px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            padding: 8px 0;
         }
-
         .dropdown-item {
             padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-mid);
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
+        .dropdown-item i { width: 20px; margin-right: 8px; color: var(--primary); }
+
+        .navbar-toggler { border: 2px solid var(--primary); padding: 4px 8px; }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23015b1e' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* ============================================
+           BRANCH BAR
+        ============================================ */
+        .branch-bar {
+            background: var(--primary-light);
+            border-bottom: 1.5px solid rgba(1,91,30,0.1);
+            padding: 10px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .branch-bar .form-select {
+            border: 1.5px solid var(--primary);
+            font-size: 13px;
+            padding: 5px 12px;
+            font-weight: 600;
+            min-width: 180px;
+            border-radius: 8px;
+            color: var(--primary);
+            background-color: #fff;
+        }
+        .branch-bar .form-select:focus {
+            box-shadow: 0 0 0 0.2rem rgba(1,91,30,0.15);
+            border-color: var(--primary);
+        }
+        .branch-bar .btn { 
+            font-size: 13px; 
+            padding: 5px 14px; 
+            border-radius: 8px; 
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .branch-bar .btn:hover {
+            background: var(--primary);
+            color: #fff !important;
+        }
+
+        /* ============================================
+           HERO SECTION
+        ============================================ */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 420px;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        .hero-section img.hero-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(1,91,30,0.72) 0%, rgba(1,91,30,0.25) 60%, transparent 100%);
+            display: flex;
+            align-items: center;
+        }
+        .hero-text {
+            padding: 40px;
+            max-width: 500px;
+        }
+        .hero-text h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 3rem;
+            color: #fff;
+            line-height: 1.15;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .hero-text p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+        .btn-hero {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-block;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        .btn-hero:hover {
+            background: var(--accent-dark);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231,72,46,0.45);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section { height: 280px; }
+            .hero-text { padding: 20px; }
+            .hero-text h1 { font-size: 1.8rem; }
+            .hero-text p { font-size: 0.9rem; margin-bottom: 15px; }
+            .btn-hero { padding: 9px 22px; font-size: 0.9rem; }
+        }
+
+        /* ============================================
+           SECTION TITLES
+        ============================================ */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .section-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header-left .section-icon {
+            width: 38px; height: 38px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .section-title-text {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .btn-see-all {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            padding: 4px 14px;
+            border-radius: 100px;
+            transition: all 0.25s;
+        }
+        .btn-see-all:hover { background: var(--primary); color: #fff; }
+
+        /* ============================================
+           CONTENT SECTIONS
+        ============================================ */
+        .content-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* ============================================
+           CATEGORY CARDS
+        ============================================ */
+        .category-card {
+            text-align: center;
+            padding: 15px 8px;
+            border-radius: 16px;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            display: block;
+            height: 100%;
+        }
+        .category-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(1,91,30,0.12);
+        }
+        .category-card.active-category {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(1,91,30,0.08);
+        }
+        .category-card .cat-img-wrap {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            background: #fff;
+        }
+        .category-card:hover .cat-img-wrap,
+        .category-card.active-category .cat-img-wrap {
+            border-color: var(--primary);
+            transform: scale(1.08);
+        }
+        .category-card .cat-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .category-card h6 {
+            font-size: 0.82rem;
+            color: var(--text-mid);
+            margin: 0;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .category-card.active-category h6 { color: var(--primary); }
+
+        /* ============================================
+           PRODUCT CARDS
+        ============================================ */
+        .wrap-prodi {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: white;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .wrap-prodi:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 24px rgba(1,91,30,0.15);
+            border-color: var(--primary);
+        }
+
+        .product-img-wrap {
+            position: relative;
+            height: 180px;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .product-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .wrap-prodi:hover .product-img-wrap img { transform: scale(1.07); }
+        .product-img-wrap .bi { font-size: 3.5rem; color: #ccc; }
+
+        /* Discount badge */
+        .badge-diskon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--accent);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 0 0 10px 0;
+            z-index: 1;
+        }
+
+        /* Stock badge */
+        .badge-stock-out {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .badge-stock-out span {
+            background: #fff;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 13px;
+            padding: 6px 16px;
+            border-radius: 100px;
+        }
+
+        /* Product body */
+        .prodi-body {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .prodi-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            min-height: 38px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.35;
+        }
+        .prodi-price {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+        .prodi-price-old {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+            margin-bottom: 8px;
+        }
+        .prodi-stock-info {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .prodi-stock-info .badge { font-size: 11px; padding: 3px 8px; border-radius: 100px; font-weight: 600; }
+        .badge-available { background: rgba(1,91,30,0.12); color: var(--primary); }
+        .badge-low { background: rgba(255,152,0,0.12); color: #e65100; }
+        .badge-out { background: rgba(231,72,46,0.12); color: var(--accent); }
+
+        .btn-tambah {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.25s;
+            margin-top: auto;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        .btn-tambah:hover {
+            background: var(--accent);
+            transform: translateY(-1px);
+        }
+        .btn-tambah:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-login-to-buy {
+            width: 100%;
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.25s;
+            margin-top: auto;
+        }
+        .btn-login-to-buy:hover { background: var(--primary); color: #fff; }
+
+        /* ============================================
+           PROMO SECTION SPECIFIC
+        ============================================ */
+        .promo-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--accent), #ff6b4a);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* ============================================
+           FEATURES / WHY CHOOSE
+        ============================================ */
+        .feature-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            border: 1.5px solid var(--border);
+            transition: all 0.3s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(1,91,30,0.12);
+        }
+        .feature-icon {
+            width: 64px; height: 64px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.7rem;
+            color: var(--primary);
+            transition: all 0.3s;
+        }
+        .feature-card:hover .feature-icon { background: var(--primary); color: #fff; }
+        .feature-card h5 {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin: 0;
+        }
+
+        /* ============================================
+           FOOTER
+        ============================================ */
+        footer {
+            background: var(--primary);
+            color: rgba(255,255,255,0.85);
+            padding: 45px 0 0;
+            margin-top: 50px;
+        }
+        footer h5, footer h6 {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        footer p, footer li, footer a {
+            color: rgba(255,255,255,0.78);
             font-size: 0.9rem;
-            transition: all 0.2s;
+            line-height: 1.9;
         }
-
-        .dropdown-item:hover {
-            background: #fff5f3;
-            color: #3F4F44;
+        footer a:hover { color: #fff; }
+        footer ul { list-style: none; padding: 0; }
+        .footer-social a {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%; color: #fff !important;
+            margin-right: 8px; font-size: 1rem;
+            transition: all 0.25s;
         }
-
-        .dropdown-item i {
-            margin-right: 10px;
-            width: 20px;
+        .footer-social a:hover { background: var(--accent); transform: translateY(-3px); }
+        .footer-bottom {
+            background: var(--primary-dark);
+            padding: 12px 0;
             text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.65);
+            margin-top: 30px;
         }
 
-        /* Branch Location Section */
-        .branch-location-section {
-            background: #fff3cd;
-            border-bottom: 1px solid #ffd966;
-            padding: 10px 0;
-            margin-bottom: 0;
+        /* ============================================
+           MISC
+        ============================================ */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* Search result info */
+        .alert { border-radius: 10px; border: none; font-weight: 600; font-size: 14px; }
+
+        /* ============================================
+           MICRO-INTERACTIONS & USER-FRIENDLY CONTROLS
+        ============================================ */
+        @keyframes badgePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+        .badge-pulse {
+            animation: badgePulse 0.4s ease-out;
         }
 
-        .branch-info-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .branch-current {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-
-        .branch-current i.bi-geo-alt-fill {
-            font-size: 1.2rem;
-        }
-
-        .branch-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #branchSelector {
-            min-width: 200px;
-            border: 1px solid #ffc107;
-            background: white;
-        }
-
-        #detectLocationBtn {
-            white-space: nowrap;
-        }
-
-        @media (max-width: 768px) {
-            .branch-info-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .branch-current {
-                justify-content: center;
-            }
-
-            .branch-selector {
-                justify-content: center;
-            }
-
-            #branchSelector {
-                flex-grow: 1;
-            }
-        }
-
-        /* Notification Styles */
-        .notification-item {
-            transition: background-color 0.2s;
-        }
-
-        .notification-item:hover {
-            background-color: #f8f9fa !important;
-        }
-
-        .unread-notification {
-            background-color: #fff5f3;
-            border-left: 3px solid #3F4F44;
-        }
-
-        .unread-notification:hover {
-            background-color: #ffe8e3 !important;
-        }
-
-        #notificationDropdownMenu {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        #notificationDropdownMenu .dropdown-header {
-            background-color: #f8f9fa;
-            padding: 12px 20px;
-            font-size: 0.95rem;
-        }
-
-        #markAllReadBtn {
-            color: #3F4F44;
-            font-size: 0.8rem;
-        }
-
-        #markAllReadBtn:hover {
-            color: #d73211;
-        }
-
-        /* Slideshow Section */
-        .slideshow-section {
-            background: white;
-            padding: 20px 0;
-            margin-bottom: 20px;
-        }
-
-        .main-carousel {
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-        }
-
-        .carousel-item {
-            height: 380px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .carousel-item img {
-            object-fit: cover;
-            height: 100%;
-            width: 100%;
-        }
-
-        .carousel-caption {
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
-            border-radius: 8px;
-            bottom: 40px;
-        }
-
-        .carousel-indicators button {
-            width: 10px;
-            height: 10px;
+        /* Scroll to Top Button */
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            z-index: 99;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-        }
-
-        /* Promo Sidebar */
-        .promo-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .promo-card {
-            background: white;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-            transition: all 0.3s;
-            height: 185px;
-        }
-
-        .promo-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .promo-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Categories Section - Shopee Style */
-
-        /* Categories Section - Shopee Style */
-        .categories-section {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .categories-title {
-            font-size: 1rem;
-            font-weight: 400;
-            color: rgba(0,0,0,.54);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .category-card {
-            text-align: center;
-            padding: 15px 10px;
-            transition: all 0.2s;
-            cursor: pointer;
-            border-radius: 4px;
-            background: transparent;
-        }
-
-        .category-card:hover {
-            background: #fafafa;
-            transform: translateY(-2px);
-        }
-
-        .category-card.active-category {
-            background: #fff5f3;
-            border: 2px solid #3F4F44;
-        }
-
-        .category-card.active-category i {
-            color: #3F4F44;
-        }
-
-        .category-card.active-category h6 {
-            color: #3F4F44;
-            font-weight: 600;
-        }
-
-        .category-card i {
-            font-size: 2.5rem;
-            color: #3F4F44;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .category-card h6 {
-            font-size: 0.875rem;
-            color: rgba(0,0,0,.87);
-            margin: 0;
-            font-weight: 400;
-        }
-
-        /* Flash Sale Section */
-        .flash-sale-section {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .flash-sale-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .flash-sale-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .flash-sale-title h3 {
-            color: #3F4F44;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .flash-sale-timer {
-            display: flex;
-            gap: 5px;
-        }
-
-        .timer-box {
-            background: #000;
+            background: var(--primary);
             color: white;
-            padding: 5px 8px;
-            border-radius: 2px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .timer-separator {
-            color: #000;
-            font-weight: 600;
-        }
-
-        .timer-separator {
-            color: #000;
-            font-weight: 600;
-        }
-
-        /* Products Section - Shopee Style */
-        .products-section {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .section-title {
-            font-size: 1rem;
-            font-weight: 400;
-            color: rgba(0,0,0,.54);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f5f5f5;
-            text-align: left;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 2px;
-            overflow: hidden;
-            transition: all 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            height: 100%;
-            border: 1px solid rgba(0,0,0,0.09);
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0,0,0,0.08);
-            border-color: rgba(238,77,45,0.3);
-        }
-
-        .product-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #f5f5f5;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        #scrollToTopBtn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #scrollToTopBtn:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
         }
 
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .product-image i {
-            font-size: 3.5rem;
-            color: #cbd5e1;
-        }
-
-        .product-body {
-            padding: 10px;
-        }
-
-        .product-title {
-            font-size: 0.875rem;
-            color: rgba(0,0,0,.87);
-            margin-bottom: 8px;
-            min-height: 40px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            font-weight: 400;
-            line-height: 1.2rem;
-        }
-
-        .product-price {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #3F4F44;
-            margin-bottom: 5px;
-        }
-
-        .product-price del {
-            font-size: 0.75rem;
-            color: rgba(0,0,0,.26);
-            margin-left: 5px;
-            font-weight: 400;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: rgba(0,0,0,.54);
-        }
-
-        .product-sold {
-            font-size: 0.75rem;
-            color: rgba(0,0,0,.54);
-        }
-
-        .discount-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: rgba(255,212,36,.9);
-            color: #3F4F44;
-            padding: 2px 4px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            border-radius: 0 0 0 2px;
-        }
-
-        .stock-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 2px;
-            font-size: 0.75rem;
-            font-weight: 400;
-        }
-
-        .stock-available {
-            background: rgba(16, 249, 155, 0.1);
-            color: #00bf56;
-        }
-
-        .stock-low {
-            background: rgba(255, 212, 36, 0.1);
-            color: #ff9800;
-        }
-
-        .stock-out {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        .btn-primary {
-            background: #3F4F44;
-            border: none;
-            border-radius: 2px;
-            padding: 6px 12px;
-            font-weight: 400;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary:hover {
-            background: #d73d1f;
-            box-shadow: 0 1px 4px rgba(238, 77, 45, 0.4);
-        }
-
-        /* Footer Style */
-        footer {
-            background: white;
-            color: rgba(0,0,0,.65);
-            padding: 40px 0 20px;
-            margin-top: 40px;
-            border-top: 4px solid #3F4F44;
-        }
-
-        footer h5, footer h6 {
-            color: rgba(0,0,0,.87);
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        footer p, footer a {
-            color: rgba(0,0,0,.65);
-            font-size: 0.875rem;
-        }
-
-        footer a:hover {
-            color: #3F4F44;
-            text-decoration: none;
-        }
-
-        /* Branch Location Section */
-        .branch-location-section {
-            background: #fff3cd;
-            border-bottom: 1px solid #ffd966;
-            padding: 10px 0;
-            margin-bottom: 0;
-        }
-
-        .branch-info-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .branch-current {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-
-        .branch-current i.bi-geo-alt-fill {
-            font-size: 1.2rem;
-        }
-
-        .branch-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #branchSelector {
-            min-width: 200px;
-            border: 1px solid #ffc107;
-            background: white;
-        }
-
-        #detectLocationBtn {
-            white-space: nowrap;
-        }
-
-        @media (max-width: 768px) {
-            .branch-info-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .branch-current {
-                justify-content: center;
-            }
-
-            .branch-selector {
-                justify-content: center;
-            }
-
-            #branchSelector {
-                flex-grow: 1;
-            }
-        }
-
-        /* Notification Styles */
-        .notification-item {
-            transition: background-color 0.2s;
-        }
-
-        .notification-item:hover {
-            background-color: #f8f9fa !important;
-        }
-
-        .unread-notification {
-            background-color: #fff5f3;
-            border-left: 3px solid #3F4F44;
-        }
-
-        .unread-notification:hover {
-            background-color: #ffe8e3 !important;
-        }
-
-        #notificationDropdownMenu {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        #notificationDropdownMenu .dropdown-header {
-            background-color: #f8f9fa;
-            padding: 12px 20px;
-            font-size: 0.95rem;
-        }
-
-        #markAllReadBtn {
-            color: #3F4F44;
-            font-size: 0.8rem;
-        }
-
-        #markAllReadBtn:hover {
-            color: #d73211;
-        }
-
-        /* Slideshow Section */
-        .slideshow-section {
-            background: white;
-            padding: 20px 0;
-            margin-bottom: 20px;
-        }
-
-        .main-carousel {
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-        }
-
-        .carousel-item {
-            height: 380px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .carousel-item img {
-            object-fit: cover;
-            height: 100%;
-            width: 100%;
-        }
-
-        .carousel-caption {
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
-            border-radius: 8px;
-            bottom: 40px;
-        }
-
-        .carousel-indicators button {
-            width: 10px;
-            height: 10px;
+        /* Floating Cart Button */
+        #floatingCartBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
-        }
-
-        /* Promo Sidebar */
-        .promo-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .promo-card {
-            background: white;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-            transition: all 0.3s;
-            height: 185px;
-        }
-
-        .promo-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .promo-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Categories Section - Shopee Style */
-
-        /* Categories Section - Shopee Style */
-        .categories-section {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .categories-title {
-            font-size: 1rem;
-            font-weight: 400;
-            color: rgba(0,0,0,.54);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .category-card {
-            text-align: center;
-            padding: 15px 10px;
-            transition: all 0.2s;
-            cursor: pointer;
-            border-radius: 4px;
-            background: transparent;
-        }
-
-        .category-card:hover {
-            background: #fafafa;
-            transform: translateY(-2px);
-        }
-
-        .category-card.active-category {
-            background: #fff5f3;
-            border: 2px solid #3F4F44;
-        }
-
-        .category-card.active-category i {
-            color: #3F4F44;
-        }
-
-        .category-card.active-category h6 {
-            color: #3F4F44;
-            font-weight: 600;
-        }
-
-        .category-card i {
-            font-size: 2.5rem;
-            color: #3F4F44;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .category-card h6 {
-            font-size: 0.875rem;
-            color: rgba(0,0,0,.87);
-            margin: 0;
-            font-weight: 400;
-        }
-
-        /* Flash Sale Section */
-        .flash-sale-section {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .flash-sale-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .flash-sale-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .flash-sale-title h3 {
-            color: #3F4F44;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .flash-sale-timer {
-            display: flex;
-            gap: 5px;
-        }
-
-        .timer-box {
-            background: #000;
+            background: var(--accent);
             color: white;
-            padding: 5px 8px;
-            border-radius: 2px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .timer-separator {
-            color: #000;
-            font-weight: 600;
-        }
-
-        .timer-separator {
-            color: #000;
-            font-weight: 600;
-        }
-
-        /* Products Section - Shopee Style */
-        .products-section {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .section-title {
-            font-size: 1rem;
-            font-weight: 400;
-            color: rgba(0,0,0,.54);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f5f5f5;
-            text-align: left;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 2px;
-            overflow: hidden;
-            transition: all 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            height: 100%;
-            border: 1px solid rgba(0,0,0,0.09);
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0,0,0,0.08);
-            border-color: rgba(238,77,45,0.3);
-        }
-
-        .product-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #f5f5f5;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231,72,46,0.4);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .product-image i {
-            font-size: 3.5rem;
-            color: #cbd5e1;
-        }
-
-        .product-body {
-            padding: 10px;
-        }
-
-        .product-title {
-            font-size: 0.875rem;
-            color: rgba(0,0,0,.87);
-            margin-bottom: 8px;
-            min-height: 40px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            font-weight: 400;
-            line-height: 1.2rem;
-        }
-
-        .product-price {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #3F4F44;
-            margin-bottom: 5px;
-        }
-
-        .product-price del {
-            font-size: 0.75rem;
-            color: rgba(0,0,0,.26);
-            margin-left: 5px;
-            font-weight: 400;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: rgba(0,0,0,.54);
-        }
-
-        .product-sold {
-            font-size: 0.75rem;
-            color: rgba(0,0,0,.54);
-        }
-
-        .discount-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: rgba(255,212,36,.9);
-            color: #3F4F44;
-            padding: 2px 4px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            border-radius: 0 0 0 2px;
-        }
-
-        .stock-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 2px;
-            font-size: 0.75rem;
-            font-weight: 400;
-        }
-
-        .stock-available {
-            background: rgba(16, 249, 155, 0.1);
-            color: #00bf56;
-        }
-
-        .stock-low {
-            background: rgba(255, 212, 36, 0.1);
-            color: #ff9800;
-        }
-
-        .stock-out {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        .btn-primary {
-            background: #3F4F44;
-            border: none;
-            border-radius: 2px;
-            padding: 6px 12px;
-            font-weight: 400;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary:hover {
-            background: #d73d1f;
-            box-shadow: 0 1px 4px rgba(238, 77, 45, 0.4);
-        }
-
-        /* Footer Style */
-        footer {
-            background: white;
-            color: rgba(0,0,0,.65);
-            padding: 40px 0 20px;
-            margin-top: 40px;
-            border-top: 4px solid #3F4F44;
-        }
-
-        footer h5, footer h6 {
-            color: rgba(0,0,0,.87);
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        footer p, footer a {
-            color: rgba(0,0,0,.65);
-            font-size: 0.875rem;
-        }
-
-        footer a:hover {
-            color: #3F4F44;
+            transition: all 0.3s ease;
             text-decoration: none;
         }
-
-        /* Branch Location Section */
-        .branch-location-section {
-            background: #fff3cd;
-            border-bottom: 1px solid #ffd966;
-            padding: 10px 0;
-            margin-bottom: 0;
+        #floatingCartBtn i {
+            font-size: 1.5rem;
         }
-
-        .branch-info-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
+        #floatingCartBtn .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--primary);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            padding: 3px 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
         }
-
-        .branch-current {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-
-        .branch-current i.bi-geo-alt-fill {
-            font-size: 1.2rem;
-        }
-
-        .branch-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #branchSelector {
-            min-width: 200px;
-            border: 1px solid #ffc107;
-            background: white;
-        }
-
-        #detectLocationBtn {
-            white-space: nowrap;
+        #floatingCartBtn:hover {
+            background: var(--accent-dark);
+            transform: scale(1.1);
         }
 
         @media (max-width: 768px) {
-            .branch-info-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .branch-current {
-                justify-content: center;
-            }
-
-            .branch-selector {
-                justify-content: center;
-            }
-
-            #branchSelector {
-                flex-grow: 1;
-            }
+            .navbar-search { max-width: 100%; margin: 8px 0; }
+            .content-section { padding: 18px; }
+            .category-card { padding: 12px 6px; }
+            .category-card .cat-img-wrap { width: 44px; height: 44px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Top Bar (desktop only) -->
+    <div class="top-bar d-none d-md-block">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-telephone-fill me-1"></i> +62 85 955 202 267 &nbsp;|&nbsp; <i class="bi bi-envelope-fill me-1"></i> tigaayumart@gmail.com</span>
+            <span>
+                <a href="https://www.facebook.com/3aayumart" class="me-2"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/3aayumart12/"><i class="bi bi-instagram"></i></a>
+            </span>
+        </div>
+    </div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('images/logo.png') }}" alt="AyuMart" height="36" class="d-inline-block align-text-top me-2">
-                Ayu Mart
+                <img src="{{ asset('images/logo.png') }}" alt="AyuMart">
+                <span>Ayu Mart</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Search Bar -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Search -->
                 <div class="navbar-search mx-lg-3 my-2 my-lg-0">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Cari Barang disini..." id="searchInput">
-                        <button class="btn" type="button">
+                        <input type="text" class="form-control" placeholder="Cari produk di sini..." id="searchInput">
+                        <button class="btn" type="button" onclick="performSearch()">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Right Menu -->
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">
-                                <i class="bi bi-box-arrow-in-right"></i> Masuk
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">
-                                <i class="bi bi-person-plus"></i> Daftar
+                            <a class="btn-hero ms-1" href="{{ route('register') }}" style="padding:8px 20px;font-size:14px;">
+                                <i class="bi bi-person-plus me-1"></i> Daftar
                             </a>
                         </li>
                     @else
-                        <!-- Notifikasi -->
-                        <!-- <li class="nav-item dropdown">
-                            <a class="nav-link nav-icon dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" title="Notifikasi" id="notificationDropdown">
-                                <i class="bi bi-bell"></i>
-                                <span class="badge bg-danger" id="notification-count" style="display: none;">0</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" style="width: 350px; max-height: 500px; overflow-y: auto;" id="notificationDropdownMenu">
-                                <li class="dropdown-header d-flex justify-content-between align-items-center">
-                                    <span><strong>Notifikasi</strong></span>
-                                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllAsRead()" id="markAllReadBtn">
-                                        <small>Tandai Semua Dibaca</small>
-                                    </button>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li id="notificationList">
-                                    <div class="text-center py-3">
-                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                        <p class="mb-0 mt-2 small text-muted">Memuat notifikasi...</p>
-                                    </div>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li class="text-center">
-                                    <a class="dropdown-item small" href="{{ route('pelanggan.orders') }}">
-                                        <i class="bi bi-eye"></i> Lihat Semua Pesanan
-                                    </a>
-                                </li>
-                            </ul>
-                        </li> -->
-
-                        <!-- Ticketing -->
+                        <!-- Ticket -->
                         <li class="nav-item">
-                            <a class="nav-link nav-icon" href="{{ route('pelanggan.tickets.index') }}" title="Ticketing">
+                            <a class="nav-icon-btn" href="{{ route('pelanggan.tickets.index') }}" title="Bantuan">
                                 <i class="bi bi-headset"></i>
-                                <span class="badge bg-info" id="ticket-count">0</span>
+                                <span class="badge" id="ticket-count" style="display:none;">0</span>
                             </a>
                         </li>
-
                         <!-- Wishlist -->
                         <li class="nav-item">
-                            <a class="nav-link nav-icon" href="{{ route('pelanggan.wishlist') }}" title="Wishlist">
+                            <a class="nav-icon-btn" href="{{ route('pelanggan.wishlist') }}" title="Wishlist">
                                 <i class="bi bi-heart"></i>
-                                <span class="badge bg-danger" id="wishlist-count">0</span>
+                                <span class="badge" id="wishlist-count" style="display:none;">0</span>
                             </a>
                         </li>
-
-                        <!-- Keranjang -->
+                        <!-- Cart -->
                         <li class="nav-item">
-                            <a class="nav-link nav-icon" href="{{ route('pelanggan.cart') }}" title="Keranjang">
+                            <a class="nav-icon-btn" href="{{ route('pelanggan.cart') }}" title="Keranjang">
                                 <i class="bi bi-cart3"></i>
-                                <span class="badge bg-danger" id="cart-count">0</span>
+                                <span class="badge" id="cart-count" style="display:none;">0</span>
                             </a>
                         </li>
-
-                        <!-- User Menu Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle user-dropdown" href="#" role="button" data-bs-toggle="dropdown">
+                        <!-- User -->
+                        <li class="nav-item dropdown ms-1">
+                            <a class="user-btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <span class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                                 <span class="d-none d-lg-inline">{{ Auth::user()->name }}</span>
                             </a>
@@ -1270,18 +849,21 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('pelanggan.reviews.index') }}">
-                                        <i class="bi bi-star-fill text-warning"></i> Review Saya
+                                        <i class="bi bi-star-fill" style="color:#f59e0b;"></i> Review Saya
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('membership') }}">
+                                        <i class="bi bi-award"></i> Membership
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                                    <a class="dropdown-item" href="{{ route('logout') }}" style="color:var(--accent);"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <i class="bi bi-box-arrow-right"></i> Keluar
+                                        <i class="bi bi-box-arrow-right" style="color:var(--accent);"></i> Keluar
                                     </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                 </li>
                             </ul>
                         </li>
@@ -1291,27 +873,28 @@
         </div>
     </nav>
 
-    <!-- Branch Location Section -->
-    <section class="branch-location-section">
+    <!-- Branch Location Bar -->
+    <section class="branch-bar">
         <div class="container">
-            <div class="branch-info-bar">
-                <div class="branch-current">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-geo-alt-fill text-danger"></i>
                     <span id="branch-info">
                         @if(session('nearest_branch'))
                             <strong>{{ session('nearest_branch')['nama_cabang'] }}</strong>
-                            <small class="text-muted ms-2">
-                                <i class="bi bi-pin-map"></i>
-                                {{ number_format(session('nearest_branch')['distance'], 1) }} km
-                            </small>
+                            @if(session('nearest_branch')['distance'])
+                                <span class="text-muted ms-1" style="font-weight:400;">
+                                    <i class="bi bi-pin-map"></i> {{ number_format(session('nearest_branch')['distance'], 1) }} km
+                                </span>
+                            @endif
                         @else
-                            <strong>Pilih Cabang Terdekat</strong>
+                            <strong>Pilih Cabang Terdekat Anda</strong>
                         @endif
                     </span>
                 </div>
-                <div class="branch-selector">
+                <div class="d-flex align-items-center gap-2">
                     <select id="branchSelector" class="form-select form-select-sm">
-                        <option value="">Ganti Cabang</option>
+                        <option value="">Pilih Cabang</option>
                         @foreach($branches as $branch)
                             <option value="{{ $branch->id_cabang }}"
                                 {{ session('nearest_branch') && session('nearest_branch')['id_cabang'] == $branch->id_cabang ? 'selected' : '' }}>
@@ -1319,7 +902,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <button id="detectLocationBtn" class="btn btn-sm btn-outline-primary ms-2" title="Deteksi Lokasi Saya">
+                    <button id="detectLocationBtn" class="btn btn-sm btn-outline-primary" style="border-radius:100px;border-color:var(--primary);color:var(--primary);" title="Deteksi Lokasi Otomatis">
                         <i class="bi bi-crosshair"></i> Deteksi Lokasi
                     </button>
                 </div>
@@ -1327,966 +910,635 @@
         </div>
     </section>
 
-    <!-- Slideshow Section -->
-    <section class="slideshow-section">
-        <div class="container">
-            <div class="row">
-                <!-- Main Carousel -->
-                <div class="col-lg-12 col-md-12 mb-3 mb-lg-0">
-                    <div id="mainCarousel" class="carousel slide main-carousel" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"></button>
-                            <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
-                            <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
-                        </div>
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 380px; display: flex; align-items: center; justify-content: center;">
-                                    <div class="text-center text-white p-4">
-                                        <h2 class="display-4 fw-bold mb-3">Selamat Datang!</h2>
-                                        <p class="fs-5 mb-4">Belanja kebutuhan sehari-hari jadi lebih mudah</p>
-                                        {{-- <a href="#products" class="btn btn-light btn-lg px-5">Belanja Sekarang</a> --}}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item">                            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); height: 380px; display: flex; align-items: center; justify-content: center;">
-                                <div class="text-center text-white p-4">
-                                    <h2 class="display-4 fw-bold mb-3">Diskon Hingga 50%!</h2>
-                                    <p class="fs-5 mb-4">Promo spesial untuk produk pilihan</p>
-                                    <a href="#promo" class="btn btn-light btn-lg px-5">Lihat Promo</a>
-                                </div>
-                            </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); height: 380px; display: flex; align-items: center; justify-content: center;">
-                                    <div class="text-center text-white p-4">
-                                        <h2 class="display-4 fw-bold mb-3">Member Baru</h2>
-                                        <p class="fs-5 mb-4">Daftar & Dapat Voucher!</p>
-                                        <a href="#products" class="btn btn-light btn-lg px-5">Belanja Yuk</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    </div>
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero-section">
+        <img src="{{ asset('images/home.jpeg') }}" alt="AyuMart Banner" class="hero-bg">
+        <div class="hero-overlay">
+            <div class="container">
+                <div class="hero-text">
+                    <h1>Belanja Segar,<br>Hidup Sehat!</h1>
+                    <p>Temukan produk segar dan berkualitas untuk kebutuhan keluarga Anda setiap hari.</p>
+                    <a href="#products" class="btn-hero">
+                        <i class="bi bi-bag-heart me-2"></i> Belanja Sekarang
+                    </a>
                 </div>
-
-                <!-- Promo Sidebar -->
-                {{-- <div class="col-lg-4 col-md-4 d-none d-md-block">
-                    <div class="promo-sidebar">
-                        <div class="promo-card">
-                            <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                                <div class="text-center text-white">
-                                    <h5 class="fw-bold">Member Baru</h5>
-                                    <p class="mb-0">Daftar & Dapat Voucher!</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="promo-card">
-                            <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                                <div class="text-center text-dark">
-                                    <h5 class="fw-bold">Flash Sale</h5>
-                                    <p class="mb-0">Setiap Hari Pukul 12.00</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
             </div>
         </div>
     </section>
 
-    <!-- Categories Section -->
-    @if($categories && count($categories) > 0)
-    <section class="container mb-3">
-        <div class="categories-section">
-            <div class="categories-title">KATEGORI</div>
-            <div class="row g-2">
-                <!-- All Products Category -->
-                <div class="col-lg-1 col-md-2 col-4">
-                    <a href="{{ route('home') }}#products" style="text-decoration: none;">
-                        <div class="category-card {{ !request('category') ? 'active-category' : '' }}">
-                            <i class="bi bi-grid-3x3-gap-fill"></i>
+    <div class="container py-4">
+
+        <!-- ==================== FEATURES BAR ==================== -->
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-truck"></i></div>
+                    <h5>Pengiriman Cepat</h5>
+                    <p>Kurir ke rumah Anda dengan aman dan tepat waktu</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <h5>Produk Terjamin</h5>
+                    <p>Kualitas produk selalu fresh dan terjamin kesegarannya</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-award"></i></div>
+                    <h5>Program Member</h5>
+                    <p>Kumpulkan poin & nikmati diskon eksklusif member</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-headset"></i></div>
+                    <h5>Layanan 24/7</h5>
+                    <p>Tim customer service siap membantu kapan saja</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CATEGORIES ==================== -->
+        @if($categories && count($categories) > 0)
+        <div class="content-section">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <div class="section-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                    <span class="section-title-text">Kategori</span>
+                </div>
+            </div>
+            <div class="row g-2 g-md-3">
+                <!-- All -->
+                <div class="col-4 col-sm-3 col-md-2 col-lg-1" style="min-width:90px;">
+                    <a href="{{ route('home', ['category' => 'all']) }}#products">
+                        <div class="category-card {{ (!request('category') || request('category') == 'all') ? 'active-category' : '' }}">
+                            <div class="cat-img-wrap">
+                                <img src="{{ asset('images/categories/semua_kategori.png') }}" class="cat-image" alt="Semua Kategori">
+                            </div>
                             <h6>Semua</h6>
                         </div>
                     </a>
                 </div>
-
                 @foreach($categories as $category)
-                <div class="col-lg-1 col-md-2 col-4">
-                    <a href="{{ route('home', ['category' => $category->id_jenis]) }}#products" style="text-decoration: none;">
+                <div class="col-4 col-sm-3 col-md-2 col-lg-1" style="min-width:90px;">
+                    <a href="{{ route('home', ['category' => $category->id_jenis]) }}#products">
                         <div class="category-card {{ request('category') == $category->id_jenis ? 'active-category' : '' }}">
                             @php
-                                // Map kategori ke icon yang sesuai
-                                $categoryIcons = [
-                                    'Makanan Pokok' => 'basket3-fill',
-                                    'Minuman' => 'cup-straw',
-                                    'Snack & Makanan Ringan' => 'cookie',
-                                    'Susu & Produk Olahan' => 'droplet-fill',
-                                    'Buah & Sayur' => 'apple',
-                                    'Daging & Seafood' => 'egg-fried',
-                                    'Bumbu & Penyedap' => 'egg',
-                                    'Frozen Food' => 'snow',
-                                    'Perawatan Pribadi' => 'heart-pulse',
-                                    'Peralatan Rumah Tangga' => 'house-door',
-                                    'Ibu & Bayi' => 'heart-fill',
-                                    'Kesehatan' => 'shield-plus',
+                                $catImages = [
+                                    'Makanan Pokok'          => 'makanan_pokok.png',
+                                    'Minuman'                => 'minuman.png',
+                                    'Snack & Makanan Ringan' => 'snack.png',
+                                    'Susu & Produk Olahan'   => 'makanan_pokok.png',
+                                    'Buah & Sayur'           => 'buah_sayur.png',
+                                    'Daging & Seafood'       => 'buah_sayur.png',
+                                    'Bumbu & Penyedap'       => 'makanan_pokok.png',
+                                    'Frozen Food'            => 'snack.png',
+                                    'Perawatan Pribadi'      => 'minuman.png',
+                                    'Peralatan Rumah Tangga' => 'makanan_pokok.png',
+                                    'Ibu & Bayi'             => 'makanan_pokok.png',
+                                    'Kesehatan'              => 'minuman.png',
                                 ];
-                                $icon = $categoryIcons[$category->nama_jenis] ?? 'box-seam';
+                                $imgFile = $catImages[$category->nama_jenis] ?? 'makanan_pokok.png';
                             @endphp
-                            <i class="bi bi-{{ $icon }}"></i>
-                            <h6>{{ Str::limit($category->nama_jenis, 15) }}</h6>
+                            <div class="cat-img-wrap">
+                                <img src="{{ asset('images/categories/' . $imgFile) }}" class="cat-image" alt="{{ $category->nama_jenis }}">
+                            </div>
+                            <h6>{{ Str::limit($category->nama_jenis, 14) }}</h6>
                         </div>
                     </a>
                 </div>
                 @endforeach
             </div>
         </div>
-    </section>
-    @endif
+        @endif
 
-    <!-- Promo Section -->
-    <section class="container mb-3" id="promo">
-        <div class="flash-sale-section">
-            <div class="flash-sale-header">
-                <div class="flash-sale-title">
-                    <i class="bi bi-percent text-danger fs-3"></i>
-                    <h3>DISKON &amp; PROMO
-                        @if(isset($categoryId) && $categoryId)
-                            @php
-                                $selectedCategory = $categories->firstWhere('id_jenis', $categoryId);
-                            @endphp
-                            <!-- @if($selectedCategory)
-                                <span class="text-muted" style="font-size: 0.8rem; font-weight: 400; text-transform: none;">
-                                    - {{ $selectedCategory->nama_jenis }}
-                                </span>
-                            @endif -->
-                        @endif
-                    </h3>
+        <!-- ==================== PROMO SECTION ==================== -->
+        <div class="content-section" id="promo">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <div class="section-icon" style="background:var(--accent);"><i class="bi bi-percent"></i></div>
+                    <span class="section-title-text" style="color:var(--accent);">Diskon & Promo</span>
                 </div>
-                <!-- <div>
-                    @if(isset($customerTier) && $customerTier)
-                        @php
-                            $tierIcons = ['bronze'=>'🥉','silver'=>'🥈','gold'=>'🥇','platinum'=>'💎'];
-                            $tierColors = ['bronze'=>'warning','silver'=>'secondary','gold'=>'info','platinum'=>'danger'];
-                        @endphp
-                        <span class="badge bg-{{ $tierColors[$customerTier] ?? 'secondary' }} me-2">
-                            {{ $tierIcons[$customerTier] ?? '' }} Tier {{ ucfirst($customerTier) }} – Diskon Eksklusif Anda
-                        </span>
-                    @endif
-                </div> -->
+                @if(isset($categoryId) && $categoryId)
+                    <a href="{{ route('home') }}" class="btn-see-all">Lihat Semua</a>
+                @endif
             </div>
 
             @if(isset($promoProducts) && count($promoProducts) > 0)
-            <div class="row g-2">
+            <div class="row g-3">
                 @foreach($promoProducts as $product)
                 @php
                     $custTier = $customerTier ?? null;
-                    $hargaSetelahDiskon = $product->getCurrentPrice($custTier);
-                    $adaDiskon = $hargaSetelahDiskon < $product->harga_produk;
-                    $pctDiskon = $adaDiskon ? round((($product->harga_produk - $hargaSetelahDiskon) / $product->harga_produk) * 100) : 0;
-                    $badgeLabel = $adaDiskon ? '-' . $pctDiskon . '%' : '';
-                    
-                    // Variabel untuk elemen badge di bawah
-                    $isTierDiscount = ($product->discount_target === 'tier');
-                    $tier = $custTier;
+                    $hargaDiskon = $product->getCurrentPrice($custTier);
+                    $adaDiskon = $hargaDiskon < $product->harga_produk;
+                    $pctDiskon = $adaDiskon ? round((($product->harga_produk - $hargaDiskon) / $product->harga_produk) * 100) : 0;
+                    $isTier = ($product->discount_target === 'tier');
+                    $stok = $product->stok_cabang ?? 0;
                 @endphp
-                <div class="col-lg-2 col-md-3 col-6">
-                    <div class="product-card position-relative">
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="wrap-prodi h-100">
                         @if($adaDiskon)
-                            <span class="discount-badge">{{ $badgeLabel }}</span>
+                            <span class="badge-diskon">-{{ $pctDiskon }}%</span>
                         @endif
-
-                        <a href="{{ route('product.show', $product->id_produk) }}" style="text-decoration: none; color: inherit;">
-                            <div class="product-image">
+                        <a href="{{ route('product.show', $product->id_produk) }}">
+                            <div class="product-img-wrap">
                                 @if($product->foto_produk)
                                     <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 200, 200) }}" alt="{{ $product->nama_produk }}">
                                 @else
                                     <i class="bi bi-box-seam"></i>
                                 @endif
-                            </div>
-
-                            <div class="product-body">
-                                <h5 class="product-title">{{ $product->nama_produk }}</h5>
-
-                                <div class="product-price">
-                                    @if($adaDiskon)
-                                        <span class="current-price">Rp {{ number_format($hargaSetelahDiskon, 0, ',', '.') }}</span>
-                                        <del class="original-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</del>
-                                    @else
-                                        <span class="current-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</span>
-                                    @endif
-                                </div>
-
-                                <div class="product-footer">
-                                    @if($adaDiskon)
-                                        <span class="stock-badge stock-low">
-                                            <i class="bi bi-tag-fill"></i> Hemat {{ number_format($pctDiskon, 0) }}%
-                                            @if($isTierDiscount && $tier)
-                                                <small>({{ ucfirst($tier) }})</small>
-                                            @endif
-                                        </span>
-                                    @else
-                                        <span class="stock-badge stock-available">Promo</span>
-                                    @endif
-                                </div>
+                                @if($stok == 0)
+                                    <div class="badge-stock-out"><span>Stok Habis</span></div>
+                                @endif
                             </div>
                         </a>
+                        <div class="prodi-body">
+                            <a href="{{ route('product.show', $product->id_produk) }}">
+                                <div class="prodi-name">{{ $product->nama_produk }}</div>
+                            </a>
+                            @if($adaDiskon)
+                                <div class="prodi-price">Rp {{ number_format($hargaDiskon, 0, ',', '.') }}</div>
+                                <div class="prodi-price-old">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</div>
+                            @else
+                                <div class="prodi-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</div>
+                            @endif
+                            <div class="prodi-stock-info">
+                                @if($stok > 10)
+                                    <span class="badge badge-available"><i class="bi bi-check-circle me-1"></i>Tersedia</span>
+                                @elseif($stok > 0)
+                                    <span class="badge badge-low"><i class="bi bi-exclamation-triangle me-1"></i>Sisa {{ $stok }}</span>
+                                @else
+                                    <span class="badge badge-out">Habis</span>
+                                @endif
+                            </div>
+                            @guest
+                                <a href="{{ route('login') }}" class="btn-login-to-buy"><i class="bi bi-cart-plus me-1"></i> Beli</a>
+                            @else
+                                @if($stok > 0)
+                                    <button class="btn-tambah" onclick="addToCart({{ $product->id_produk }}, event)">
+                                        <i class="bi bi-cart-plus me-1"></i> Tambah
+                                    </button>
+                                @else
+                                    <button class="btn-tambah" disabled>Stok Habis</button>
+                                @endif
+                            @endguest
+                        </div>
                     </div>
                 </div>
                 @endforeach
             </div>
             @else
             <div class="text-center py-4">
-                <i class="bi bi-tag" style="font-size: 3rem; color: #cbd5e1;"></i>
+                <i class="bi bi-tag" style="font-size:3rem;color:#ccc;"></i>
+                <p class="text-muted mt-2">Belum ada produk promo saat ini</p>
                 @if(isset($categoryId) && $categoryId)
-                    @php
-                        $selectedCategory = $categories->firstWhere('id_jenis', $categoryId);
-                    @endphp
-                    <p class="text-muted mt-2">Belum ada produk diskon untuk kategori <strong>{{ $selectedCategory->nama_jenis ?? 'ini' }}</strong></p>
-                    <a href="{{ route('home') }}" class="btn btn-sm btn-outline-primary mt-2">
+                    <a href="{{ route('home') }}" class="btn btn-sm btn-outline-primary mt-1" style="border-radius:100px;">
                         <i class="bi bi-arrow-clockwise"></i> Lihat Semua Diskon
                     </a>
-                @else
-                    <p class="text-muted mt-2">Belum ada produk diskon saat ini</p>
                 @endif
             </div>
             @endif
         </div>
-    </section>
 
-    <!-- Products Section -->
-    <section class="container mb-3" id="products">
-        <div class="products-section">
-            <div class="section-title">PRODUK UNTUK ANDA</div>
+        <!-- ==================== ALL PRODUCTS ==================== -->
+        <div class="content-section" id="products">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <div class="section-icon"><i class="bi bi-shop-window"></i></div>
+                    <span class="section-title-text">Produk untuk Anda</span>
+                </div>
+            </div>
 
             <!-- Search Result Info -->
-            <div id="searchResultInfo" class="alert alert-info" style="display: none;">
-                <i class="bi bi-info-circle"></i>
+            <div id="searchResultInfo" class="alert alert-info mb-3" style="display:none;">
+                <i class="bi bi-info-circle me-1"></i>
                 <span id="searchResultText"></span>
             </div>
 
-            <!-- No Product Found Message -->
-            <div id="noProductFound" class="text-center py-5" style="display: none;">
-                <i class="bi bi-search" style="font-size: 4rem; color: #cbd5e1;"></i>
-                <h4 class="mt-3 text-muted">Produk Tidak Ditemukan</h4>
-                <p class="text-muted">Coba gunakan kata kunci lain atau lihat semua produk</p>
-                <button class="btn btn-primary" onclick="clearSearch()">
+            <!-- No Product Found -->
+            <div id="noProductFound" class="text-center py-5" style="display:none;">
+                <i class="bi bi-search" style="font-size:4rem;color:#ccc;"></i>
+                <h5 class="mt-3 text-muted">Produk Tidak Ditemukan</h5>
+                <p class="text-muted">Coba gunakan kata kunci lain</p>
+                <button class="btn btn-sm btn-primary" onclick="clearSearch()" style="border-radius:100px;">
                     <i class="bi bi-arrow-clockwise"></i> Lihat Semua Produk
                 </button>
             </div>
 
             @if($products && count($products) > 0)
-            <div class="row g-2" id="productContainer">
+            <div class="row g-3" id="productContainer">
                 @foreach($products as $product)
                 @php
                     $custTier = $customerTier ?? null;
                     $prodHargaDiskon = $product->getCurrentPrice($custTier);
                     $prodAdaDiskon = $prodHargaDiskon < $product->harga_produk;
                     $prodPctDiskon = $prodAdaDiskon ? round((($product->harga_produk - $prodHargaDiskon) / $product->harga_produk) * 100) : 0;
-                    $prodBadge = $prodAdaDiskon ? '-' . $prodPctDiskon . '%' : '';
+                    $stok = $product->stok_cabang ?? 0;
                 @endphp
-                <div class="col-lg-2 col-md-3 col-6 product-item">
-                    <div class="product-card position-relative">
+                <div class="col-6 col-md-4 col-lg-2 product-item">
+                    <div class="wrap-prodi h-100">
                         @if($prodAdaDiskon)
-                            <span class="discount-badge">{{ $prodBadge }}</span>
+                            <span class="badge-diskon">-{{ $prodPctDiskon }}%</span>
                         @endif
-
-                        <a href="{{ route('product.show', $product->id_produk) }}" style="text-decoration: none; color: inherit;">
-                            <div class="product-image">
+                        <a href="{{ route('product.show', $product->id_produk) }}">
+                            <div class="product-img-wrap">
                                 @if($product->foto_produk)
                                     <img src="{{ \App\Helpers\ImageHelper::getProductThumbnail($product->foto_produk, 200, 200) }}" alt="{{ $product->nama_produk }}">
                                 @else
                                     <i class="bi bi-box-seam"></i>
                                 @endif
-                            </div>
-
-                            <div class="product-body">
-                                <h5 class="product-title">{{ $product->nama_produk }}</h5>
-
-                                <div class="product-price">
-                                    @if($prodAdaDiskon)
-                                        <span class="current-price">Rp {{ number_format($prodHargaDiskon, 0, ',', '.') }}</span>
-                                        <del class="original-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</del>
-                                    @else
-                                        <span class="current-price">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</span>
-                                    @endif
-                                </div>
-
-                                <div class="product-footer">
-                                    <div>
-                                        @php
-                                            $stok = $product->stok_cabang ?? 0;
-                                        @endphp
-                                        @if($stok > 10)
-                                            <span class="stock-badge stock-available">Stok: {{ $stok }}</span>
-                                        @elseif($stok > 0)
-                                            <span class="stock-badge stock-low">Stok: {{ $stok }}</span>
-                                        @else
-                                            <span class="stock-badge stock-out">Habis</span>
-                                        @endif
-                                    </div>
-                                    <div class="product-sold">
-                                        <i class="bi bi-star-fill" style="color: #ffce3d;"></i> 4.8
-                                    </div>
-                                </div>
-
-                                @guest
-                                    <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">
-                                        <i class="bi bi-cart-plus"></i> Beli
-                                    </a>
-                                @else
-                                    @php
-                                        $stok = $product->stok_cabang ?? 0;
-                                    @endphp
-                                    @if($stok > 0)
-                                        <button class="btn btn-primary w-100 mt-2" onclick="addToCart({{ $product->id_produk }}, event)">
-                                            <i class="bi bi-cart-plus"></i> Tambah
-                                        </button>
-                                    @else
-                                        <button class="btn btn-secondary w-100 mt-2" disabled>
-                                            Habis
-                                        </button>
-                                    @endif
-                                @endguest
+                                @if($stok == 0)
+                                    <div class="badge-stock-out"><span>Stok Habis</span></div>
+                                @endif
                             </div>
                         </a>
+                        <div class="prodi-body">
+                            <a href="{{ route('product.show', $product->id_produk) }}">
+                                <div class="prodi-name">{{ $product->nama_produk }}</div>
+                            </a>
+                            @if($prodAdaDiskon)
+                                <div class="prodi-price">Rp {{ number_format($prodHargaDiskon, 0, ',', '.') }}</div>
+                                <div class="prodi-price-old">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</div>
+                            @else
+                                <div class="prodi-price" style="color:var(--primary);">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</div>
+                            @endif
+                            <div class="prodi-stock-info">
+                                @if($stok > 10)
+                                    <span class="badge badge-available"><i class="bi bi-check-circle me-1"></i>Stok: {{ $stok }}</span>
+                                @elseif($stok > 0)
+                                    <span class="badge badge-low"><i class="bi bi-exclamation-triangle me-1"></i>Sisa: {{ $stok }}</span>
+                                @else
+                                    <span class="badge badge-out">Stok Habis</span>
+                                @endif
+                            </div>
+                            @guest
+                                <a href="{{ route('login') }}" class="btn-login-to-buy"><i class="bi bi-cart-plus me-1"></i> Beli</a>
+                            @else
+                                @if($stok > 0)
+                                    <button class="btn-tambah" onclick="addToCart({{ $product->id_produk }}, event)">
+                                        <i class="bi bi-cart-plus me-1"></i> Tambah
+                                    </button>
+                                @else
+                                    <button class="btn-tambah" disabled>Stok Habis</button>
+                                @endif
+                            @endguest
+                        </div>
                     </div>
                 </div>
                 @endforeach
             </div>
+            
+            @if(!request('category') || request('category') == '')
+            <div class="text-center mt-5">
+                <a href="{{ route('home', ['category' => 'all']) }}#products" class="btn btn-primary px-4 py-2" style="border-radius: 100px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(1, 91, 30, 0.2);">
+                    Lihat Semua Produk <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            @endif
+
             @else
             <div class="text-center py-5">
-                <i class="bi bi-inbox" style="font-size: 4rem; color: #cbd5e1;"></i>
-                <h4 class="mt-3 text-muted">Belum ada produk tersedia</h4>
+                <i class="bi bi-inbox" style="font-size:4rem;color:#ccc;"></i>
+                <h5 class="mt-3 text-muted">Belum ada produk tersedia</h5>
             </div>
             @endif
         </div>
-    </section>
+
+    </div><!-- /container -->
 
     <!-- Footer -->
     <footer>
         <div class="container">
             <div class="row">
-                <div class="col-md-3 mb-4">
-                    <h6>LAYANAN PELANGGAN</h6>
-                    <ul class="list-unstyled">
-                        {{-- <li class="mb-2"><a href="#">Pusat Bantuan</a></li> --}}
-                        <li class="mb-2"><a href="{{ route('pelanggan.tickets.index') }}">Pusat Bantuan</a></li>
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="{{ asset('images/logo.png') }}" alt="AyuMart" height="55" style="background:white;border-radius:50%;padding:2px;">
+                        <div>
+                            <h5 class="mb-0" style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;">AYU MART</h5>
+                            <small style="color:rgba(255,255,255,0.65);font-style:italic;">Always Fresh, Be Healthy</small>
+                        </div>
+                    </div>
+                    <p>Supermarket online terpercaya pilihan keluarga Indonesia. Produk segar, harga terjangkau, pengiriman cepat.</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6>Layanan</h6>
+                    <ul>
+                        <li><a href="{{ route('pelanggan.tickets.index') }}"><i class="bi bi-chevron-right me-1" style="font-size:11px;"></i>Pusat Bantuan</a></li>
+                        <li><a href="{{ route('pelanggan.orders') }}"><i class="bi bi-chevron-right me-1" style="font-size:11px;"></i>Pesanan Saya</a></li>
+                        <li><a href="{{ route('pelanggan.profile') }}"><i class="bi bi-chevron-right me-1" style="font-size:11px;"></i>Profil Saya</a></li>
+                        <li><a href="{{ route('membership') }}"><i class="bi bi-chevron-right me-1" style="font-size:11px;"></i>Membership</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 mb-4">
-                    <h6>IKUTI KAMI</h6>
-                    <div class="d-flex gap-3 mt-3">
-                        <a href="https://www.facebook.com/3aayumart"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="https://www.instagram.com/3aayumart12/?igshid=YmMyMTA2M2Y%3D"><i class="bi bi-instagram fs-4"></i></a>
+                    <h6>Ikuti Kami</h6>
+                    <div class="footer-social mb-3">
+                        <a href="https://www.facebook.com/3aayumart" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com/3aayumart12/" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="https://wa.me/6285955202267" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
                     </div>
-                    <div class="mt-3">
-                        <p class="mb-1"><i class="bi bi-telephone"></i> +62 85 955 202 267</p>
-                        <p><i class="bi bi-envelope"></i> tigaayumart@gmail.com</p>
-                    </div>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>+62 85 955 202 267</p>
+                    <p><i class="bi bi-envelope-fill me-2"></i>tigaayumart@gmail.com</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6>Jam Operasional</h6>
+                    <ul>
+                        <li><i class="bi bi-clock me-2"></i>Senin – Jumat: 08.00 – 21.00</li>
+                        <li><i class="bi bi-clock me-2"></i>Sabtu: 08.00 – 22.00</li>
+                        <li><i class="bi bi-clock me-2"></i>Minggu: 09.00 – 21.00</li>
+                    </ul>
                 </div>
             </div>
-            <hr style="border-color: rgba(0,0,0,.12);">
-            <div class="text-center" style="color: rgba(0,0,0,.54);">
-                <p class="mb-0">&copy; 2025 SuperMarket. Hak Cipta Dilindungi.</p>
-            </div>
         </div>
+        <div class="footer-bottom">
+            &copy; {{ date('Y') }} AyuMart Supermarket. Hak Cipta Dilindungi.
     </footer>
 
+    @auth
+    <!-- Floating Cart Button -->
+    <a href="{{ route('pelanggan.cart') }}" id="floatingCartBtn" title="Keranjang Belanja">
+        <i class="bi bi-cart3"></i>
+        <span class="badge" id="floating-cart-count" style="display:none;">0</span>
+    </a>
+    @endauth
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Kembali ke Atas">
+        <i class="bi bi-arrow-up-short" style="font-size: 1.8rem;"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // SweetAlert2 untuk success messages
+        // ===================== NOTIFICATIONS =====================
         @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#3F4F44',
-                timer: 3000,
-                timerProgressBar: true
-            });
+            Swal.fire({ icon:'success', title:'Berhasil!', text:'{{ session('success') }}', confirmButtonColor:'#015b1e', timer:3000, timerProgressBar:true });
         @endif
-
         @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: '{{ session('error') }}',
-                confirmButtonColor: '#3F4F44'
-            });
+            Swal.fire({ icon:'error', title:'Gagal!', text:'{{ session('error') }}', confirmButtonColor:'#015b1e' });
         @endif
 
-        // Search functionality with auto-scroll and not found message
+        // ===================== SEARCH =====================
         function performSearch() {
             const searchInput = document.getElementById('searchInput');
+            if (!searchInput) return;
 
-            if (!searchInput) {
-                console.error('Search input not found!');
-                return;
-            }
+            const term = searchInput.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.product-item');
+            const container = document.getElementById('productContainer');
+            const notFound = document.getElementById('noProductFound');
+            const info = document.getElementById('searchResultInfo');
+            const infoText = document.getElementById('searchResultText');
 
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            const productItems = document.querySelectorAll('.product-item');
-            const productContainer = document.getElementById('productContainer');
-            const noProductFound = document.getElementById('noProductFound');
-            const searchResultInfo = document.getElementById('searchResultInfo');
-            const searchResultText = document.getElementById('searchResultText');
+            let visible = 0;
 
-            let visibleCount = 0;
-            let totalCount = productItems.length;
-
-            console.log('=== SEARCH DEBUG ===');
-            console.log('Search term:', searchTerm);
-            console.log('Total product items found:', totalCount);
-            console.log('Elements check:', {
-                searchInput: !!searchInput,
-                productContainer: !!productContainer,
-                noProductFound: !!noProductFound,
-                searchResultInfo: !!searchResultInfo,
-                searchResultText: !!searchResultText
+            items.forEach(item => {
+                const title = item.querySelector('.prodi-name')?.textContent.toLowerCase().trim() || '';
+                const match = term === '' || title.includes(term);
+                item.style.display = match ? '' : 'none';
+                if (match) visible++;
             });
 
-            // Filter products
-            productItems.forEach((item, index) => {
-                const titleElement = item.querySelector('.product-title');
-                const title = titleElement?.textContent.toLowerCase().trim() || '';
-
-                if (index === 0) {
-                    console.log('First product title element:', titleElement);
-                    console.log('First product title text:', title);
-                }
-
-                const isMatch = searchTerm === '' || title.includes(searchTerm);
-
-                if (isMatch) {
-                    item.style.display = '';
-                    visibleCount++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            console.log('Visible products after filter:', visibleCount);
-
-            // Show/hide messages based on search results
-            if (searchTerm !== '') {
-                // Scroll to products section when searching
+            if (term !== '') {
                 setTimeout(() => {
-                    const productsSection = document.getElementById('products');
-                    if (productsSection) {
-                        console.log('Scrolling to products section');
-                        productsSection.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    } else {
-                        console.error('Products section not found!');
-                    }
+                    document.getElementById('products')?.scrollIntoView({ behavior:'smooth', block:'start' });
                 }, 100);
 
-                if (visibleCount === 0) {
-                    // No products found
-                    console.log('No products found - showing message');
-                    if (productContainer) productContainer.style.display = 'none';
-                    if (noProductFound) noProductFound.style.display = 'block';
-                    if (searchResultInfo) searchResultInfo.style.display = 'none';
+                if (visible === 0) {
+                    if (container) container.style.display = 'none';
+                    if (notFound) notFound.style.display = 'block';
+                    if (info) info.style.display = 'none';
                 } else {
-                    // Products found
-                    console.log('Products found - showing results');
-                    if (productContainer) productContainer.style.display = '';
-                    if (noProductFound) noProductFound.style.display = 'none';
-                    if (searchResultInfo) searchResultInfo.style.display = 'block';
-                    if (searchResultText) {
-                        searchResultText.textContent = `Menampilkan ${visibleCount} dari ${totalCount} produk untuk "${searchTerm}"`;
-                    }
+                    if (container) container.style.display = '';
+                    if (notFound) notFound.style.display = 'none';
+                    if (info) info.style.display = 'block';
+                    if (infoText) infoText.textContent = `Menampilkan ${visible} dari ${items.length} produk untuk "${term}"`;
                 }
             } else {
-                // Reset to show all
-                console.log('Empty search - showing all products');
-                if (productContainer) productContainer.style.display = '';
-                if (noProductFound) noProductFound.style.display = 'none';
-                if (searchResultInfo) searchResultInfo.style.display = 'none';
+                if (container) container.style.display = '';
+                if (notFound) notFound.style.display = 'none';
+                if (info) info.style.display = 'none';
             }
-            console.log('=== END SEARCH DEBUG ===');
         }
 
-        // Initialize search functionality when DOM is ready
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.product-item').forEach(i => i.style.display = '');
+            const c = document.getElementById('productContainer');
+            const n = document.getElementById('noProductFound');
+            const i = document.getElementById('searchResultInfo');
+            if (c) c.style.display = '';
+            if (n) n.style.display = 'none';
+            if (i) i.style.display = 'none';
+            document.getElementById('products')?.scrollIntoView({ behavior:'smooth', block:'start' });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded - initializing search');
-
-            const searchInput = document.getElementById('searchInput');
-            const searchButton = document.querySelector('.navbar-search button');
-
-            console.log('Search elements:', {
-                searchInput: !!searchInput,
-                searchButton: !!searchButton
-            });
-
-            // Event listener untuk input search (real-time)
-            if (searchInput) {
-                searchInput.addEventListener('keyup', function(e) {
-                    console.log('Keyup event:', e.key, 'Value:', this.value);
-
-                    // Jika Enter ditekan, lakukan pencarian dan scroll
+            const inp = document.getElementById('searchInput');
+            if (inp) {
+                inp.addEventListener('keyup', e => {
                     if (e.key === 'Enter') {
-                        console.log('Enter pressed - performing search');
                         performSearch();
                     } else {
-                        // Untuk typing biasa, filter dengan debounce
-                        clearTimeout(window.searchTimeout);
-                        window.searchTimeout = setTimeout(() => {
-                            console.log('Debounced search triggered');
-                            performSearch();
-                        }, 300);
+                        clearTimeout(window._st);
+                        window._st = setTimeout(performSearch, 350);
                     }
                 });
-                console.log('Search input event listener attached');
-            } else {
-                console.error('Search input not found - event listener NOT attached');
-            }
-
-            // Event listener untuk tombol search
-            if (searchButton) {
-                searchButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Search button clicked');
-                    performSearch();
-                });
-                console.log('Search button event listener attached');
-            } else {
-                console.error('Search button not found - event listener NOT attached');
             }
         });
 
-        // Clear search function
-        function clearSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const productItems = document.querySelectorAll('.product-item');
-            const productContainer = document.getElementById('productContainer');
-            const noProductFound = document.getElementById('noProductFound');
-            const searchResultInfo = document.getElementById('searchResultInfo');
-
-            // Clear search input
-            searchInput.value = '';
-
-            // Show all products
-            productItems.forEach(item => {
-                item.style.display = '';
-            });
-
-            // Reset displays
-            if (productContainer) productContainer.style.display = '';
-            noProductFound.style.display = 'none';
-            searchResultInfo.style.display = 'none';
-
-            // Scroll back to top of products
-            document.getElementById('products').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-
-        // Add to cart function with SweetAlert
+        // ===================== ADD TO CART =====================
         function addToCart(productId, event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
+            if (event) { event.preventDefault(); event.stopPropagation(); }
 
-            Swal.fire({
-                title: 'Tambah ke Keranjang?',
-                text: "Produk akan ditambahkan ke keranjang belanja Anda",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3F4F44',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Tambahkan!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Send AJAX request to add to cart
-                    fetch(`/cart/add/${productId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                        },
-                        body: JSON.stringify({ quantity: 1 })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Ditambahkan!',
-                            text: 'Produk berhasil ditambahkan ke keranjang',
-                            confirmButtonColor: '#3F4F44',
-                            timer: 2000,
-                            timerProgressBar: true
-                        });
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal!',
-                            text: 'Terjadi kesalahan saat menambahkan produk',
-                            confirmButtonColor: '#3F4F44'
-                        });
-                    });
+            // Define Toast SweetAlert
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1800,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             });
-        }
 
-        // Auto-play carousel
-        const carousel = new bootstrap.Carousel(document.getElementById('mainCarousel'), {
-            interval: 4000,
-            ride: 'carousel'
-        });
+            const btn = event?.target.closest('button') || event?.target;
+            let originalContent = '';
+            if (btn) {
+                originalContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            }
 
-        // Load cart and wishlist count for logged-in users
-        @auth
-        function loadCartCount() {
-            fetch('/api/cart/count', {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('cart-count');
-                if (badge && data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline-block';
-                } else if (badge) {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error loading cart count:', error));
-        }
-
-        function loadWishlistCount() {
-            fetch('/api/wishlist/count', {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('wishlist-count');
-                if (badge && data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline-block';
-                } else if (badge) {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error loading wishlist count:', error));
-        }
-
-        function loadTicketCount() {
-            fetch('/api/tickets/count', {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('ticket-count');
-                if (badge && data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline-block';
-                } else if (badge) {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error loading ticket count:', error));
-        }
-
-        function loadNotificationCount() {
-            fetch('/api/notifications/count', {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('notification-count');
-                if (badge && data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline-block';
-                } else if (badge) {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error loading notification count:', error));
-        }
-
-        function loadNotifications() {
-            const notificationList = document.getElementById('notificationList');
-
-            console.log('Loading notifications...');
-
-            fetch('/api/notifications', {
-                headers: {
+            fetch(`/cart/add/${productId}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
                     'Accept': 'application/json'
-                }
+                },
+                body: JSON.stringify({ qty: 1 })
             })
-            .then(response => {
-                console.log('Notification response status:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                console.log('Notification data received:', data);
-
-                // Check if response is successful
-                if (!data.success) {
-                    throw new Error(data.message || 'Failed to load notifications');
-                }
-
-                // Check if we have notifications
-                if (data.notifications && Array.isArray(data.notifications) && data.notifications.length > 0) {
-                    notificationList.innerHTML = '';
-
-                    data.notifications.forEach(notification => {
-                        const item = document.createElement('a');
-                        item.className = 'dropdown-item notification-item' + (notification.read ? '' : ' unread-notification');
-                        item.href = notification.url;
-                        item.style.cssText = 'white-space: normal; padding: 12px 20px; border-bottom: 1px solid #f0f0f0;';
-
-                        item.innerHTML = `
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 me-3">
-                                    <i class="bi ${notification.icon} text-${notification.color}" style="font-size: 1.5rem;"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <strong class="d-block mb-1" style="font-size: 0.9rem;">${notification.title}</strong>
-                                    <p class="mb-1 small text-muted">${notification.message}</p>
-                                    <small class="text-muted"><i class="bi bi-clock"></i> ${notification.time}</small>
-                                </div>
-                            </div>
-                        `;
-
-                        // Mark as read when clicked
-                        item.addEventListener('click', function(e) {
-                            markNotificationAsRead(notification.id);
-                        });
-
-                        notificationList.appendChild(item);
+                if (data.success) {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Produk ditambahkan ke keranjang'
                     });
+                    
+                    loadCounts();
+
+                    if (btn) {
+                        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Berhasil';
+                        btn.classList.remove('btn-tambah');
+                        btn.classList.add('btn-success', 'text-white');
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            btn.classList.remove('btn-success', 'text-white');
+                            btn.classList.add('btn-tambah');
+                        }, 1500);
+                    }
                 } else {
-                    notificationList.innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="bi bi-bell-slash" style="font-size: 2.5rem; color: #cbd5e1;"></i>
-                            <p class="text-muted mb-0 mt-2 small">Tidak ada notifikasi</p>
-                        </div>
-                    `;
+                    Swal.fire({ icon:'error', title:'Gagal!', text: data.message || 'Terjadi kesalahan. Silakan coba lagi.', confirmButtonColor:'#015b1e' });
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                    }
                 }
             })
-            .catch(error => {
-                console.error('Error loading notifications:', error);
-                notificationList.innerHTML = `
-                    <div class="text-center py-3">
-                        <i class="bi bi-exclamation-triangle text-warning"></i>
-                        <p class="text-muted mb-0 small">Gagal memuat notifikasi</p>
-                        <small class="text-muted d-block">${error.message}</small>
-                    </div>
-                `;
+            .catch(() => {
+                Swal.fire({ icon:'error', title:'Gagal!', text:'Terjadi kesalahan. Silakan coba lagi.', confirmButtonColor:'#015b1e' });
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
             });
         }
 
-        function markNotificationAsRead(notificationId) {
-            fetch(`/api/notifications/${notificationId}/read`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+        // ===================== COUNTS =====================
+        @auth
+        function loadCounts() {
+            const h = { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' };
+            
+            const triggerBadgeAnimation = (el, newVal) => {
+                const prevVal = el.textContent;
+                el.textContent = newVal;
+                el.style.display = newVal > 0 ? 'inline-block' : 'none';
+                if (prevVal !== String(newVal)) {
+                    el.classList.remove('badge-pulse');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('badge-pulse');
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadNotificationCount();
-                }
-            })
-            .catch(error => console.error('Error marking notification as read:', error));
+            };
+
+            ['cart','wishlist','ticket'].forEach(type => {
+                const ep = type === 'ticket' ? '/api/tickets/count' : `/api/${type}/count`;
+                fetch(ep, { headers: h })
+                    .then(r => r.json())
+                    .then(data => {
+                        const count = data.count || 0;
+                        const b = document.getElementById(`${type}-count`);
+                        if (b) {
+                            triggerBadgeAnimation(b, count);
+                        }
+                        if (type === 'cart') {
+                            const fb = document.getElementById('floating-cart-count');
+                            if (fb) {
+                                triggerBadgeAnimation(fb, count);
+                            }
+                        }
+                    }).catch(() => {});
+            });
         }
-
-        function markAllAsRead() {
-            fetch('/api/notifications/read-all', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadNotificationCount();
-                    loadNotifications();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: 'Semua notifikasi ditandai sebagai dibaca',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                }
-            })
-            .catch(error => console.error('Error marking all as read:', error));
-        }
-
-        // Load notifications when dropdown is opened
-        document.getElementById('notificationDropdown')?.addEventListener('click', function(e) {
-            loadNotifications();
-        });
-
-        // Load counts on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCartCount();
-            loadWishlistCount();
-            loadTicketCount();
-            loadNotificationCount();
-
-            // Refresh counts every 30 seconds
-            setInterval(function() {
-                loadCartCount();
-                loadWishlistCount();
-                loadTicketCount();
-                loadNotificationCount();
-            }, 30000);
-        });
+        document.addEventListener('DOMContentLoaded', loadCounts);
         @endauth
 
-        // Branch location detection and selection
-        document.getElementById('detectLocationBtn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
+        // ===================== BRANCH DETECTION =====================
+        document.getElementById('detectLocationBtn')?.addEventListener('click', function() {
+            if (!navigator.geolocation) {
+                Swal.fire({ icon:'error', title:'Browser Tidak Mendukung', text:'Browser Anda tidak mendukung deteksi lokasi.', confirmButtonColor:'#015b1e' });
+                return;
+            }
+            const btn = this;
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mencari...';
 
-                    // Send AJAX request to get nearest branch
+            navigator.geolocation.getCurrentPosition(
+                pos => {
                     fetch('/api/set-user-location', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                        },
-                        body: JSON.stringify({ latitude: lat, longitude: lon })
+                        method:'POST',
+                        headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]')?.content || '' },
+                        body: JSON.stringify({ latitude: pos.coords.latitude, longitude: pos.coords.longitude })
                     })
-                    .then(response => response.json())
+                    .then(r => r.json())
                     .then(data => {
                         if (data.success && data.branch) {
-                            // Show success message and reload
                             Swal.fire({
-                                icon: 'success',
-                                title: 'Lokasi Ditemukan',
-                                text: `Cabang terdekat: ${data.branch.nama_cabang} (${data.branch.distance} km)`,
-                                confirmButtonColor: '#3F4F44',
-                                timer: 2000,
-                                timerProgressBar: true,
-                                showConfirmButton: false
-                            }).then(() => {
-                                // Reload page to show new stock data
-                                window.location.reload();
-                            });
+                                icon:'success', title:'Lokasi Ditemukan',
+                                text:`Cabang terdekat: ${data.branch.nama_cabang} (${data.branch.distance} km)`,
+                                confirmButtonColor:'#015b1e', timer:2000, timerProgressBar:true, showConfirmButton:false
+                            }).then(() => window.location.reload());
                         } else {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Informasi',
-                                text: 'Cabang terdekat tidak ditemukan',
-                                confirmButtonColor: '#3F4F44'
-                            });
+                            Swal.fire({ icon:'info', title:'Informasi', text:'Cabang terdekat tidak ditemukan.', confirmButtonColor:'#015b1e' });
+                            btn.disabled = false;
+                            btn.innerHTML = originalHTML;
                         }
                     })
-                    .catch(error => {
-                        console.error('Error detecting location:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat mendeteksi lokasi',
-                            confirmButtonColor: '#3F4F44'
-                        });
+                    .catch(() => {
+                        Swal.fire({ icon:'error', title:'Gagal', text:'Terjadi kesalahan saat mendeteksi lokasi.', confirmButtonColor:'#015b1e' });
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
                     });
-                }, function() {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Perijinan Diperlukan',
-                        text: 'Izinkan akses lokasi untuk mendeteksi cabang terdekat',
-                        confirmButtonColor: '#3F4F44'
-                    });
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Browser Tidak Mendukung',
-                    text: 'Browser Anda tidak mendukung fitur deteksi lokasi',
-                    confirmButtonColor: '#3F4F44'
-                });
+                },
+                () => {
+                    Swal.fire({ icon:'warning', title:'Izin Diperlukan', text:'Izinkan akses lokasi untuk mendeteksi cabang terdekat.', confirmButtonColor:'#015b1e' });
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                }
+            );
+        });
+
+        // ===================== SCROLL TO TOP VISIBILITY =====================
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById('scrollToTopBtn');
+            if (btn) {
+                if (window.scrollY > 300) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
             }
         });
 
-        document.getElementById('branchSelector').addEventListener('change', function() {
-            const branchId = this.value;
-
-            if (branchId) {
-                // Send AJAX request to switch branch
-                fetch('/api/change-branch', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                    },
-                    body: JSON.stringify({ id_cabang: branchId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success message and reload page
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Cabang Berhasil Diubah',
-                            text: `Anda sekarang memilih cabang: ${data.branch.nama_cabang}`,
-                            confirmButtonColor: '#3F4F44',
-                            timer: 2000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
-                        }).then(() => {
-                            // Reload page to show new stock data
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat mengubah cabang',
-                            confirmButtonColor: '#3F4F44'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error switching branch:', error);
+        document.getElementById('branchSelector')?.addEventListener('change', function() {
+            const id = this.value;
+            if (!id) return;
+            fetch('/api/change-branch', {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]')?.content || '' },
+                body: JSON.stringify({ id_cabang: id })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: 'Terjadi kesalahan saat mengubah cabang',
-                        confirmButtonColor: '#3F4F44'
-                    });
-                });
-            }
+                        icon:'success', title:'Cabang Diubah',
+                        text:`Sekarang memilih cabang: ${data.branch.nama_cabang}`,
+                        confirmButtonColor:'#015b1e', timer:2000, timerProgressBar:true, showConfirmButton:false
+                    }).then(() => window.location.reload());
+                } else {
+                    Swal.fire({ icon:'error', title:'Gagal', text:'Terjadi kesalahan saat mengubah cabang.', confirmButtonColor:'#015b1e' });
+                }
+            })
+            .catch(() => Swal.fire({ icon:'error', title:'Gagal', text:'Terjadi kesalahan.', confirmButtonColor:'#015b1e' }));
         });
     </script>
 </body>

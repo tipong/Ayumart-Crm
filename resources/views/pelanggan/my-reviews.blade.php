@@ -105,77 +105,90 @@
     }
 
     /* Pagination */
-    .pagination {
-        margin-bottom: 0;
+    .pagination { gap: 4px; }
+    .page-link {
+        border-radius: 8px !important;
+        border: 1.5px solid var(--border) !important;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 6px 12px;
+        transition: all 0.25s;
     }
-
-    .pagination .page-link {
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        margin: 0 4px;
-        border: none;
-        background: white;
-        color: #3F4F44;
-        font-weight: 500;
-    }
-
-    .pagination .page-link:hover {
-        background-color: #3F4F44;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #3F4F44;
-        border-color: #3F4F44;
-        color: white;
-    }
-
-    .pagination .page-item.disabled .page-link {
-        background: #e9ecef;
-        color: #6c757d;
-    }
+    .page-link:hover { background: var(--primary); color: #fff; border-color: var(--primary) !important; }
+    .page-item.active .page-link { background: var(--primary) !important; border-color: var(--primary) !important; color: #fff; }
+    .page-item.disabled .page-link { color: var(--text-muted); background: #f8f8f8; }
 
     .badge-date {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 0.5rem 1rem;
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 0.4rem 0.9rem;
         border-radius: 20px;
-        font-weight: 500;
+        font-weight: 700;
+        font-size: 12px;
     }
 
     .order-info {
-        background: #f8f9fa;
+        background: var(--bg-light, #f5f5f5);
         padding: 0.75rem 1rem;
         border-radius: 8px;
-        border-left: 4px solid #3F4F44;
+        border-left: 4px solid var(--primary);
+        font-size: 13px;
+        color: var(--text-mid);
+    }
+    .review-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius, 12px);
+        overflow: hidden;
+        transition: all 0.28s ease;
+        background: white;
+    }
+    .review-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover) !important;
+    }
+    .btn-primary {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        color: #fff !important;
+    }
+    .btn-primary:hover {
+        background: var(--primary-dark) !important;
+        border-color: var(--primary-dark) !important;
     }
 </style>
 @endpush
 
 @section('content')
-<div class="container py-5">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="card-body py-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-white">
-                            <h2 class="mb-2 fw-bold">
-                                <i class="bi bi-star-fill"></i>
-                                Review Saya
-                            </h2>
-                            <p class="mb-0 opacity-75">Kelola semua review yang sudah Anda berikan</p>
-                        </div>
-                        <a href="{{ route('pelanggan.orders') }}" class="btn btn-light">
-                            <i class="bi bi-arrow-left"></i> Kembali ke Pesanan
-                        </a>
-                    </div>
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="hero-icon">
+                    <i class="bi bi-star-fill" style="color:#fbbf24;"></i>
+                </div>
+                <div>
+                    <h1>Review Saya</h1>
+                    <p>Kelola semua ulasan dan penilaian produk yang Anda berikan</p>
                 </div>
             </div>
+            <a href="{{ route('pelanggan.orders') }}" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;font-size:14px;padding:8px 20px;">
+                <i class="bi bi-arrow-left me-1"></i> Riwayat Pesanan
+            </a>
         </div>
     </div>
+</div>
+
+<div class="container py-3 pb-5">
+    <!-- Breadcrumb -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pelanggan.orders') }}">Pesanan</a></li>
+            <li class="breadcrumb-item active">Review Saya</li>
+        </ol>
+    </nav>
 
     <!-- Alert Messages -->
     @if(session('success'))
@@ -310,7 +323,7 @@
 <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <div class="modal-header text-white" style="background: var(--primary); border: none;">
                 <h5 class="modal-title fw-bold" id="editReviewModalLabel">
                     <i class="bi bi-pencil-square"></i> Edit Review Anda
                 </h5>
@@ -387,10 +400,10 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 bg-light">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+                    <button type="button" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" style="border-radius: 100px;">
                         <i class="bi bi-x-circle"></i> Batal
                     </button>
-                    <button type="submit" class="btn btn-primary" style="border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                    <button type="submit" class="btn btn-primary" style="border-radius: 100px;">
                         <i class="bi bi-save"></i> Simpan Perubahan
                     </button>
                 </div>

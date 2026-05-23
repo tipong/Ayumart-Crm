@@ -9,6 +9,9 @@ use App\Models\Integrasi\Produk as ProdukIntegrasi;
 use App\Models\Cart;
 use App\Models\Wishlist;
 use App\Models\Transaction;
+use App\Models\Order;
+use App\Models\Ticket;
+use App\Models\PembatalanTransaksi;
 use App\Models\Membership;
 use App\Models\CustomerAddress;
 use App\Services\IntegrasiProdukService;
@@ -55,6 +58,14 @@ class PelangganController extends Controller
     }
 
     /**
+     * Display notification page
+     */
+    public function notifications()
+    {
+        return view('pelanggan.notifications');
+    }
+
+    /**
      * Display shopping cart
      */
     public function cart()
@@ -82,7 +93,10 @@ class PelangganController extends Controller
 
         $total = $subtotal - $discount;
 
-        return view('pelanggan.cart', compact('cartItems', 'subtotal', 'discount', 'total', 'membership'));
+        // Ambil semua cabang aktif untuk pemilih cabang di keranjang belanja
+        $branches = $this->nearestBranchService->getAllActiveBranches();
+
+        return view('pelanggan.cart', compact('cartItems', 'subtotal', 'discount', 'total', 'membership', 'branches'));
     }
 
     /**

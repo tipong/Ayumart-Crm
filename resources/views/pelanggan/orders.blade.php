@@ -4,42 +4,65 @@
 
 @push('styles')
 <style>
-    /* Custom Pagination Styling */
-    .pagination {
-        margin-bottom: 0;
+    /* Pagination */
+    .pagination { gap: 4px; margin: 0; }
+    .page-link {
+        border-radius: 8px !important;
+        border: 1.5px solid var(--border) !important;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 6px 12px;
+        transition: all 0.25s;
     }
+    .page-link:hover { background: var(--primary); color: #fff; border-color: var(--primary) !important; }
+    .page-item.active .page-link { background: var(--primary) !important; border-color: var(--primary) !important; color: #fff; }
+    .page-item.disabled .page-link { color: var(--text-muted); background: #f8f8f8; }
 
-    .pagination .page-link {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-        border-radius: 0.25rem;
-        margin: 0 2px;
-    }
+    /* Orders table badges */
+    .order-code { font-weight: 700; font-size: 13px; color: var(--text-dark); }
+    .order-code small { font-weight: 400; color: var(--text-muted); display: block; font-size: 11px; }
 
-    .pagination .page-item:first-child .page-link,
-    .pagination .page-item:last-child .page-link {
-        border-radius: 0.25rem;
+    /* Sidebar cards */
+    .sidebar-stat {
+        background: #fff;
+        border-radius: 12px;
+        border: 1.5px solid var(--border);
+        padding: 16px;
+        text-align: center;
+        margin-bottom: 12px;
+        transition: all 0.25s;
     }
-
-    .pagination .page-link:hover {
-        background-color: #0d6efd;
-        color: white;
-        border-color: #0d6efd;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
-
-    .pagination .page-item.disabled .page-link {
-        color: #6c757d;
-    }
+    .sidebar-stat:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .sidebar-stat .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+    .sidebar-stat .stat-lbl { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
 </style>
 @endpush
 
 @section('content')
-<div class="container py-5">
+<!-- Page Hero -->
+<div class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <div class="hero-icon">
+                <i class="bi bi-bag-check-fill"></i>
+            </div>
+            <div>
+                <h1>Pesanan Saya</h1>
+                <p>Pantau status dan riwayat pesanan Anda di sini</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-3 pb-5">
+    <!-- Breadcrumb -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item active">Pesanan Saya</li>
+        </ol>
+    </nav>
     <!-- Alert Messages -->
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -110,14 +133,14 @@
 
     <div class="row">
         <div class="col-lg-9">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-box-seam"></i> Pesanan Saya</h5>
-                    <a href="{{ route('pelanggan.reviews.index') }}" class="btn btn-light btn-sm">
-                        <i class="bi bi-star-fill text-warning"></i> Review Saya
+            <div class="ay-card">
+                <div class="ay-card-header">
+                    <i class="bi bi-box-seam"></i> Pesanan Saya
+                    <a href="{{ route('pelanggan.reviews.index') }}" class="btn btn-sm ms-auto" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:100px;font-weight:700;padding:4px 14px;font-size:12px;">
+                        <i class="bi bi-star-fill" style="color:#fbbf24;"></i> Review Saya
                     </a>
                 </div>
-                <div class="card-body">
+                <div class="ay-card-body">
                     @if($orders->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -229,7 +252,7 @@
                                                 @if($canConfirmReceived)
                                                     <button type="button"
                                                             class="btn btn-sm btn-primary mb-1"
-                                                            onclick="confirmOrderReceived({{ $order->id_transaksi }}, '{{ $order->kode_transaksi }}')"
+                                                            onclick="confirmOrderReceived(this, {{ $order->id_transaksi }}, '{{ $order->kode_transaksi }}')"
                                                             title="Konfirmasi Barang Diterima">
                                                         <i class="bi bi-check-circle"></i> Barang Diterima
                                                     </button>
@@ -239,7 +262,7 @@
                                                 @if($canConfirmPickup)
                                                     <button type="button"
                                                             class="btn btn-sm btn-success mb-1"
-                                                            onclick="confirmPickup({{ $order->id_transaksi }}, '{{ $order->kode_transaksi }}')"
+                                                            onclick="confirmPickup(this, {{ $order->id_transaksi }}, '{{ $order->kode_transaksi }}')"
                                                             title="Konfirmasi Barang Diambil">
                                                         <i class="bi bi-bag-check"></i> Sudah Diambil
                                                     </button>
@@ -417,7 +440,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm mt-3">
+            <!-- <div class="card shadow-sm mt-3">
                 <div class="card-body">
                     <h6 class="mb-3"><i class="bi bi-info-circle"></i> Info Poin</h6>
                     <small class="text-muted">
@@ -430,7 +453,7 @@
                         </ul>
                     </small>
                 </div>
-            </div>
+            </div> -->
             @endif
         </div>
     </div>
@@ -607,13 +630,12 @@
 <script>
 let currentOrderId = null;
 
-function confirmOrderReceived(orderId, orderCode) {
+function confirmOrderReceived(btn, orderId, orderCode) {
     if (!confirm(`Apakah Anda yakin sudah menerima pesanan ${orderCode}?\n\nSetelah dikonfirmasi, status akan berubah menjadi "Selesai" dan Anda dapat memberikan review untuk produk.`)) {
         return;
     }
 
     // Show loading state
-    const btn = event.target.closest('button');
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
@@ -644,7 +666,10 @@ function confirmOrderReceived(orderId, orderCode) {
                 <i class="bi bi-check-circle"></i> ${data.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+            const row = document.querySelector('.row');
+            if (row && row.parentNode) {
+                row.parentNode.insertBefore(alertDiv, row);
+            }
 
             // Reload page after 1.5 seconds
             setTimeout(() => {
@@ -664,13 +689,12 @@ function confirmOrderReceived(orderId, orderCode) {
     });
 }
 
-function confirmPickup(orderId, orderCode) {
+function confirmPickup(btn, orderId, orderCode) {
     if (!confirm(`Apakah Anda yakin sudah mengambil pesanan ${orderCode}?\n\nSetelah dikonfirmasi, status akan berubah menjadi "Selesai" dan Anda dapat memberikan review untuk produk.`)) {
         return;
     }
 
     // Show loading state
-    const btn = event.target.closest('button');
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
@@ -701,7 +725,10 @@ function confirmPickup(orderId, orderCode) {
                 <i class="bi bi-check-circle"></i> ${data.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+            const row = document.querySelector('.row');
+            if (row && row.parentNode) {
+                row.parentNode.insertBefore(alertDiv, row);
+            }
 
             // Reload page after 1.5 seconds
             setTimeout(() => {
@@ -833,7 +860,10 @@ document.getElementById('cancelOrderForm').addEventListener('submit', function(e
                 <i class="bi bi-check-circle"></i> ${data.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+            const row = document.querySelector('.row');
+            if (row && row.parentNode) {
+                row.parentNode.insertBefore(alertDiv, row);
+            }
 
             // Reload page after 2 seconds
             setTimeout(() => {
