@@ -151,8 +151,29 @@
 
     <!-- Cancellations Table -->
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0 py-3 ps-4">
+        <div class="card-header bg-white border-0 py-3 ps-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <h5 class="m-0 fw-bold text-success-emphasis">Daftar Permintaan Pembatalan</h5>
+            
+            <form action="{{ route('admin.cancellations.index') }}" method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Cari transaksi / alasan / pelanggan..." value="{{ request('search') }}">
+                </div>
+                
+                <select name="status" class="form-select form-select-sm" style="width: 150px;" onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
+                    <option value="diajukan" {{ request('status') === 'diajukan' ? 'selected' : '' }}>Perlu Review</option>
+                    <option value="disetujui" {{ request('status') === 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                    <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                </select>
+                
+                <button type="submit" class="btn btn-sm btn-success text-white">Filter</button>
+                @if(request()->filled('search') || request()->filled('status'))
+                    <a href="{{ route('admin.cancellations.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                @endif
+            </form>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -249,7 +270,7 @@
                 </div>
                 @if($cancellations->hasPages())
                     <div>
-                        {{ $cancellations->links('pagination.bootstrap-4') }}
+                        {{ $cancellations->appends(request()->query())->links('pagination.bootstrap-4') }}
                     </div>
                 @endif
             </div>

@@ -284,15 +284,44 @@ class AdminController extends Controller
         }
     }
 
-    public function staff()
+    public function staff(Request $request)
     {
         try {
-            // Get staff users with their biodata from tb_staff
-            $staff = User::whereIn('id_role', [1, 2, 3, 4])
-                        ->with('staff')
-                        ->orderBy('id_role')
-                        ->orderBy('email')
-                        ->get();
+            $search = $request->get('search', '');
+            $roleFilter = $request->get('role', '');
+            $statusFilter = $request->get('status', '');
+
+            // Build base query
+            $query = User::whereIn('id_role', [1, 2, 3, 4])->with('staff');
+
+            // Apply search
+            if (!empty($search)) {
+                $searchTerm = '%' . $search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('email', 'like', $searchTerm)
+                      ->orWhereHas('staff', function ($subQ) use ($searchTerm) {
+                          $subQ->where('nama_staff', 'like', $searchTerm)
+                               ->orWhere('no_tlp_staff', 'like', $searchTerm);
+                      });
+                });
+            }
+
+            // Apply role filter
+            if (!empty($roleFilter)) {
+                $query->where('id_role', $roleFilter);
+            }
+
+            // Apply status filter
+            if (!empty($statusFilter)) {
+                $statusVal = $statusFilter === 'active' ? 'aktif' : 'nonaktif';
+                $query->whereHas('staff', function ($q) use ($statusVal) {
+                    $q->where('status_akun', $statusVal);
+                });
+            }
+
+            $staff = $query->orderBy('id_role')
+                           ->orderBy('email')
+                           ->get();
 
             // Role options for dropdown
             $roles = [
@@ -302,7 +331,7 @@ class AdminController extends Controller
                 4 => 'Kurir',
             ];
 
-            return view('admin.staff.index', compact('staff', 'roles'));
+            return view('admin.staff.index', compact('staff', 'roles', 'search', 'roleFilter', 'statusFilter'));
         } catch (\Exception $e) {
             Log::error('Error loading staff list: ' . $e->getMessage());
             return back()->with('error', 'Maaf, terjadi kesalahan saat memuat data staff.');

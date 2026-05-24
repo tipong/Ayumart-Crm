@@ -10,12 +10,41 @@ use Illuminate\Support\Facades\Log;
 
 class MembershipController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $memberships = Membership::with(['user', 'user.pelanggan'])  // FIXED: Added eager loading for pelanggan
-                                    ->orderBy('id', 'desc')  // FIXED: Changed from created_at to id
-                                    ->paginate(15);
+            $search = $request->get('search', '');
+            $tierFilter = $request->get('tier', '');
+            $statusFilter = $request->get('status', '');
+
+            $query = Membership::with(['user', 'user.pelanggan']);
+
+            if (!empty($search)) {
+                $searchTerm = '%' . $search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('tier', 'like', $searchTerm)
+                      ->orWhereHas('user', function ($subQ) use ($searchTerm) {
+                          $subQ->where('email', 'like', $searchTerm)
+                               ->orWhereHas('pelanggan', function ($custQ) use ($searchTerm) {
+                                   $custQ->where('nama_pelanggan', 'like', $searchTerm);
+                               });
+                      });
+                });
+            }
+
+            if (!empty($tierFilter)) {
+                $query->where('tier', $tierFilter);
+            }
+
+            if ($statusFilter !== '') {
+                if ($statusFilter === 'active') {
+                    $query->where('is_active', true);
+                } elseif ($statusFilter === 'inactive') {
+                    $query->where('is_active', false);
+                }
+            }
+
+            $memberships = $query->orderBy('id', 'desc')->paginate(15);
 
             $tiers = ['bronze', 'silver', 'gold', 'platinum'];
             $tierCounts = [
@@ -31,7 +60,7 @@ class MembershipController extends Controller
                                             ->whereDoesntHave('membership')
                                             ->get();
 
-            return view('admin.memberships.index', compact('memberships', 'tiers', 'tierCounts', 'customersWithoutMembership'));
+            return view('admin.memberships.index', compact('memberships', 'tiers', 'tierCounts', 'customersWithoutMembership', 'search', 'tierFilter', 'statusFilter'));
         } catch (\Exception $e) {
             Log::error('Error loading memberships: ' . $e->getMessage());
             return back()->with('error', 'Maaf, terjadi kesalahan saat memuat data membership.');

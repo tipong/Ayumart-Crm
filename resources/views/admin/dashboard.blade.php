@@ -238,7 +238,7 @@
                                 </div>
                                 <div class="flex-grow-1 ms-3">
                                     <div class="product-name">
-                                        <span class="badge bg-success bg-opacity-15 text-success me-2">{{ $index + 1 }}</span>
+                                        <span class="badge text-dark bg-warning bg-opacity-15 text-success me-2">{{ $index + 1 }}</span>
                                         {{ Str::limit($product->nama_produk, 35) }}
                                     </div>
                                     <div class="product-sold">

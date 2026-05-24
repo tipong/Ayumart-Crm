@@ -39,11 +39,40 @@
 
     <!-- Staff Table Card -->
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 py-3 ps-4 d-flex justify-content-between align-items-center">
+        <div class="card-header bg-white border-0 py-3 ps-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <h5 class="m-0 fw-bold text-success-emphasis">
                 <i class="bi bi-list-ul text-success me-1"></i> Daftar Staff Terdaftar
             </h5>
-            <span class="text-muted small">Total Staff: <strong>{{ $staff->count() }}</strong></span>
+            
+            <form action="{{ route('admin.staff.index') }}" method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="input-group input-group-sm" style="width: 220px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Cari nama, email, telepon..." value="{{ request('search') }}">
+                </div>
+                
+                <select name="role" class="form-select form-select-sm" style="width: 140px;" onchange="this.form.submit()">
+                    <option value="">Semua Role</option>
+                    @foreach($roles as $roleId => $roleName)
+                        <option value="{{ $roleId }}" {{ request('role') == $roleId ? 'selected' : '' }}>
+                            {{ $roleName }}
+                        </option>
+                    @endforeach
+                </select>
+                
+                <select name="status" class="form-select form-select-sm" style="width: 130px;" onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                </select>
+                
+                <button type="submit" class="btn btn-sm btn-success text-white">Filter</button>
+                @if(request()->filled('search') || request()->filled('role') || request()->filled('status'))
+                    <a href="{{ route('admin.staff.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                @endif
+                <span class="text-muted small ms-md-2">Total Staff: <strong>{{ $staff->count() }}</strong></span>
+            </form>
         </div>
         <div class="card-body p-0">
             @if($staff->count() > 0)
@@ -70,7 +99,6 @@
                                             </div>
                                             <div>
                                                 <span class="fw-bold text-dark d-block">{{ $user->name }}</span>
-                                                <small class="text-muted" style="font-size: 0.8rem;">ID: #{{ $user->id_user }}</small>
                                             </div>
                                         </div>
                                     </td>

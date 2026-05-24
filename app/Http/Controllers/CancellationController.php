@@ -175,12 +175,32 @@ class CancellationController extends Controller
     /**
      * Show cancellation list for admin
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $cancellations = PembatalanTransaksi::with(['transaksi.pelanggan'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(15);
+            $search = $request->get('search', '');
+            $statusFilter = $request->get('status', '');
+
+            $query = PembatalanTransaksi::with(['transaksi.pelanggan']);
+
+            if (!empty($search)) {
+                $searchTerm = '%' . $search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('alasan_pembatalan', 'like', $searchTerm)
+                      ->orWhereHas('transaksi', function ($subQ) use ($searchTerm) {
+                          $subQ->where('kode_transaksi', 'like', $searchTerm)
+                               ->orWhereHas('pelanggan', function ($custQ) use ($searchTerm) {
+                                   $custQ->where('nama_pelanggan', 'like', $searchTerm);
+                               });
+                      });
+                });
+            }
+
+            if (!empty($statusFilter)) {
+                $query->where('status_pembatalan', $statusFilter);
+            }
+
+            $cancellations = $query->orderBy('created_at', 'desc')->paginate(15);
 
             $statusCounts = [
                 'pending' => PembatalanTransaksi::where('status_pembatalan', 'diajukan')->count(),
@@ -188,7 +208,7 @@ class CancellationController extends Controller
                 'rejected' => PembatalanTransaksi::where('status_pembatalan', 'ditolak')->count(),
             ];
 
-            return view('admin.cancellations.index', compact('cancellations', 'statusCounts'));
+            return view('admin.cancellations.index', compact('cancellations', 'statusCounts', 'search', 'statusFilter'));
         } catch (\Exception $e) {
             Log::error('Error loading cancellations: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan saat memuat data pembatalan');

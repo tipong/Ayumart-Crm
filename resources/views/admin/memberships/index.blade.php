@@ -135,10 +135,38 @@
 
     <!-- Memberships Table Card -->
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
+        <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <h6 class="m-0 font-weight-bold text-primary">
                 <i class="fas fa-list"></i> Daftar Membership
             </h6>
+            
+            <form action="{{ route('admin.memberships.index') }}" method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="input-group input-group-sm" style="width: 220px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Cari nama, email, tier..." value="{{ request('search') }}">
+                </div>
+                
+                <select name="tier" class="form-select form-select-sm" style="width: 140px;" onchange="this.form.submit()">
+                    <option value="">Semua Tier</option>
+                    <option value="bronze" {{ request('tier') === 'bronze' ? 'selected' : '' }}>Bronze</option>
+                    <option value="silver" {{ request('tier') === 'silver' ? 'selected' : '' }}>Silver</option>
+                    <option value="gold" {{ request('tier') === 'gold' ? 'selected' : '' }}>Gold</option>
+                    <option value="platinum" {{ request('tier') === 'platinum' ? 'selected' : '' }}>Platinum</option>
+                </select>
+                
+                <select name="status" class="form-select form-select-sm" style="width: 130px;" onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                </select>
+                
+                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                @if(request()->filled('search') || request()->filled('tier') || request()->filled('status'))
+                    <a href="{{ route('admin.memberships.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                @endif
+            </form>
         </div>
         <div class="card-body">
             @if($memberships->count() > 0)
@@ -237,7 +265,7 @@
                         Menampilkan {{ $memberships->firstItem() ?? 0 }} - {{ $memberships->lastItem() ?? 0 }} dari {{ $memberships->total() }} membership
                     </div>
                     <div>
-                        {{ $memberships->links('pagination::bootstrap-5') }}
+                        {{ $memberships->appends(request()->query())->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             @else
