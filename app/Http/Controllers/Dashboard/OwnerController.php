@@ -8,6 +8,7 @@ use App\Models\Pelanggan;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\Cabang;
+use App\Models\Membership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,13 +30,14 @@ class OwnerController extends Controller
             ->map(function($t) { return $t->getTotalAmount(); })
             ->sum();
 
-        // Get transaction statistics (excluding cancelled)
-        $totalTransactions = Order::whereDoesntHave('cancellation', function($q) {
-            $q->where('status_pembatalan', 'disetujui');
-        })->count();
+        // Get transaction statistics (only successful/paid transactions, excluding cancelled)
+        $totalTransactions = Order::where('status_pembayaran', 'sudah_bayar')
+            ->whereDoesntHave('cancellation', function($q) {
+                $q->where('status_pembatalan', 'disetujui');
+            })->count();
 
-        // Get customer statistics
-        $totalCustomers = Pelanggan::count();
+        // Get customer statistics (based on total active members)
+        $totalCustomers = Membership::where('is_active', true)->count();
 
         // Get product statistics (Total item yang terjual, bukan jumlah SKU)
         $totalProducts = DB::table('tb_detail_transaksi as dt')

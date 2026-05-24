@@ -210,7 +210,7 @@ class AdminController extends Controller
             $transactionData = Order::select(
                     DB::raw('MONTH(tanggal_transaksi) as month'),
                     DB::raw('COUNT(*) as count'),
-                    DB::raw('SUM(total_harga - total_diskon) as total_revenue')
+                    DB::raw('SUM(total_harga - total_diskon + ongkir + COALESCE(biaya_membership, 0)) as total_revenue')
                 )
                 ->whereYear('tanggal_transaksi', $currentYear)
                 ->where('status_pembayaran', 'sudah_bayar')
@@ -819,7 +819,7 @@ class AdminController extends Controller
         $transactionData = Order::select(
                 DB::raw('MONTH(tanggal_transaksi) as month'),
                 DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(total_harga - total_diskon) as total_revenue')
+                DB::raw('SUM(total_harga - total_diskon + ongkir + COALESCE(biaya_membership, 0)) as total_revenue')
             )
             ->whereYear('tanggal_transaksi', $year)
             ->where('status_pembayaran', 'sudah_bayar')
