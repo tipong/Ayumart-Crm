@@ -26,8 +26,11 @@ class AdminController extends Controller
     public function index()
     {
         try {
-            // Use Order model (tb_transaksi) - our restructured system
-            $totalOrders = Order::count();
+            // Use Order model (tb_transaksi) - count only successful transactions
+            $totalOrders = Order::where('status_pembayaran', 'sudah_bayar')
+                ->whereDoesntHave('cancellation', function($q) {
+                    $q->where('status_pembatalan', 'disetujui');
+                })->count();
             $pendingOrders = Order::where('status_pembayaran', 'belum_bayar')->count();
 
             // Count total staff (users with id_role 1-4: Owner, Admin, CS, Kurir)

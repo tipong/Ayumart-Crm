@@ -461,7 +461,11 @@ class PelangganController extends Controller
             ->with(['produkIntegrasi', 'product'])
             ->get();
 
-        return view('pelanggan.wishlist', compact('wishlistItems'));
+        // Get membership tier
+        $membership = $user->membership;
+        $customerTier = ($membership && $membership->is_active) ? $membership->tier : null;
+
+        return view('pelanggan.wishlist', compact('wishlistItems', 'customerTier'));
     }
 
     /**

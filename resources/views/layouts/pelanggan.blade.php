@@ -1029,7 +1029,6 @@
     <div class="footer-bottom">
         <div class="container">
             &copy; {{ date('Y') }} <strong style="color:rgba(255,255,255,0.85);">AyuMart Supermarket</strong>. Hak Cipta Dilindungi.
-            &nbsp;|&nbsp; Dibuat dengan <i class="bi bi-heart-fill" style="color:var(--accent);"></i> untuk keluarga Indonesia
         </div>
     </div>
 </footer>

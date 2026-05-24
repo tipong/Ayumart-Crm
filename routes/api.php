@@ -74,7 +74,7 @@ Route::middleware(['auth:web'])->get('/tickets/count', function (Request $reques
         Log::info('Ticket count for user: ' . $user->id . ' (' . $user->email . ')');
 
         // Count unread tickets for this user (tickets with new messages from CS)
-        $count = Ticket::where('2', $user->id)
+        $count = Ticket::where('user_id', $user->id_user)
             ->where('is_read', false)
             ->count();
 

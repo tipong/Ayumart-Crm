@@ -26,11 +26,30 @@ class NewsletterController extends Controller
     /**
      * Display a listing of newsletters
      */
-    public function index()
+    public function index(Request $request)
     {
-        $newsletters = Newsletter::with('creator')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Newsletter::with('creator');
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                  ->orWhere('subjek_email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('metode_pengiriman')) {
+            $query->where('metode_pengiriman', $request->input('metode_pengiriman'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $newsletters = $query->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
 
         return view('cs.newsletters.index', compact('newsletters'));
     }

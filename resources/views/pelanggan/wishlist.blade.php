@@ -36,7 +36,8 @@
     }
     .wl-img-wrap img {
         width: 100%; height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        padding: 8px;
         transition: transform 0.4s ease;
     }
     .wl-card:hover .wl-img-wrap img { transform: scale(1.06); }
@@ -185,18 +186,16 @@
                 <i class="bi bi-heart-fill text-danger me-1"></i>
                 <strong style="color:var(--text-dark);">{{ $wishlistItems->count() }}</strong> produk di wishlist
             </div>
-            <a href="{{ route('home') }}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-plus-circle me-1"></i> Tambah Produk
-            </a>
         </div>
 
         <!-- Grid -->
         <div class="row g-3">
             @foreach($wishlistItems as $item)
             @php
-                $hasDiscount = $item->produk->hasActiveDiscount();
-                $discountPct = $hasDiscount ? $item->produk->persentase_diskon : 0;
-                $currentPrice = $item->produk->getCurrentPrice();
+                $custTier = $customerTier ?? null;
+                $currentPrice = $item->produk->getCurrentPrice($custTier);
+                $hasDiscount = $currentPrice < $item->produk->harga_produk;
+                $discountPct = $hasDiscount ? round((($item->produk->harga_produk - $currentPrice) / $item->produk->harga_produk) * 100) : 0;
             @endphp
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="wl-card">

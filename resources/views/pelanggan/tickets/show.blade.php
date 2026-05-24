@@ -69,25 +69,25 @@
 
                 <div class="card-body bg-light" style="flex-grow: 1; height: 450px; overflow-y: auto;" id="chatContainer">
                     @forelse($ticket->messages as $message)
-                    <div class="message-item mb-3 {{ $message->user_id === auth()->id() ? 'text-end' : '' }}">
+                    <div class="message-item mb-3 {{ $message->user_id == auth()->id() ? 'text-end' : '' }}">
                         <div class="d-inline-block" style="max-width: 70%;">
-                            <div class="card shadow-none border-0 {{ $message->user_id === auth()->id() ? 'bg-primary text-white' : 'bg-white' }}" style="border-radius: 12px;">
+                            <div class="card shadow-none border-0 {{ $message->user_id == auth()->id() ? 'bg-primary text-white' : 'bg-white' }}" style="border-radius: 12px;">
                                 <div class="card-body py-2 px-3 text-start">
                                     <div class="d-flex align-items-center justify-content-between mb-1 gap-3">
                                         <strong class="small">
-                                            @if($message->user_id === auth()->id())
+                                            @if($message->user_id == auth()->id())
                                                 <i class="bi bi-person-circle"></i> Anda
                                             @else
                                                 <i class="bi bi-headset"></i> Customer Service
                                             @endif
                                         </strong>
-                                        <small class="{{ $message->user_id === auth()->id() ? 'text-white-50' : 'text-muted' }}">
+                                        <small class="{{ $message->user_id == auth()->id() ? 'text-white-50' : 'text-muted' }}">
                                             {{ $message->created_at->diffForHumans() }}
                                         </small>
                                     </div>
                                     <p class="mb-0" style="white-space: pre-wrap; font-size: 14px;">{{ $message->message }}</p>
                                     <div class="text-end mt-1">
-                                        <small class="{{ $message->user_id === auth()->id() ? 'text-white-50' : 'text-muted' }}" style="font-size: 10px;">
+                                        <small class="{{ $message->user_id == auth()->id() ? 'text-white-50' : 'text-muted' }}" style="font-size: 10px;">
                                             {{ $message->created_at->format('H:i') }}
                                         </small>
                                     </div>
@@ -317,19 +317,20 @@ setInterval(function() {
                 const currentScroll = chatContainer.scrollTop;
                 const currentHeight = chatContainer.scrollHeight;
                 const newMessageCount = newChat.querySelectorAll('.message-item').length;
+                const hasNewMessage = newMessageCount > lastMessageCount;
 
                 // Update chat content
                 chatContainer.innerHTML = newChat.innerHTML;
 
                 // Auto scroll only if user was at bottom or new message arrived
-                if (currentScroll + chatContainer.clientHeight >= currentHeight - 100 || newMessageCount > lastMessageCount) {
+                if (currentScroll + chatContainer.clientHeight >= currentHeight - 100 || hasNewMessage) {
                     smoothScrollToBottom();
                 }
 
                 lastMessageCount = newMessageCount;
 
                 // Show notification if new message
-                if (newMessageCount > lastMessageCount) {
+                if (hasNewMessage) {
                     // Could add sound notification here
                     console.log('New message received!');
                 }

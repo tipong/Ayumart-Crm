@@ -322,7 +322,7 @@
 
                 <a class="nav-link {{ request()->routeIs('admin.discounts.*') ? 'active' : '' }}"
                    href="{{ route('admin.discounts.index') }}">
-                    <i class="bi bi-tags-fill"></i> Diskon Cabang
+                    <i class="bi bi-tags-fill"></i> Diskon Produk
                 </a>
 
                 <a class="nav-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}"

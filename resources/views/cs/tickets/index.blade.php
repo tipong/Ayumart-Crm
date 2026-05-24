@@ -558,9 +558,6 @@
                                     <a href="{{ route('cs.tickets.show', $ticket->id) }}" class="btn btn-outline-primary" title="Lihat Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <button class="btn btn-outline-success" title="Balas" onclick="replyTicket({{ $ticket->id }})" type="button">
-                                        <i class="fas fa-reply"></i>
-                                    </button>
                                     <button class="btn btn-outline-danger" title="Hapus" onclick="deleteTicket({{ $ticket->id }})" type="button">
                                         <i class="fas fa-trash"></i>
                                     </button>

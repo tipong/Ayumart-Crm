@@ -97,6 +97,23 @@
             display: none;
         }
     }
+
+    /* Filter Card Styling */
+    .filter-card {
+        background: white;
+        border-radius: 0.75rem;
+        border: 1px solid #e9ecef;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-card .form-label {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
 </style>
 @endpush
 
@@ -164,6 +181,48 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+
+    <!-- Filter Card -->
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('cs.newsletters.index') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-dark mb-2">Metode Pengiriman</label>
+                    <select name="metode_pengiriman" class="form-select">
+                        <option value="">Semua Metode</option>
+                        <option value="mailchimp" {{ request('metode_pengiriman') === 'mailchimp' ? 'selected' : '' }}>Mailchimp</option>
+                        <option value="fonnte" {{ request('metode_pengiriman') === 'fonnte' ? 'selected' : '' }}>Fonnte (WhatsApp)</option>
+                        <option value="keduanya" {{ request('metode_pengiriman') === 'keduanya' ? 'selected' : '' }}>Keduanya</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-dark mb-2">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="mengirim" {{ request('status') === 'mengirim' ? 'selected' : '' }}>Mengirim</option>
+                        <option value="terkirim" {{ request('status') === 'terkirim' ? 'selected' : '' }}>Terkirim</option>
+                        <option value="gagal" {{ request('status') === 'gagal' ? 'selected' : '' }}>Gagal</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-dark mb-2">Cari Newsletter</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0" value="{{ request('search') }}" placeholder="Cari judul atau subjek email...">
+                    </div>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Newsletters Table -->
     <div class="card shadow-sm border-0 rounded-3 mb-4">

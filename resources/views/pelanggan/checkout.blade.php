@@ -127,9 +127,6 @@
                                                                  <p class="mb-1 mt-1">{{ $address->nama_penerima }} - {{ $address->no_telp_penerima }}</p>
                                                                  <p class="text-muted small mb-0">{{ $address->formatted_address }}</p>
                                                              </div>
-                                                             <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="event.stopPropagation(); editAddress({{ $address->id }});" style="font-size: 0.75rem; border-radius: 6px;">
-                                                                 <i class="bi bi-pencil-square"></i> Edit
-                                                             </button>
                                                          </div>
                                                      </label>
                                                  </div>
