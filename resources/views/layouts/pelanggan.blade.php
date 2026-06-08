@@ -870,7 +870,7 @@
                 </li>
 
                 <!-- Notification Bell -->
-                <li class="nav-item dropdown">
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-icon-btn" href="#" id="notifBell" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi" aria-label="Notifikasi">
                         <i class="bi bi-bell" id="bellIcon"></i>
@@ -891,7 +891,7 @@
                             <a href="{{ route('pelanggan.notifications') }}"><i class="bi bi-list-ul me-1"></i>Lihat Semua Notifikasi</a>
                         </div>
                     </div>
-                </li>
+                </li> -->
 
                 <!-- Ticket -->
                 <li class="nav-item">

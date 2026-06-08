@@ -196,33 +196,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Info Section -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm bg-light-green-gradient">
-                <div class="card-body p-4 text-success-emphasis">
-                    <h5 class="fw-bold d-flex align-items-center mb-3">
-                        <i class="bi bi-shield-lock-fill me-2 text-success"></i> Kebijakan & Ketentuan Laporan
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <ul class="mb-0 ps-3">
-                                <li class="mb-2">Laporan penjualan hanya merekapitulasi transaksi dengan status <span class="badge bg-success">Sudah Bayar</span>.</li>
-                                <li class="mb-2">Transaksi yang dibatalkan atau kedaluwarsa tidak akan dimasukkan ke dalam perhitungan laba.</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="mb-0 ps-3">
-                                <li class="mb-2">Gunakan format **Tahun Sekarang** untuk data yang sedang berjalan guna mencerminkan kondisi real-time cabang.</li>
-                                <li>Dokumen PDF yang dihasilkan telah disesuaikan dengan format cetak kertas ukuran **A4 (Potrait)**.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection
 
