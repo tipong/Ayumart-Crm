@@ -932,7 +932,7 @@
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{{ route('pelanggan.profile') }}"><i class="bi bi-person-circle"></i> Profil Saya</a></li>
                         <li><a class="dropdown-item" href="{{ route('pelanggan.orders') }}"><i class="bi bi-bag-check"></i> Pesanan Saya</a></li>
-                        <li><a class="dropdown-item" href="{{ route('pelanggan.notifications') }}"><i class="bi bi-bell"></i> Notifikasi <span id="dropdown-notif-badge" class="badge ms-1" style="background:var(--accent);display:none;">0</span></a></li>
+                        <!-- <li><a class="dropdown-item" href="{{ route('pelanggan.notifications') }}"><i class="bi bi-bell"></i> Notifikasi <span id="dropdown-notif-badge" class="badge ms-1" style="background:var(--accent);display:none;">0</span></a></li> -->
                         <li><a class="dropdown-item" href="{{ route('pelanggan.reviews.index') }}"><i class="bi bi-star-fill" style="color:#f59e0b;"></i> Review Saya</a></li>
                         <li><a class="dropdown-item" href="{{ route('membership') }}"><i class="bi bi-award"></i> Membership</a></li>
                         <li><a class="dropdown-item" href="{{ route('pelanggan.wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>

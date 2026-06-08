@@ -374,7 +374,7 @@
                 <div class="d-flex align-items-center">
                     <span class="me-3 d-none d-md-inline text-muted small fw-semibold">
                         <i class="bi bi-calendar3 text-success me-1"></i>
-                        {{ \Carbon\Carbon::now()->translatedFormat('d, D F Y') }}
+                        {{ \Carbon\Carbon::now()->translatedFormat('D, d F Y') }}
                     </span>
 
                     <div class="dropdown">
